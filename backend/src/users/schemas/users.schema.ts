@@ -1,37 +1,49 @@
-import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsEmpty, IsNotEmpty, IsNumber } from "class-validator";
-import { ObjectId } from "mongoose";
+import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 
-export class CreateUserDto {
+@Schema({
+    timestamps: true
+})
+export class User{
 
+    @Prop()
     first_name: string;
 
+    @Prop()
     last_name: string;
 
+    @Prop()
     email_address: string;
 
+    @Prop()
     profile_picture: string;
 
+    @Prop()
     contact_number: string;
 
+    @Prop()
     address: string;
 
-    @IsDate()
-    @Type(() => Date)
+    @Prop()
     birthday: Date;
 
+    @Prop()
     civil_status: string;
 
+    @Prop()
     user_type: string;
 
-    @IsBoolean()
+    @Prop()
     isAuthenticated: string;
 
-    @IsDate()
-    @Type(() => Date)
+    @Prop()
     membership_date: Date;
 
+    @Prop()
     person_to_notify: string;
 
+    @Prop()
     fishing_vessel_type: string;
+
 }
+
+export const UserSchema = SchemaFactory.createForClass(User);

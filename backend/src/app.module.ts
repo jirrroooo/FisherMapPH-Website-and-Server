@@ -18,7 +18,7 @@ import { MongooseModule } from '@nestjs/mongoose';
   }),
   AlertsModule, UsersModule, WeathersModule,
   PositionsModule, ReportModule, LogsModule,
-  MongooseModule.forRoot(process.env.DB_URI, {dbName: process.env.DB_NAME})],
+  MongooseModule.forRoot(process.env.DB_URI)],
   controllers: [AppController],
   providers: [AppService],
 })
