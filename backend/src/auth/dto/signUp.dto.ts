@@ -20,10 +20,6 @@ export class SignUpDto {
     @MinLength(6)
     password: string;
 
-    @IsOptional()
-    @IsString()
-    profile_picture = "";
-
     @IsNotEmpty()
     @IsString()
     contact_number: string;
