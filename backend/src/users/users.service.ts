@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/users.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -39,6 +39,12 @@ export class UsersService {
   }
 
   async getUser(id: ObjectId): Promise<User> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     const user = await this.userModel.findById(id);
 
     if(!user){
@@ -49,6 +55,12 @@ export class UsersService {
   }
 
   async updateUser(id: ObjectId, updateUserDto: UpdateUserDto): Promise<User> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.userModel.findByIdAndUpdate(id, updateUserDto, {
       new: true,
       runValidators: true
@@ -56,6 +68,12 @@ export class UsersService {
   }
 
   async removeUser(id: ObjectId): Promise<User> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.userModel.findByIdAndRemove(id);
   }
 }

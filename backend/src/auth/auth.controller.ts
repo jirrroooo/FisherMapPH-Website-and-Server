@@ -10,12 +10,12 @@ export class AuthController {
     ) {}
     
     @Post('/signup')
-    signUp(@Body(new ValidationPipe()) signUpDto: SignUpDto): Promise<{ status: string }> {
+    signUp(@Body() signUpDto: SignUpDto): Promise<{ status: string }> {
         return this.authService.signUp(signUpDto);
     }
 
     @Get('/login')
-    login(@Body(new ValidationPipe()) logInDto: LogInDto): Promise<{ token: string }> {
+    login(@Body() logInDto: LogInDto): Promise<{ token: string }> {
         return this.authService.login(logInDto);
     }
 

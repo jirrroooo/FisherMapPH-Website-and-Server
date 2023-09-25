@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsEmpty, IsNotEmpty, IsNumber } from "class-validator";
+import { IsBoolean, IsDate, IsEmpty, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { ObjectId } from "mongoose";
 
 export class CreateReportDto {
@@ -10,7 +10,9 @@ export class CreateReportDto {
     @IsNotEmpty()
     position_id: ObjectId;
 
+    @IsString()
     type: string;
 
+    @IsString()
     content: string;
 }

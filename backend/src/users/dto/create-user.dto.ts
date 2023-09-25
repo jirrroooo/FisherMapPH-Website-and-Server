@@ -1,6 +1,5 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsEmail, IsEmpty, IsNotEmpty, IsNumber, IsString, MinLength } from "class-validator";
-import { ObjectId } from "mongoose";
+import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, } from "class-validator";
 
 export class CreateUserDto {
 
@@ -21,7 +20,9 @@ export class CreateUserDto {
     @MinLength(6)
     password: string;
 
-    profile_picture: string;
+    @IsOptional()
+    @IsString()
+    profile_picture = "";
 
     @IsNotEmpty()
     @IsString()
@@ -43,18 +44,20 @@ export class CreateUserDto {
     @IsString()
     user_type: string;
 
+    @IsOptional()
     @IsBoolean()
-    isAuthenticated: string;
+    isAuthenticated = false;
 
+    @IsOptional()
     @IsDate()
     @Type(() => Date)
-    membership_date: Date;
+    membership_date = null;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    person_to_notify: string;
+    person_to_notify = "";
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
-    fishing_vessel_type: string;
+    fishing_vessel_type = "";
 }

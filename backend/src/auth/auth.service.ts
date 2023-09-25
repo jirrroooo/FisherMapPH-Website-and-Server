@@ -26,14 +26,14 @@ export class AuthService {
       birthday,
       civil_status,
       user_type,
+      isAuthenticated,
+      membership_date,
       fishing_vessel_type,
       person_to_notify,
     } = signUpDto;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let isAuthenticated = false;
-    let membership_date = null;
 
     const user = await this.userModel.create({
         first_name,

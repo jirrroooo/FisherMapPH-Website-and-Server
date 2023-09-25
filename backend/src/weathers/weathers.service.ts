@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { UpdateWeatherDto } from './dto/update-weather.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Weather } from './schemas/weathers.schema';
@@ -38,6 +38,12 @@ export class WeathersService {
   }
 
   async getWeather(id: ObjectId): Promise<Weather> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     const weather = await this.weatherModel.findById(id);
 
     if(!weather){
@@ -48,6 +54,12 @@ export class WeathersService {
   }
 
   async updateWeather(id: ObjectId, updateWeatherDto: UpdateWeatherDto): Promise<Weather> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.weatherModel.findByIdAndUpdate(id, updateWeatherDto, {
       new: true,
       runValidators: true
@@ -55,6 +67,12 @@ export class WeathersService {
   }
 
   async removeWeather(id: ObjectId): Promise<Weather> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.weatherModel.findByIdAndRemove(id);
   }
 }

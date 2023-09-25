@@ -36,7 +36,7 @@ export class User{
     user_type: string;
 
     @Prop()
-    isAuthenticated: string;
+    isAuthenticated: boolean;
 
     @Prop()
     membership_date: Date;

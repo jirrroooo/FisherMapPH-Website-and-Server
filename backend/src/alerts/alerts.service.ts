@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UpdateAlertDto } from './dto/update-alert.dto';
 import { Alert } from './schemas/alerts.schema';
@@ -40,6 +40,12 @@ export class AlertsService {
   }
 
   async getAlert(id: ObjectId): Promise<Alert> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     const alert = await this.alertModel.findById(id);
 
     if(!alert){
@@ -50,6 +56,12 @@ export class AlertsService {
   }
 
   async updateAlert(id: ObjectId, updateAlertDto: UpdateAlertDto): Promise<Alert> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.alertModel.findByIdAndUpdate(id, updateAlertDto, {
       new: true,
       runValidators: true
@@ -57,6 +69,12 @@ export class AlertsService {
   }
 
   async removeAlert(id: ObjectId): Promise<Alert> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.alertModel.findByIdAndRemove(id);
   }
 }

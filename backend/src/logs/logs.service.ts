@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { UpdateLogDto } from './dto/update-log.dto';
 import { Log } from './schemas/logs.schema';
 import * as mongoose from 'mongoose';
@@ -38,6 +38,12 @@ export class LogsService {
   }
 
   async getLog(id: ObjectId): Promise<Log> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     const log = await this.logModel.findById(id);
 
     if(!log){
@@ -48,6 +54,12 @@ export class LogsService {
   }
 
   async updateLog(id: ObjectId, updateLogDto: UpdateLogDto) {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.logModel.findByIdAndUpdate(id, updateLogDto, {
       new: true,
       runValidators: true
@@ -55,6 +67,12 @@ export class LogsService {
   }
 
   async removeLog(id: ObjectId) {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+    
     return await this.logModel.findByIdAndRemove(id);
   }
 }

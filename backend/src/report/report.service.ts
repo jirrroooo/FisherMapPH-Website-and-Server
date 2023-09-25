@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { ObjectId } from 'mongoose';
@@ -39,6 +39,12 @@ export class ReportsService {
   }
 
   async getReport(id: ObjectId): Promise<Report> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     const report = await this.reportModel.findById(id);
 
     if(!report){
@@ -49,6 +55,12 @@ export class ReportsService {
   }
 
   async updateReport(id: ObjectId, updateReportDto: UpdateReportDto): Promise<Report> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.reportModel.findByIdAndUpdate(id, updateReportDto, {
       new: true,
       runValidators: true
@@ -56,6 +68,12 @@ export class ReportsService {
   }
 
   async removeReport(id: ObjectId): Promise<Report> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.reportModel.findByIdAndRemove(id);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { UpdatePositionDto } from './dto/update-position.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { ObjectId } from 'mongoose';
@@ -38,6 +38,12 @@ export class PositionsService {
   }
 
   async getPosition(id: ObjectId): Promise<Position> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     const position = await this.positionModel.findById(id);
 
     if(!position){
@@ -48,6 +54,12 @@ export class PositionsService {
   }
 
   async updatePosition(id: ObjectId, updatePositionDto: UpdatePositionDto): Promise<Position> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
     return await this.positionModel.findByIdAndUpdate(id, updatePositionDto, {
       new: true,
       runValidators: true
@@ -55,6 +67,12 @@ export class PositionsService {
   }
 
   async removePosition(id: ObjectId): Promise<Position> {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if(!isValidId){
+      throw new BadRequestException('Please enter valid ID.');
+    }
+    
     return await this.positionModel.findByIdAndRemove(id);
   }
 }
