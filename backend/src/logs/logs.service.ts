@@ -4,7 +4,7 @@ import { Log } from './schemas/logs.schema';
 import * as mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId } from 'mongoose';
-
+import { Query } from 'express-serve-static-core';
 @Injectable()
 export class LogsService {
 
@@ -18,8 +18,22 @@ export class LogsService {
     return res;
   }
 
-  async getLogs(): Promise<Log[]> {
-    const alerts = await this.logModel.find().sort({createdAt: -1});
+  async getLogs(query: Query): Promise<Log[]> {
+    const responsePerPage = 10;
+    const currentPage = Number(query.page) || 1;
+    const skip = responsePerPage * (currentPage - 1);
+
+    const keyword = query.keyword ? {
+      title: {
+        $regex: query.keyword,
+        $options: 'i'
+      }
+    } : {}
+
+    const alerts = await this.logModel.find({...keyword})
+    .sort({createdAt: -1})
+    .limit(responsePerPage)
+    .skip(skip);
     return alerts;
   }
 

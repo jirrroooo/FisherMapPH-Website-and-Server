@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ReportsService } from './report.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { ObjectId } from 'mongoose';
 import { Report } from './schemas/reports.schema';
+
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('reports')
 export class ReportsController {
@@ -15,8 +17,8 @@ export class ReportsController {
   }
 
   @Get()
-  async getReports(): Promise<Report[]> {
-    return this.reportsService.getReports();
+  async getReports(@Query() query: ExpressQuery): Promise<Report[]> {
+    return this.reportsService.getReports(query);
   }
 
   @Get(':id')

@@ -4,6 +4,8 @@ import { User } from './schemas/users.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { ObjectId } from 'mongoose';
 
+import { Query } from 'express-serve-static-core';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -16,8 +18,23 @@ export class UsersService {
     return res;
   }
 
-  async getUsers(): Promise<User[]> {
-    const users = await this.userModel.find().sort({createdAt: -1});
+  async getUsers(query: Query): Promise<User[]> {
+    const responsePerPage = 10;
+    const currentPage = Number(query.page) || 1;
+    const skip = responsePerPage * (currentPage - 1);
+
+    const keyword = query.keyword ? {
+      title: {
+        $regex: query.keyword,
+        $options: 'i'
+      }
+    } : {}
+
+    const users = await this.userModel.find()
+    .sort({createdAt: -1})
+    .limit(responsePerPage)
+    .skip(skip);
+
     return users;
   }
 

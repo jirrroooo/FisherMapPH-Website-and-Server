@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Weather } from './schemas/weathers.schema';
 import mongoose, { ObjectId } from 'mongoose';
 
+import { Query } from 'express-serve-static-core';
 @Injectable()
 export class WeathersService {
   constructor(
@@ -16,8 +17,23 @@ export class WeathersService {
     return res;
   }
 
-  async getWeathers(): Promise<Weather[]> {
-    const weathers = await this.weatherModel.find().sort({createdAt: -1});
+  async getWeathers(query: Query): Promise<Weather[]> {
+    const responsePerPage = 10;
+    const currentPage = Number(query.page) || 1;
+    const skip = responsePerPage * (currentPage - 1);
+
+    const keyword = query.keyword ? {
+      title: {
+        $regex: query.keyword,
+        $options: 'i'
+      }
+    } : {}
+    
+    const weathers = await this.weatherModel.find()
+    .sort({createdAt: -1})
+    .limit(responsePerPage)
+    .skip(skip);
+
     return weathers;
   }
 

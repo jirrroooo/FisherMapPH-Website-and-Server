@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { AlertsService } from './alerts.service';
 import { CreateAlertDto } from './dto/create-alert.dto';
 import { UpdateAlertDto } from './dto/update-alert.dto';
 import { Alert } from './schemas/alerts.schema';
 import { ObjectId } from 'mongoose';
+
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('alerts')
 export class AlertsController {
@@ -15,8 +17,8 @@ export class AlertsController {
   }
 
   @Get()
-  async getAlerts(): Promise<Alert[]> {
-    return this.alertsService.getAlerts();
+  async getAlerts(@Query() query: ExpressQuery): Promise<Alert[]> {
+    return this.alertsService.getAlerts(query);
   }
 
   @Get(':id')

@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { LogsService } from './logs.service';
 import { CreateLogDto } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
 import { ObjectId } from 'mongoose';
 import { Log } from './schemas/logs.schema';
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('logs')
 export class LogsController {
@@ -15,8 +16,8 @@ export class LogsController {
   }
 
   @Get()
-  async getLogs(): Promise<Log[]> {
-    return this.logsService.getLogs();
+  async getLogs(@Query() query: ExpressQuery): Promise<Log[]> {
+    return this.logsService.getLogs(query);
   }
 
   @Get(':id')

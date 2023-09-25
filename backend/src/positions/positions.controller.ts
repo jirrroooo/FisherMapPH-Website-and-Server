@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { PositionsService } from './positions.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
 import { ObjectId } from 'mongoose';
 import { Position } from './schemas/positions.schema';
+import { Query as ExpressQuery } from 'express-serve-static-core';
+
 
 @Controller('positions')
 export class PositionsController {
@@ -15,8 +17,8 @@ export class PositionsController {
   }
 
   @Get()
-  async getPositions(): Promise<Position[]> {
-    return this.positionsService.getPositions();
+  async getPositions(@Query() query: ExpressQuery): Promise<Position[]> {
+    return this.positionsService.getPositions(query);
   }
 
   @Get(':id')

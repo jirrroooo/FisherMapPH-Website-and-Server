@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { WeathersService } from './weathers.service';
 import { CreateWeatherDto } from './dto/create-weather.dto';
 import { UpdateWeatherDto } from './dto/update-weather.dto';
 import { Weather } from './schemas/weathers.schema';
 import { ObjectId } from 'mongoose';
+
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('weathers')
 export class WeathersController {
@@ -15,8 +17,8 @@ export class WeathersController {
   }
 
   @Get()
-  async getWeathers(): Promise<Weather[]> {
-    return this.weathersService.getWeathers();
+  async getWeathers(@Query() query: ExpressQuery): Promise<Weather[]> {
+    return this.weathersService.getWeathers(query);
   }
 
   @Get(':id')
