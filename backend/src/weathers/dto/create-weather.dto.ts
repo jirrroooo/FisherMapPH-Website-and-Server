@@ -2,7 +2,7 @@ import { Type } from "class-transformer";
 import { IsBoolean, IsDate, IsEmpty, IsNotEmpty, IsNumber } from "class-validator";
 import { ObjectId } from "mongoose";
 
-export class CreateAlertDto {
+export class CreateWeatherDto {
 
     headline: string;
 

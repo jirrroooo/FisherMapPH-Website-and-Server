@@ -10,8 +10,8 @@ export class Report{
     // @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     // user_id: User;
 
-    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Position'})
-    position_id: Position
+    // @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Position'})
+    // position_id: Position
 
     @Prop()
     type: string;

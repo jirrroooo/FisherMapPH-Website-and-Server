@@ -1,34 +1,36 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ReportService } from './report.service';
+import { ReportsService } from './report.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
+import { ObjectId } from 'mongoose';
+import { Report } from './schemas/reports.schema';
 
-@Controller('report')
-export class ReportController {
-  constructor(private readonly reportService: ReportService) {}
+@Controller('reports')
+export class ReportsController {
+  constructor(private readonly reportsService: ReportsService) {}
 
   @Post()
-  create(@Body() createReportDto: CreateReportDto) {
-    return this.reportService.create(createReportDto);
+  async newReport(@Body() report: CreateReportDto): Promise<Report> {
+    return this.reportsService.newReport(report);
   }
 
   @Get()
-  findAll() {
-    return this.reportService.findAll();
+  async getReports(): Promise<Report[]> {
+    return this.reportsService.getReports();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reportService.findOne(+id);
+  async getReport(@Param('id') id: ObjectId) {
+    return this.reportsService.getReport(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReportDto: UpdateReportDto) {
-    return this.reportService.update(+id, updateReportDto);
+  async updateReport(@Param('id') id: ObjectId, @Body() updateReportDto: UpdateReportDto) {
+    return this.reportsService.updateReport(id, updateReportDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reportService.remove(+id);
+  async removeReport(@Param('id') id: ObjectId) {
+    return this.reportsService.removeReport(id);
   }
 }

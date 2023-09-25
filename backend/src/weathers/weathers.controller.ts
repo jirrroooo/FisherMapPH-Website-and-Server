@@ -2,33 +2,35 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { WeathersService } from './weathers.service';
 import { CreateWeatherDto } from './dto/create-weather.dto';
 import { UpdateWeatherDto } from './dto/update-weather.dto';
+import { Weather } from './schemas/weathers.schema';
+import { ObjectId } from 'mongoose';
 
 @Controller('weathers')
 export class WeathersController {
   constructor(private readonly weathersService: WeathersService) {}
 
   @Post()
-  create(@Body() createWeatherDto: CreateWeatherDto) {
-    return this.weathersService.create(createWeatherDto);
+  async newWeather(@Body() weather: CreateWeatherDto) {
+    return this.weathersService.newWeather(weather);
   }
 
   @Get()
-  findAll() {
-    return this.weathersService.findAll();
+  async getWeathers(): Promise<Weather[]> {
+    return this.weathersService.getWeathers();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.weathersService.findOne(+id);
+  async getWeather(@Param('id') id: ObjectId) {
+    return this.weathersService.getWeather(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWeatherDto: UpdateWeatherDto) {
-    return this.weathersService.update(+id, updateWeatherDto);
+  async updateWeather(@Param('id') id: ObjectId, @Body() updateWeatherDto: UpdateWeatherDto) {
+    return this.weathersService.updateWeather(id, updateWeatherDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.weathersService.remove(+id);
+  async removeWeather(@Param('id') id: ObjectId) {
+    return this.weathersService.removeWeather(id);
   }
 }

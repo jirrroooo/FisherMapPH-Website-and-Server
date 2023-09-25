@@ -1,26 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { CreateWeatherDto } from './dto/create-weather.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateWeatherDto } from './dto/update-weather.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Weather } from './schemas/weathers.schema';
+import mongoose, { ObjectId } from 'mongoose';
 
 @Injectable()
 export class WeathersService {
-  create(createWeatherDto: CreateWeatherDto) {
-    return 'This action adds a new weather';
+  constructor(
+    @InjectModel(Weather.name)
+    private weatherModel: mongoose.Model<Weather>
+  ){}
+
+  async newWeather(weather: Weather): Promise<Weather>{
+    const res = await this.weatherModel.create(weather);
+    return res;
   }
 
-  findAll() {
-    return `This action returns all weathers`;
+  async getWeathers(): Promise<Weather[]> {
+    const weathers = await this.weatherModel.find().sort({createdAt: -1});
+    return weathers;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} weather`;
+  async getWeather(id: ObjectId): Promise<Weather> {
+    const weather = await this.weatherModel.findById(id);
+
+    if(!weather){
+      throw new NotFoundException('Weather Not Found!');
+    }
+
+    return weather;
   }
 
-  update(id: number, updateWeatherDto: UpdateWeatherDto) {
-    return `This action updates a #${id} weather`;
+  async updateWeather(id: ObjectId, updateWeatherDto: UpdateWeatherDto) {
+    return await this.weatherModel.findByIdAndUpdate(id, updateWeatherDto, {
+      new: true,
+      runValidators: true
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} weather`;
+  async removeWeather(id: ObjectId) {
+    return await this.weatherModel.findByIdAndRemove(id);
   }
 }
