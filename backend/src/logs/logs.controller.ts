@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { LogsService } from './logs.service';
 import { CreateLogDto } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
-import { ObjectId } from 'typeorm';
+import { ObjectId } from 'mongoose';
 import { Log } from './schemas/logs.schema';
 
 @Controller('logs')

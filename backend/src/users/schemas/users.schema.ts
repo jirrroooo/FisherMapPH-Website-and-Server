@@ -11,8 +11,11 @@ export class User{
     @Prop()
     last_name: string;
 
-    @Prop()
+    @Prop({unique: [true, "Duplicate email entered"]})
     email_address: string;
+
+    @Prop()
+    password: string;
 
     @Prop()
     profile_picture: string;

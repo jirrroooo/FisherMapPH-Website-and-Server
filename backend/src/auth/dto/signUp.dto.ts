@@ -2,7 +2,7 @@ import { Type } from "class-transformer";
 import { IsBoolean, IsDate, IsEmail, IsEmpty, IsNotEmpty, IsNumber, IsString, MinLength } from "class-validator";
 import { ObjectId } from "mongoose";
 
-export class CreateUserDto {
+export class SignUpDto {
 
     @IsNotEmpty()
     @IsString()
@@ -46,15 +46,12 @@ export class CreateUserDto {
     @IsBoolean()
     isAuthenticated: string;
 
-    @IsDate()
-    @Type(() => Date)
     membership_date: Date;
 
     @IsNotEmpty()
     @IsString()
     person_to_notify: string;
 
-    @IsNotEmpty()
     @IsString()
     fishing_vessel_type: string;
 }
