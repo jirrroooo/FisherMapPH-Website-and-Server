@@ -10,7 +10,7 @@ export class PositionsController {
   constructor(private readonly positionsService: PositionsService) {}
 
   @Post()
-  async newPosition(@Body() position: CreatePositionDto) {
+  async newPosition(@Body() position: CreatePositionDto): Promise<Position> {
     return this.positionsService.newPosition(position);
   }
 
@@ -20,17 +20,17 @@ export class PositionsController {
   }
 
   @Get(':id')
-  async getPosition(@Param('id') id: ObjectId) {
+  async getPosition(@Param('id') id: ObjectId): Promise<Position> {
     return this.positionsService.getPosition(id);
   }
 
   @Patch(':id')
-  async updatePosition(@Param('id') id: ObjectId, @Body() updatePositionDto: UpdatePositionDto) {
+  async updatePosition(@Param('id') id: ObjectId, @Body() updatePositionDto: UpdatePositionDto): Promise<Position> {
     return this.positionsService.updatePosition(id, updatePositionDto);
   }
 
   @Delete(':id')
-  async removePosition(@Param('id') id: ObjectId) {
+  async removePosition(@Param('id') id: ObjectId): Promise<Position> {
     return this.positionsService.removePosition(id);
   }
 }

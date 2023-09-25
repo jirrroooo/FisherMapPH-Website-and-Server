@@ -31,14 +31,14 @@ export class ReportsService {
     return report;
   }
 
-  async updateReport(id: ObjectId, updateReportDto: UpdateReportDto) {
+  async updateReport(id: ObjectId, updateReportDto: UpdateReportDto): Promise<Report> {
     return await this.reportModel.findByIdAndUpdate(id, updateReportDto, {
       new: true,
       runValidators: true
     })
   }
 
-  async removeReport(id: ObjectId) {
+  async removeReport(id: ObjectId): Promise<Report> {
     return await this.reportModel.findByIdAndRemove(id);
   }
 }

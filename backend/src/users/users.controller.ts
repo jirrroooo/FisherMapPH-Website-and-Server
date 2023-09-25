@@ -20,17 +20,17 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUser(@Param('id') id: ObjectId) {
+  async getUser(@Param('id') id: ObjectId): Promise<User> {
     return this.usersService.getUser(id);
   }
 
   @Patch(':id')
-  async updateUser(@Param('id') id: ObjectId, @Body() updateUserDto: UpdateUserDto) {
+  async updateUser(@Param('id') id: ObjectId, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
-  async removeUser(@Param('id') id: ObjectId) {
+  async removeUser(@Param('id') id: ObjectId): Promise<User> {
     return this.usersService.removeUser(id);
   }
 }

@@ -10,7 +10,7 @@ export class AlertsController {
   constructor(private readonly alertsService: AlertsService) {}
 
   @Post()
-  async newAlert(@Body() alert: CreateAlertDto) {
+  async newAlert(@Body() alert: CreateAlertDto): Promise<Alert> {
     return this.alertsService.newAlert(alert);
   }
 
@@ -20,17 +20,17 @@ export class AlertsController {
   }
 
   @Get(':id')
-  async getAlert(@Param('id') id: ObjectId) {
+  async getAlert(@Param('id') id: ObjectId): Promise<Alert> {
     return this.alertsService.getAlert(id);
   }
 
   @Patch(':id')
-  async updateAlert(@Param('id') id: ObjectId, @Body() updateAlertDto: UpdateAlertDto) {
+  async updateAlert(@Param('id') id: ObjectId, @Body() updateAlertDto: UpdateAlertDto): Promise<Alert> {
     return this.alertsService.updateAlert(id, updateAlertDto);
   }
 
   @Delete(':id')
-  async removeAlert(@Param('id') id: ObjectId) {
+  async removeAlert(@Param('id') id: ObjectId): Promise<Alert> {
     return this.alertsService.removeAlert(id);
   }
 }

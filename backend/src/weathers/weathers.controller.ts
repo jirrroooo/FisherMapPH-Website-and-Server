@@ -10,7 +10,7 @@ export class WeathersController {
   constructor(private readonly weathersService: WeathersService) {}
 
   @Post()
-  async newWeather(@Body() weather: CreateWeatherDto) {
+  async newWeather(@Body() weather: CreateWeatherDto): Promise<Weather> {
     return this.weathersService.newWeather(weather);
   }
 
@@ -20,17 +20,17 @@ export class WeathersController {
   }
 
   @Get(':id')
-  async getWeather(@Param('id') id: ObjectId) {
+  async getWeather(@Param('id') id: ObjectId): Promise<Weather> {
     return this.weathersService.getWeather(id);
   }
 
   @Patch(':id')
-  async updateWeather(@Param('id') id: ObjectId, @Body() updateWeatherDto: UpdateWeatherDto) {
+  async updateWeather(@Param('id') id: ObjectId, @Body() updateWeatherDto: UpdateWeatherDto): Promise<Weather> {
     return this.weathersService.updateWeather(id, updateWeatherDto);
   }
 
   @Delete(':id')
-  async removeWeather(@Param('id') id: ObjectId) {
+  async removeWeather(@Param('id') id: ObjectId): Promise<Weather> {
     return this.weathersService.removeWeather(id);
   }
 }

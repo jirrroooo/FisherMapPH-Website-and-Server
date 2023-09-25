@@ -32,14 +32,14 @@ export class AlertsService {
     return alert;
   }
 
-  async updateAlert(id: ObjectId, updateAlertDto: UpdateAlertDto) {
+  async updateAlert(id: ObjectId, updateAlertDto: UpdateAlertDto): Promise<Alert> {
     return await this.alertModel.findByIdAndUpdate(id, updateAlertDto, {
       new: true,
       runValidators: true
     })
   }
 
-  async removeAlert(id: ObjectId) {
+  async removeAlert(id: ObjectId): Promise<Alert> {
     return await this.alertModel.findByIdAndRemove(id);
   }
 }

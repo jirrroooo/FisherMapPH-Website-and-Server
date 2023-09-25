@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateLogDto } from './dto/update-log.dto';
 import { Log } from './schemas/logs.schema';
-import mongoose from 'mongoose';
+import * as mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { ObjectId } from 'typeorm';
+import { ObjectId } from 'mongoose';
 
 @Injectable()
 export class LogsService {

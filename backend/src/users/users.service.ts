@@ -31,14 +31,14 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(id: ObjectId, updateUserDto: UpdateUserDto) {
+  async updateUser(id: ObjectId, updateUserDto: UpdateUserDto): Promise<User> {
     return await this.userModel.findByIdAndUpdate(id, updateUserDto, {
       new: true,
       runValidators: true
     })
   }
 
-  async removeUser(id: ObjectId) {
+  async removeUser(id: ObjectId): Promise<User> {
     return await this.userModel.findByIdAndRemove(id);
   }
 }

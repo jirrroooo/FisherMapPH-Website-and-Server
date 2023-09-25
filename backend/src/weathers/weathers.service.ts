@@ -31,14 +31,14 @@ export class WeathersService {
     return weather;
   }
 
-  async updateWeather(id: ObjectId, updateWeatherDto: UpdateWeatherDto) {
+  async updateWeather(id: ObjectId, updateWeatherDto: UpdateWeatherDto): Promise<Weather> {
     return await this.weatherModel.findByIdAndUpdate(id, updateWeatherDto, {
       new: true,
       runValidators: true
     })
   }
 
-  async removeWeather(id: ObjectId) {
+  async removeWeather(id: ObjectId): Promise<Weather> {
     return await this.weatherModel.findByIdAndRemove(id);
   }
 }

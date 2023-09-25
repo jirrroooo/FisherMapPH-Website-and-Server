@@ -31,14 +31,14 @@ export class PositionsService {
     return position;
   }
 
-  async updatePosition(id: ObjectId, updatePositionDto: UpdatePositionDto) {
+  async updatePosition(id: ObjectId, updatePositionDto: UpdatePositionDto): Promise<Position> {
     return await this.positionModel.findByIdAndUpdate(id, updatePositionDto, {
       new: true,
       runValidators: true
     })
   }
 
-  async removePosition(id: ObjectId) {
+  async removePosition(id: ObjectId): Promise<Position> {
     return await this.positionModel.findByIdAndRemove(id);
   }
 }

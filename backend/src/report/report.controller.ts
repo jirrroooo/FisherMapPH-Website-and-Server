@@ -20,17 +20,17 @@ export class ReportsController {
   }
 
   @Get(':id')
-  async getReport(@Param('id') id: ObjectId) {
+  async getReport(@Param('id') id: ObjectId): Promise<Report> {
     return this.reportsService.getReport(id);
   }
 
   @Patch(':id')
-  async updateReport(@Param('id') id: ObjectId, @Body() updateReportDto: UpdateReportDto) {
+  async updateReport(@Param('id') id: ObjectId, @Body() updateReportDto: UpdateReportDto): Promise<Report> {
     return this.reportsService.updateReport(id, updateReportDto);
   }
 
   @Delete(':id')
-  async removeReport(@Param('id') id: ObjectId) {
+  async removeReport(@Param('id') id: ObjectId): Promise<Report> {
     return this.reportsService.removeReport(id);
   }
 }
