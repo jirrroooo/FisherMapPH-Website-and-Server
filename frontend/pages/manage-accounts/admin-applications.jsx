@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import "./style.css";
+import "../../styles/custom.scss";
 
 export default function AdminApplications(){
     useEffect(() => {

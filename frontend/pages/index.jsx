@@ -1,6 +1,7 @@
 // import "bootstrap/dist/css/bootstrap.css";
 import "./style.css";
 import { useEffect } from "react";
+import "../../styles/custom.scss";
 
 export default function Index() {
   useEffect(() => {
