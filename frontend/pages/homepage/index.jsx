@@ -10,7 +10,8 @@ export default function Homepage() {
 
   return (
     <>
-      <Navbar />
+    <Navbar />
+    <h1>HomePage</h1>
     </>
   );
 }
