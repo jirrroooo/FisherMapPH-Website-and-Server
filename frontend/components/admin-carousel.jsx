@@ -33,13 +33,13 @@ function AdminCarousel() {
       </div>
       <div class="carousel-inner">
         <div class="carousel-item active">
-          <Image src="/images/pic1.jpg" width={400} height={500} alt="..." />
+          <Image src="/images/1.jpg" width={800} height={500} alt="..." />
         </div>
         <div class="carousel-item">
-          <Image src="/images/pic2.jpg" width={400} height={500} alt="..." />
+          <Image src="/images/2.jpg" width={800} height={500} alt="..." />
         </div>
         <div class="carousel-item">
-          <Image src="/images/pic3.jpg" width={400} height={500} alt="..." />
+          <Image src="/images/3.jpg" width={800} height={500} alt="..." />
         </div>
       </div>
       <button

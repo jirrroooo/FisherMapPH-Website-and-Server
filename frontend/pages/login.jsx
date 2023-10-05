@@ -15,7 +15,7 @@ export default function Homepage() {
       <Navbar />
       <div className="container mt-4">
         <div className="row">
-          <div className="col-sm-6">
+          <div className="col-sm-4">
             <div className="text-center loginForm">
               <h5>Register an Administrator Account</h5>
               <form action="" id="signupForm">
@@ -49,7 +49,7 @@ export default function Homepage() {
               </p>
             </div>
           </div>
-          <div className="col-sm-6">
+          <div className="col-sm-8">
             <AdminCarousel />
           </div>
         </div>
