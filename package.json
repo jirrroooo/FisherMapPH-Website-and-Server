@@ -4,5 +4,10 @@
     "@nestjs/typeorm": "^10.0.0",
     "pg": "^8.11.3",
     "typeorm": "^0.3.17"
+  },
+  "scripts": {
+    "start": "npm run start-backend && npm run start-frontend",
+    "start-frontend" : "cd frontend && npm run dev",
+    "start-backend" : "start powershell -Command \"cd backend | npm run start:dev\""
   }
 }
