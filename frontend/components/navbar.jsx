@@ -12,11 +12,11 @@ export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-sm bg-dark navbar-dark">
       <div className="container-fluid">
-        <a className="navbar-brand" href="#">
+        {/* <a className="navbar-brand" href="#"> */}
           <Link className="text-decoration-none text-white" href="/homepage">
             <h4>FisherMap PH</h4>
           </Link>
-        </a>
+        {/* </a> */}
 
         {route.pathname != "/login" && route.pathname != "/signup" && (
           <ul className="navbar-nav">
