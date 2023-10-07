@@ -1,10 +1,1 @@
 @import "../../app/globals.css";
-
-.pg-active{
-    background-color: #2b5497 !important;
-    border: #2b5497 !important;
-}
-
-.pg-inactive{
-    color: rgb(189, 186, 186) !important;
-}

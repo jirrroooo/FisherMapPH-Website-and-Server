@@ -49,7 +49,7 @@ export default function ManageAlerts() {
                   </li>
                   <li>
                     <a className="dropdown-item" href="#" onClick={null}>
-                      Vessel ID
+                      Vessel Type
                     </a>
                   </li>
                   <li>
