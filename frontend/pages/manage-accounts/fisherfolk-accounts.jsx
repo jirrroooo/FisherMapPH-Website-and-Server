@@ -26,9 +26,9 @@ export default function FisherfolkAccount(){
               <div className="col-6">
                 <input
                   type="text"
-                  className="form-control student-input"
+                  className="form-control"
                   placeholder="Enter Name"
-                  name="student"
+                  name="seach"
                 />
               </div>
   

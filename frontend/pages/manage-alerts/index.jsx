@@ -26,9 +26,9 @@ export default function ManageAlerts() {
             <div className="col-6">
               <input
                 type="text"
-                className="form-control student-input"
+                className="form-control"
                 placeholder="Enter Name"
-                name="student"
+                name="seach"
               />
             </div>
 
@@ -128,12 +128,16 @@ export default function ManageAlerts() {
               <p>Low</p>
             </div>
             <div className="col-2">
-              <button className="btn btn-success px-4 rounded-5 fw-semibold text-white">View</button>
+              <button className="btn btn-success px-4 rounded-5 fw-semibold text-white">
+                View
+              </button>
             </div>
             <div className="col-3">
               <div className="row">
                 <div className="col">
-                  <button className="btn btn-light px-3 rounded-5 fw-semibold">Suspend</button>
+                  <button className="btn btn-light px-3 rounded-5 fw-semibold">
+                    Suspend
+                  </button>
                 </div>
                 <div className="col">
                   <button className="btn btn-danger px-4 text-white rounded-5 fw-semibold ">

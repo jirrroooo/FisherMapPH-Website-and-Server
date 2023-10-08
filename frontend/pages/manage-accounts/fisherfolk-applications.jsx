@@ -23,12 +23,12 @@ export default function FisherfolkApplications(){
   
           <form className="my-5">
             <div className="row">
-              <div className="col-6">
+            <div className="col-6">
                 <input
                   type="text"
-                  className="form-control student-input"
+                  className="form-control"
                   placeholder="Enter Name"
-                  name="student"
+                  name="seach"
                 />
               </div>
   
