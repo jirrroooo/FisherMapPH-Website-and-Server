@@ -1,0 +1,15 @@
+@import "../app/globals.css";
+
+input[type="text"], input[type="email"], input[type="password"], input[type="submit"]{
+    margin: 15px 0px 15px 0px;
+}
+
+#submitBtn{
+    padding-left: 100px;
+    padding-right: 100px;
+    margin-top: 10px;
+}
+
+.loginForm{
+    margin-top: 120px;
+}
