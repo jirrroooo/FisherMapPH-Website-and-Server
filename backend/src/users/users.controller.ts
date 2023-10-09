@@ -1,34 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './schemas/users.schema';
+import { ObjectId } from 'mongoose';
+
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async newUser(@Body() user: CreateUserDto) {
+    return this.usersService.newUser(user);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async getUsers(@Query() query: ExpressQuery): Promise<User[]> {
+    return this.usersService.getUsers(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async getUser(@Param('id') id: ObjectId): Promise<User> {
+    return this.usersService.getUser(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async updateUser(@Param('id') id: ObjectId, @Body() updateUserDto: UpdateUserDto): Promise<User> {
+    return this.usersService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async removeUser(@Param('id') id: ObjectId): Promise<User> {
+    return this.usersService.removeUser(id);
   }
 }

@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, } from "class-validator";
 
-export class CreateUserDto {
+export class SignUpDto {
 
     @IsNotEmpty()
     @IsString()

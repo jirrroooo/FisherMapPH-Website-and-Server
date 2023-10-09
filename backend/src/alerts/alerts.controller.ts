@@ -1,34 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { AlertsService } from './alerts.service';
 import { CreateAlertDto } from './dto/create-alert.dto';
 import { UpdateAlertDto } from './dto/update-alert.dto';
+import { Alert } from './schemas/alerts.schema';
+import { ObjectId } from 'mongoose';
+
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Controller('alerts')
 export class AlertsController {
   constructor(private readonly alertsService: AlertsService) {}
 
   @Post()
-  create(@Body() createAlertDto: CreateAlertDto) {
-    return this.alertsService.create(createAlertDto);
+  async newAlert(@Body() alert: CreateAlertDto): Promise<Alert> {
+    return this.alertsService.newAlert(alert);
   }
 
   @Get()
-  findAll() {
-    return this.alertsService.findAll();
+  async getAlerts(@Query() query: ExpressQuery): Promise<Alert[]> {
+    return this.alertsService.getAlerts(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.alertsService.findOne(+id);
+  async getAlert(@Param('id') id: ObjectId): Promise<Alert> {
+    return this.alertsService.getAlert(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAlertDto: UpdateAlertDto) {
-    return this.alertsService.update(+id, updateAlertDto);
+  async updateAlert(@Param('id') id: ObjectId, @Body() updateAlertDto: UpdateAlertDto): Promise<Alert> {
+    return this.alertsService.updateAlert(id, updateAlertDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.alertsService.remove(+id);
+  async removeAlert(@Param('id') id: ObjectId): Promise<Alert> {
+    return this.alertsService.removeAlert(id);
   }
 }
