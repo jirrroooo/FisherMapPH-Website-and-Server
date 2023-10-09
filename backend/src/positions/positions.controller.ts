@@ -1,34 +1,38 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { PositionsService } from './positions.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
+import { ObjectId } from 'mongoose';
+import { Position } from './schemas/positions.schema';
+import { Query as ExpressQuery } from 'express-serve-static-core';
+
 
 @Controller('positions')
 export class PositionsController {
   constructor(private readonly positionsService: PositionsService) {}
 
   @Post()
-  create(@Body() createPositionDto: CreatePositionDto) {
-    return this.positionsService.create(createPositionDto);
+  async newPosition(@Body() position: CreatePositionDto): Promise<Position> {
+    return this.positionsService.newPosition(position);
   }
 
   @Get()
-  findAll() {
-    return this.positionsService.findAll();
+  async getPositions(@Query() query: ExpressQuery): Promise<Position[]> {
+    return this.positionsService.getPositions(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.positionsService.findOne(+id);
+  async getPosition(@Param('id') id: ObjectId): Promise<Position> {
+    return this.positionsService.getPosition(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePositionDto: UpdatePositionDto) {
-    return this.positionsService.update(+id, updatePositionDto);
+  async updatePosition(@Param('id') id: ObjectId, @Body() updatePositionDto: UpdatePositionDto): Promise<Position> {
+    return this.positionsService.updatePosition(id, updatePositionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.positionsService.remove(+id);
+  async removePosition(@Param('id') id: ObjectId): Promise<Position> {
+    return this.positionsService.removePosition(id);
   }
 }
