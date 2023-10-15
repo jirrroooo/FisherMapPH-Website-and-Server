@@ -7,15 +7,15 @@ export class CreateLogDto {
     @IsNotEmpty()
     user_id: ObjectId
 
-    manage_user: [string];
+    manage_user: [ObjectId];
 
     manage_alert: [string];
 
-    location_log: [string];
+    location_log: [ObjectId];
 
-    alert_log: [string];
+    alert_log: [ObjectId];
 
     permission: [string];
 
-    report_log: [string];
+    report_log: [ObjectId];
 }
