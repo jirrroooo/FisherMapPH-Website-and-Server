@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
-import mongoose from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 
 @Schema({
     timestamps: true
@@ -9,23 +9,23 @@ export class Log{
     // @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     // user_id: User;
 
-    @Prop()
-    manage_user: [string];
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
+    manage_user: [ObjectId];
 
     @Prop()
     manage_alert: [string];
 
-    @Prop()
-    location_log: [string];
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Position'})
+    location_log: [ObjectId];
 
-    @Prop()
-    alert_log: [string];
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Alert'})
+    alert_log: [ObjectId];
 
     @Prop()
     permission: [string];
 
-    @Prop()
-    report_log: [string];
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Report'})
+    report_log: [ObjectId];
 
 }
 

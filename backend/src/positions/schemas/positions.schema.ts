@@ -1,15 +1,16 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
+import mongoose, { ObjectId } from "mongoose";
 
 @Schema({
     timestamps: true
 })
 export class Position{
 
-    // @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
-    // user_id: User;
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
+    user_id: ObjectId;
 
-    // @Prop()
-    // weather_id: Weather;
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Weather'})
+    weather_id: ObjectId;
 
     @Prop()
     isSailing: boolean;
