@@ -2,38 +2,23 @@
 import "./style.css";
 import { useEffect } from "react";
 import "../styles/custom.scss";
+import { useRouter } from "next/router";
 
 export default function Index() {
+  const router = useRouter();
+
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
+
+    router.push('login');
   }, []);
 
   return (
-    <div className="dropdown">
-      <button
-        type="button"
-        className="btn btn-primary dropdown-toggle"
-        data-bs-toggle="dropdown"
-      >
-        Dropdown button
-      </button>
-      <ul className="dropdown-menu">
-        <li>
-          <a className="dropdown-item" href="#">
-            Link 1
-          </a>
-        </li>
-        <li>
-          <a className="dropdown-item" href="#">
-            Link 2
-          </a>
-        </li>
-        <li>
-          <a className="dropdown-item" href="#">
-            Link 3
-          </a>
-        </li>
-      </ul>
-    </div>
+    <>
+      <div className="m-auto mt-5">
+        <h1 className="text-center" style={{marginTop: '150px'}}>FisherMap PH</h1>
+      </div>
+      <div className="loader m-auto mt-5"></div>
+    </>
   );
 }

@@ -1,14 +1,59 @@
+"use client"
 import Navbar from "@/components/navbar";
 import "./style.css";
 import "../styles/custom.scss";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AdminCarousel from "@/components/admin-carousel";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useLoginStore } from "@/store/loginStore";
 
 export default function Homepage() {
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
   }, []);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(useLoginStore.getState().isLoggedIn);
+
+  const router = useRouter();
+
+  useEffect(() => {
+      useLoginStore.setState({isLoggedIn: isLoggedIn});
+
+      if (useLoginStore.getState().isLoggedIn) {
+          router.push('/homepage');
+      }
+  }, [isLoggedIn])
+
+  function logIn(e) {
+      e.preventDefault();
+
+      console.log(document.getElementById("email").value);
+      console.log(document.getElementById("password").value);
+
+      fetch("http://localhost:3001/auth/login",
+          {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                  email_address: document.getElementById("email").value,
+                  password: document.getElementById("password").value
+              })
+          })
+          .then(response => response.json())
+          .then(body => {
+              if (body.token) {
+                  
+                  setIsLoggedIn(true);
+                  useLoginStore.setState({authToken: body.token});
+
+                  console.log(useLoginStore.getState().authToken);
+                  // localStorage.setItem("user", JSON.stringify(body))
+              } else { alert(body.message[0]) }
+          })
+  }
 
   return (
     <>
@@ -40,6 +85,7 @@ export default function Homepage() {
                   type="submit"
                   className="btn btn-primary"
                   id="submitBtn"
+                  onClick={logIn}
                 >
                   LOGIN
                 </button>

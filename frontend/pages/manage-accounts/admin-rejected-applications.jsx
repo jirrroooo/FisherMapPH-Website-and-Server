@@ -3,13 +3,23 @@ import "./style.css";
 import "../../styles/custom.scss";
 import Link from "next/link";
 import Navbar from "@/components/navbar";
+import { useLoginStore } from "@/store/loginStore";
+import { useRouter } from "next/router";
 
 export default function AdminRejectedApplications(){
+  const router = useRouter();
+
     useEffect(() => {
         import("bootstrap/dist/js/bootstrap");
+
+        if (!useLoginStore.getState().isLoggedIn) {
+          router.push("/login");
+        }
       }, []);
     
     return(
+        <>
+              {useLoginStore.getState().isLoggedIn ? (
         <>
         <Navbar />
         <div className="container mt-4 text-center">
@@ -193,6 +203,10 @@ export default function AdminRejectedApplications(){
             <div className="col-3"></div>
           </div>
         </div>
-      </>
+        </>
+      ) : (
+        <div className="loader m-auto mt-5"></div>
+      )}
+    </>
     );
 }

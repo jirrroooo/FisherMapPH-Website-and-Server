@@ -1,13 +1,19 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useLoginStore } from "@/store/loginStore";
 
 export default function Navbar() {
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
   }, []);
 
-  const route = useRouter();
+  const router = useRouter();
+
+  function logOut(){
+    useLoginStore.setState({isLoggedIn : false, authToken: "" })
+    router.push("/login");
+  }
 
   return (
     <nav className="navbar navbar-expand-sm bg-dark navbar-dark">
@@ -18,7 +24,7 @@ export default function Navbar() {
           </Link>
         {/* </a> */}
 
-        {route.pathname != "/login" && route.pathname != "/signup" && (
+        {router.pathname != "/login" && router.pathname != "/signup" && (
           <ul className="navbar-nav">
             <li className="nav-item dropdown">
               <a
@@ -36,7 +42,8 @@ export default function Navbar() {
                   </a>
                 </li>
                 <li>
-                  <Link className="text-decoration-none text-black px-3 " href="/signup">Log Out</Link>
+                  <a className="text-decoration-none text-black px-3" onClick={logOut}>Log Out</a>
+                  {/* <Link className="text-decoration-none text-black px-3 " href="/signup">Log Out</Link> */}
                 </li>
               </ul>
             </li>
