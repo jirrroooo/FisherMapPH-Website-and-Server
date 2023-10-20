@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "./style.css";
 import "../../styles/custom.scss";
 import Navbar from "../../components/navbar";
@@ -9,17 +9,30 @@ import { useRouter } from "next/router";
 export default function FisherfolkAccount() {
   const router = useRouter();
 
+  const [isVerified, setIsVerified] = useState(false);
+
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
 
-    if (!useLoginStore.getState().isLoggedIn) {
-      router.push("/login");
-    }
+    fetch("/api/verify")
+    .then(response => response.json())
+    .then(body => {
+        console.log(body);
+        if(body.status == "success"){
+          setIsVerified(true);
+          useLoginStore.setState({isVerifiedCookie: true, token: body.token, id: body.id});
+        }
+        else{
+          setIsVerified(false);
+          useLoginStore.setState({isVerifiedCookie: false});
+          router.push("/login");
+        }
+    })
   }, []);
 
   return (
     <>
-      {useLoginStore.getState().isLoggedIn ? (
+      {isVerified ? (
         <>
           <Navbar />
           <div className="container mt-4 text-center">

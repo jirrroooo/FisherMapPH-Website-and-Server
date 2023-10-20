@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './dto/signUp.dto';
 import { LogInDto } from './dto/logIn.dto';
 import { Response } from 'express';
+import { ObjectId } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -63,7 +64,7 @@ export class AuthService {
     // const token = this.jwtService.sign({ id: user._id });
   }
 
-  async login(loginDto: LogInDto): Promise<{ token: string }> {
+  async login(loginDto: LogInDto): Promise<{ token: string, userId: ObjectId, userType: string }> {
     const { email_address, password } = loginDto;
 
     const user = await this.userModel.findOne({ email_address });
@@ -80,6 +81,6 @@ export class AuthService {
 
     const token = this.jwtService.sign({ id: user._id });
 
-    return { token: token };
+    return { token: token, userId: user._id, userType: user.user_type };
   }
 }

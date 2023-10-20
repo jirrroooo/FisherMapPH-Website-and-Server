@@ -4,6 +4,7 @@ import { SignUpDto } from './dto/signUp.dto';
 import { LogInDto } from './dto/logIn.dto';
 import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { ObjectId } from 'typeorm';
 
 @Controller('auth')
 export class AuthController {
@@ -18,16 +19,16 @@ export class AuthController {
     }
 
     @Post('/login')
-    login(@Body() logInDto: LogInDto, @Res({passthrough: true}) response : Response): Promise<{ token: string }> {
-        return this.authService.login(logInDto, response);
+    login(@Body() logInDto: LogInDto, @Res({passthrough: true}) response : Response): Promise<{ token: string, userId: ObjectId, userType: string }> {
+        return this.authService.login(logInDto);
     }
 
-    @Post('/logout')
-    logout(@Res({passthrough: true}) response : Response) {
-        response.clearCookie("token"); 
+    // @Post('/logout')
+    // logout(@Res({passthrough: true}) response : Response) {
+    //     response.clearCookie("token"); 
 
-        return { status : "success"} ;
-    }
+    //     return { status : "success"} ;
+    // }
 
     @Get('/verify-cookie')
     async verifyCookie(@Res({passthrough: true}) response: Response, @Req() request: Request){

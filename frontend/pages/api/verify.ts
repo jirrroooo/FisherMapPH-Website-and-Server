@@ -7,25 +7,34 @@ export default function handler (req: NextApiRequest, res: NextApiResponse) {
     // Verifying a cookie
     if ( req.method === 'GET') {
       try{
+        const hasToken = hasCookie("tk", {req, res});
+        const hasId = hasCookie("id", {req, res});
+        const tk = getCookie("tk", {req, res});
+        const id = getCookie("id", {req, res});
 
-        const hasToken = hasCookie("token", {req, res});        
-        const val = getCookie("token", {req, res});
-
-        if(hasToken){
+        if(tk != "" && id != "" && hasToken && hasId){
           return res.status(200).json({
                 status: "success",
-                token: val
+                token: tk,
+                id: id
               });
         }else{
+          deleteCookie("tk", {req, res});
+          deleteCookie("id", {req, res});
+
           return res.status(200).json({
-            status: "unsuccessful",
-            token: ""
+            status: "failed",
+            token: "",
+            id: ""
           });
         }
       }catch{
-        return res.status(200).json({
-          status: "unsuccessful",
-          token: ""
+        deleteCookie("tk", {req, res});
+        deleteCookie("id", {req, res});
+        return res.status(500).json({
+          status: "failed",
+          token: "",
+          id: ""
         });
       }
     }

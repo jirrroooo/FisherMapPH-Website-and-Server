@@ -25,7 +25,7 @@ export default function Homepage() {
           console.log(body);
           if(body.status == "success"){
             setIsVerified(true);
-            useLoginStore.setState({isVerifiedCookie: true, token: body.token});
+            useLoginStore.setState({isVerifiedCookie: true, token: body.token, id: body.id});
           }
           else{
             setIsVerified(false);

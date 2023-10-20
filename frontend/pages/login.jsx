@@ -47,7 +47,8 @@ export default function Homepage() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        token: useLoginStore.getState().token,
+        tk: useLoginStore.getState().token,
+        id: useLoginStore.getState().id
       }),
     })
       .then((response) => response.json())
@@ -80,12 +81,16 @@ export default function Homepage() {
     })
       .then((response) => response.json())
       .then((body) => {
-        if (body.token) {
+        console.log(body);
+        if (body.token && body.userType != "user") {
+          useLoginStore.setState({token: body.token, id: body.userId});
           setCookie();
           setIsLoggedIn(true);
           router.push("/homepage");
-        } else {
+        } else if(body.token == "" && body.userType != "user"){
           alert("Unsuccessful Login Try Again.");
+        } else if(body.userType == "user"){
+          alert("You are only allowed to signin on FisherMap PH mobile application!")
         }
       });
   }
