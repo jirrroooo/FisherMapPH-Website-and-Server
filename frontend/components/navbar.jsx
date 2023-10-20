@@ -11,7 +11,31 @@ export default function Navbar() {
   const router = useRouter();
 
   function logOut(){
-    useLoginStore.setState({isLoggedIn : false, authToken: "" })
+    useLoginStore.setState({isLoggedIn : false, token: "", isVerifiedCookie : false})
+
+    fetch("/api/manage-cookie", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // body: JSON.stringify({
+      //   token: useLoginStore.getState().token,
+      // }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body);
+
+        if (body.status == "success") {
+          console.log("status is success");
+          // useLoginStore.setState({ isVerifiedCookie: false });
+        } else {
+          console.log("status is not success");
+          // useLoginStore.setState({ isVerifiedCookie: false });
+          // router.push("/login");
+        }
+      });
+
     router.push("/login");
   }
 

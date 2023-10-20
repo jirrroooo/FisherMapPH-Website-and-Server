@@ -10,6 +10,8 @@ import { useLoginStore } from "../store/loginStore";
 import { useApiStore } from "../store/apiStore";
 
 export default function Homepage() {
+  const [isVerified, setIsVerified] = useState(false);
+
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
   }, []);
@@ -21,15 +23,24 @@ export default function Homepage() {
   const router = useRouter();
 
   useEffect(() => {
-    useLoginStore.setState({ isLoggedIn: isLoggedIn });
+    // Verify the the cookie
+    fetch("/api/verify")
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body);
+        if (body.status == "success") {
+          setIsVerified(true);
+          useLoginStore.setState({ isLoggedIn: true, token: body.token });
+          router.push("/homepage");
+        } else {
+          setIsVerified(false);
+        }
+      });
 
-    if (useLoginStore.getState().isLoggedIn) {
-      router.push("/homepage");
-    }
-  }, [isLoggedIn]);
+  }, []);
 
   // Set cookie for token
-  function setCookie(){
+  function setCookie() {
     fetch("/api/manage-cookie", {
       method: "POST",
       headers: {
@@ -44,12 +55,9 @@ export default function Homepage() {
         console.log(body);
 
         if (body.status == "success") {
-          console.log("status is success");
           useLoginStore.setState({ isVerifiedCookie: true });
         } else {
-          console.log("status is not success");
           useLoginStore.setState({ isVerifiedCookie: false });
-          // router.push("/login");
         }
       });
   }
@@ -73,9 +81,9 @@ export default function Homepage() {
       .then((response) => response.json())
       .then((body) => {
         if (body.token) {
-          setIsLoggedIn(true);
-          useLoginStore.setState({ token: body.token });
           setCookie();
+          setIsLoggedIn(true);
+          router.push("/homepage");
         } else {
           alert("Unsuccessful Login Try Again.");
         }
@@ -84,49 +92,55 @@ export default function Homepage() {
 
   return (
     <>
-      <Navbar />
-      <div className="container mt-4">
-        <div className="row">
-          <div className="col-sm-4">
-            <div className="text-center loginForm">
-              <h5>Register an Administrator Account</h5>
-              <form action="" id="signupForm">
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  name="email"
-                  placeholder="Enter Address"
-                  required
-                />
-                <input
-                  type="password"
-                  className="form-control"
-                  id="password"
-                  name="password"
-                  placeholder="Password"
-                  required
-                />
+      {isVerified ? (
+        <div className="loader text-center m-auto m-5"></div>
+      ) : (
+        <>
+          <Navbar />
+          <div className="container mt-4">
+            <div className="row">
+              <div className="col-sm-4">
+                <div className="text-center loginForm">
+                  <h5>Register an Administrator Account</h5>
+                  <form action="" id="signupForm">
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="email"
+                      name="email"
+                      placeholder="Enter Address"
+                      required
+                    />
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="password"
+                      name="password"
+                      placeholder="Password"
+                      required
+                    />
 
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  id="submitBtn"
-                  onClick={logIn}
-                >
-                  LOGIN
-                </button>
-              </form>
-              <p>
-                No account yet? Signup <Link href="/signup">here</Link>.
-              </p>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      id="submitBtn"
+                      onClick={logIn}
+                    >
+                      LOGIN
+                    </button>
+                  </form>
+                  <p>
+                    No account yet? Signup <Link href="/signup">here</Link>.
+                  </p>
+                </div>
+              </div>
+              <div className="col-sm-8">
+                <AdminCarousel />
+              </div>
             </div>
           </div>
-          <div className="col-sm-8">
-            <AdminCarousel />
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </>
   );
 }

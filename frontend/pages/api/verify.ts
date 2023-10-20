@@ -17,13 +17,13 @@ export default function handler (req: NextApiRequest, res: NextApiResponse) {
                 token: val
               });
         }else{
-          return res.status(401).json({
+          return res.status(200).json({
             status: "unsuccessful",
             token: ""
           });
         }
       }catch{
-        return res.status(401).json({
+        return res.status(200).json({
           status: "unsuccessful",
           token: ""
         });

@@ -10,7 +10,7 @@ export default function handler (req: NextApiRequest, res: NextApiResponse) {
         setCookie('token', token, {
           req,
           res,
-          maxAge: 60*60*24, // 1day
+          maxAge: 60*60, // 1hour
           path: '/',
           httpOnly: true
         });
@@ -20,7 +20,7 @@ export default function handler (req: NextApiRequest, res: NextApiResponse) {
           status: "success"
         });
       }catch{
-        return res.status(500).json({
+        return res.status(401).json({
           status: "unsuccessful"
         });
       }
@@ -30,7 +30,7 @@ export default function handler (req: NextApiRequest, res: NextApiResponse) {
     // Deleting a cookie
     if ( req.method === 'DELETE') {
       try{
-        deleteCookie("token", { path: '/' });
+        deleteCookie("token", {req, res});
 
         //   respond with status and message
         return res.status(200).json({
