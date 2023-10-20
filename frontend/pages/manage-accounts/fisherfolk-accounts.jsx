@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import "./style.css";
 import "../../styles/custom.scss";
-import Navbar from "@/components/navbar";
+import Navbar from "../../components/navbar";
 import Link from "next/link";
-import { useLoginStore } from "@/store/loginStore";
+import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
 
 export default function FisherfolkAccount() {

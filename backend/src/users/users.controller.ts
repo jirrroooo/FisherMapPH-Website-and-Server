@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+  UnauthorizedException,
+  Req,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,10 +19,15 @@ import { ObjectId } from 'mongoose';
 
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard())
@@ -19,9 +36,28 @@ export class UsersController {
   }
 
   @Get()
-  @UseGuards(AuthGuard())
-  async getUsers(@Query() query: ExpressQuery): Promise<User[]> {
-    return this.usersService.getUsers(query);
+  // @UseGuards(AuthGuard())
+  async getUsers(
+    @Query() query: ExpressQuery,
+    @Req() request: Request,
+  ): Promise<User[]> {
+    try {
+      const cookie = request.cookies['token'];
+
+      const data = await this.jwtService.verifyAsync(cookie);
+
+      if (!data) {
+        throw new UnauthorizedException();
+      }
+
+      const users = await this.usersService.getUsers(query);
+
+      return users;
+    } catch (e) {
+      throw new UnauthorizedException();
+    }
+
+    // return this.usersService.getUsers(query);
   }
 
   @Get(':id')
@@ -32,7 +68,10 @@ export class UsersController {
 
   @Patch(':id')
   @UseGuards(AuthGuard())
-  async updateUser(@Param('id') id: ObjectId, @Body() updateUserDto: UpdateUserDto): Promise<User> {
+  async updateUser(
+    @Param('id') id: ObjectId,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     return this.usersService.updateUser(id, updateUserDto);
   }
 

@@ -1,58 +1,85 @@
-"use client"
-import Navbar from "@/components/navbar";
+"use client";
+import Navbar from "../components/navbar";
 import "./style.css";
 import "../styles/custom.scss";
 import { useEffect, useState } from "react";
-import AdminCarousel from "@/components/admin-carousel";
+import AdminCarousel from "../components/admin-carousel";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useLoginStore } from "@/store/loginStore";
+import { useLoginStore } from "../store/loginStore";
+import { useApiStore } from "../store/apiStore";
 
 export default function Homepage() {
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
   }, []);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(useLoginStore.getState().isLoggedIn);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    useLoginStore.getState().isLoggedIn
+  );
 
   const router = useRouter();
 
   useEffect(() => {
-      useLoginStore.setState({isLoggedIn: isLoggedIn});
+    useLoginStore.setState({ isLoggedIn: isLoggedIn });
 
-      if (useLoginStore.getState().isLoggedIn) {
-          router.push('/homepage');
-      }
-  }, [isLoggedIn])
+    if (useLoginStore.getState().isLoggedIn) {
+      router.push("/homepage");
+    }
+  }, [isLoggedIn]);
+
+  // Set cookie for token
+  function setCookie(){
+    fetch("/api/manage-cookie", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: useLoginStore.getState().token,
+      }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body);
+
+        if (body.status == "success") {
+          console.log("status is success");
+          useLoginStore.setState({ isVerifiedCookie: true });
+        } else {
+          console.log("status is not success");
+          useLoginStore.setState({ isVerifiedCookie: false });
+          // router.push("/login");
+        }
+      });
+  }
 
   function logIn(e) {
-      e.preventDefault();
+    e.preventDefault();
 
-      console.log(document.getElementById("email").value);
-      console.log(document.getElementById("password").value);
+    console.log(document.getElementById("email").value);
+    console.log(document.getElementById("password").value);
 
-      fetch("http://localhost:3001/auth/login",
-          {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                  email_address: document.getElementById("email").value,
-                  password: document.getElementById("password").value
-              })
-          })
-          .then(response => response.json())
-          .then(body => {
-              if (body.token) {
-                  
-                  setIsLoggedIn(true);
-                  useLoginStore.setState({authToken: body.token});
-
-                  console.log(useLoginStore.getState().authToken);
-                  // localStorage.setItem("user", JSON.stringify(body))
-              } else { alert(body.message[0]) }
-          })
+    fetch(`${useApiStore.getState().apiUrl}auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email_address: document.getElementById("email").value,
+        password: document.getElementById("password").value,
+      }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        if (body.token) {
+          setIsLoggedIn(true);
+          useLoginStore.setState({ token: body.token });
+          setCookie();
+        } else {
+          alert("Unsuccessful Login Try Again.");
+        }
+      });
   }
 
   return (

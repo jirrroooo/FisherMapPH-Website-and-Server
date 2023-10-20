@@ -1,26 +1,44 @@
-import Navbar from "@/components/navbar";
+import Navbar from "/components/navbar";
 import "./style.css";
 import "../../styles/custom.scss";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useLoginStore } from "@/store/loginStore";
+import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
+import { useApiStore } from "/store/apiStore";
+import { setCookie, deleteCookie, getCookie } from "cookies-next";
 
 export default function Homepage() {
   const router = useRouter();
+  const [isVerified, setIsVerified] = useState(useLoginStore.getState().isVerifiedCookie);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
 
-    if (!useLoginStore.getState().isLoggedIn) {
-      router.push("/login");
-    }
+    console.log(useLoginStore.getState().token);
+
+    // Verify the the cookie
+    fetch("/api/verify")
+      .then(response => response.json())
+      .then(body => {
+          console.log(body);
+          if(body.status == "success"){
+            setIsVerified(true);
+            useLoginStore.setState({isVerifiedCookie: true, token: body.token});
+          }
+          else{
+            setIsVerified(false);
+            useLoginStore.setState({isVerifiedCookie: false});
+            router.push("/login");
+          }
+      })
+
   }, []);
 
   return (
     <>
-      {useLoginStore.getState().isLoggedIn ? (
+      { isVerified ? (
         <>
           <Navbar />
           <div className="container mt-4 text-center">

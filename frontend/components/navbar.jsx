@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useLoginStore } from "@/store/loginStore";
+import { useLoginStore } from "../store/loginStore";
 
 export default function Navbar() {
   useEffect(() => {

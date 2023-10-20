@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import "./style.css";
 import "../../styles/custom.scss";
 import Link from "next/link";
-import Navbar from "@/components/navbar";
-import { useLoginStore } from "@/store/loginStore";
+import Navbar from "../../components/navbar";
+import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
 
 export default function AdminAccounts() {

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import "./style.css";
 import "../../styles/custom.scss";
-import { useLoginStore } from "@/store/loginStore";
+import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
 
 export default function ManageAccounts() {
