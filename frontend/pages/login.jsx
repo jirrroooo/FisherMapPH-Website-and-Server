@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { useLoginStore } from "../store/loginStore";
 import { useApiStore } from "../store/apiStore";
 
-export default function Homepage() {
+export default function LoginPage() {
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
@@ -27,10 +27,9 @@ export default function Homepage() {
     fetch("/api/verify")
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         if (body.status == "success") {
           setIsVerified(true);
-          useLoginStore.setState({ isLoggedIn: true, token: body.token });
+          useLoginStore.setState({ isLoggedIn: true, token: body.token, id: body.id });
           router.push("/homepage");
         } else {
           setIsVerified(false);
@@ -53,8 +52,6 @@ export default function Homepage() {
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
-
         if (body.status == "success") {
           useLoginStore.setState({ isVerifiedCookie: true });
         } else {
@@ -65,9 +62,6 @@ export default function Homepage() {
 
   function logIn(e) {
     e.preventDefault();
-
-    console.log(document.getElementById("email").value);
-    console.log(document.getElementById("password").value);
 
     fetch(`${useApiStore.getState().apiUrl}auth/login`, {
       method: "POST",
@@ -81,9 +75,8 @@ export default function Homepage() {
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         if (body.token && body.userType != "user") {
-          useLoginStore.setState({token: body.token, id: body.userId});
+          useLoginStore.setState({token: body.token, id: body.userId, isLoggedIn: true});
           setCookie();
           setIsLoggedIn(true);
           router.push("/homepage");

@@ -36,7 +36,7 @@ export class UsersController {
   }
 
   @Get()
-  // @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard())
   async getUsers(
     @Query() query: ExpressQuery,
     @Req() request: Request,

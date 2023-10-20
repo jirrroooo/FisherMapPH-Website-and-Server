@@ -6,43 +6,44 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
-import { useApiStore } from "/store/apiStore";
-import { setCookie, deleteCookie, getCookie } from "cookies-next";
+import { useUserDataStore } from "../../store/userDataStore";
 
 export default function Homepage() {
   const router = useRouter();
-  const [isVerified, setIsVerified] = useState(useLoginStore.getState().isVerifiedCookie);
+  const [isVerified, setIsVerified] = useState(false);
+  const [name, setName] = useState(
+    useUserDataStore.getState().userData.first_name
+  );
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
 
-    console.log(useLoginStore.getState().token);
-
     // Verify the the cookie
     fetch("/api/verify")
-      .then(response => response.json())
-      .then(body => {
-          console.log(body);
-          if(body.status == "success"){
-            setIsVerified(true);
-            useLoginStore.setState({isVerifiedCookie: true, token: body.token, id: body.id});
-          }
-          else{
-            setIsVerified(false);
-            useLoginStore.setState({isVerifiedCookie: false});
-            router.push("/login");
-          }
-      })
-
+      .then((response) => response.json())
+      .then((body) => {
+        if (body.status == "success") {
+          setIsVerified(true);
+          useLoginStore.setState({
+            isVerifiedCookie: true,
+            token: body.token,
+            id: body.id,
+          });
+        } else {
+          setIsVerified(false);
+          useLoginStore.setState({ isVerifiedCookie: false });
+          router.push("/login");
+        }
+      });
   }, []);
 
   return (
     <>
-      { isVerified ? (
+      {useUserDataStore.getState.userData != {} ? (
         <>
           <Navbar />
           <div className="container mt-4 text-center">
-            <h2>WELCOME SUPER ADMINISTRATOR!</h2>
+            <h2 className="text-uppercase">WELCOME {name}!</h2>
             <p>
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Modi
               voluptas, dolore, similique velit rerum neque minima delectus illo
@@ -140,9 +141,7 @@ export default function Homepage() {
         </>
       ) : (
         <div className="loader text-center m-auto m-5"></div>
-      )
-      
-      }
+      )}
     </>
   );
 }
