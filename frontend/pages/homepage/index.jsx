@@ -7,13 +7,13 @@ import Link from "next/link";
 import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
 import { useUserDataStore } from "../../store/userDataStore";
+import { useApiStore } from "../../store/apiStore";
 
 export default function Homepage() {
   const router = useRouter();
   const [isVerified, setIsVerified] = useState(false);
-  const [name, setName] = useState(
-    useUserDataStore.getState().userData.first_name
-  );
+  const [name, setName] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -29,6 +29,7 @@ export default function Homepage() {
             token: body.token,
             id: body.id,
           });
+          getData();
         } else {
           setIsVerified(false);
           useLoginStore.setState({ isVerifiedCookie: false });
@@ -37,9 +38,28 @@ export default function Homepage() {
       });
   }, []);
 
+
+  function getData(){
+    fetch(
+      `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
+      {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          const { password, ...user } = data;
+          useUserDataStore.setState({ userData: user });
+          setName(user.first_name);
+          setIsLoading(false);
+        }
+      });
+  }
+
   return (
     <>
-      {useUserDataStore.getState.userData != {} ? (
+      {!isLoading ? (
         <>
           <Navbar />
           <div className="container mt-4 text-center">

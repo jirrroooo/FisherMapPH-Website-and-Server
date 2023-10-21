@@ -64,7 +64,14 @@ export class AuthService {
     // const token = this.jwtService.sign({ id: user._id });
   }
 
-  async login(loginDto: LogInDto): Promise<{ token: string, userId: ObjectId, userType: string }> {
+  async login(
+    loginDto: LogInDto,
+  ): Promise<{
+    token: string;
+    userId: ObjectId;
+    userType: string;
+    isAuthenticated: boolean;
+  }> {
     const { email_address, password } = loginDto;
 
     const user = await this.userModel.findOne({ email_address });
@@ -81,6 +88,11 @@ export class AuthService {
 
     const token = this.jwtService.sign({ id: user._id });
 
-    return { token: token, userId: user._id, userType: user.user_type };
+    return {
+      token: token,
+      userId: user._id,
+      userType: user.user_type,
+      isAuthenticated: user.isAuthenticated,
+    };
   }
 }

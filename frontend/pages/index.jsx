@@ -20,6 +20,7 @@ export default function Index() {
         if(body.status == "success"){
           setIsVerified(true);
           useLoginStore.setState({isVerifiedCookie: true, token: body.token, id: body.id});
+          router.push('/homepage')
         }
         else{
           setIsVerified(false);

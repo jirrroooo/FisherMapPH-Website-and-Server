@@ -14,8 +14,9 @@
     "cookies": "^0.8.0",
     "cookies-next": "^4.0.0",
     "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "reactstrap": "^9.2.0"
   },
   "devDependencies": {
     "@types/node": "20.8.7",

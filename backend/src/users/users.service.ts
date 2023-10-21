@@ -18,8 +18,8 @@ export class UsersService {
     return res;
   }
 
-  async getUsers(query: Query): Promise<User[]> {
-    const responsePerPage = 10;
+  async getAdminUsers(query: Query): Promise<User[]> {
+    const responsePerPage = 6;
     const currentPage = Number(query.page) || 1;
     const skip = responsePerPage * (currentPage - 1);
 
@@ -30,7 +30,47 @@ export class UsersService {
       }
     } : {}
 
-    const users = await this.userModel.find()
+    const users = await this.userModel.find({"user_type" : { $in: ["admin","superadmin"]}, "isAuthenticated" : true})
+    .sort({createdAt: -1})
+    .limit(responsePerPage)
+    .skip(skip);
+
+    return users;
+  }
+
+  async getAdminPendingUsers(query: Query): Promise<User[]> {
+    const responsePerPage = 5;
+    const currentPage = Number(query.page) || 1;
+    const skip = responsePerPage * (currentPage - 1);
+
+    const keyword = query.keyword ? {
+      title: {
+        $regex: query.keyword,
+        $options: 'i'
+      }
+    } : {}
+
+    const users = await this.userModel.find({isAuthenticated: false, "user_type" : { $in: ["admin","superadmin"]}})
+    .sort({createdAt: -1})
+    .limit(responsePerPage)
+    .skip(skip);
+
+    return users;
+  }
+
+  async getAdminRejectedUsers(query: Query): Promise<User[]> {
+    const responsePerPage = 5;
+    const currentPage = Number(query.page) || 1;
+    const skip = responsePerPage * (currentPage - 1);
+
+    const keyword = query.keyword ? {
+      title: {
+        $regex: query.keyword,
+        $options: 'i'
+      }
+    } : {}
+
+    const users = await this.userModel.find({"user_type" : { $in: ["admin-rejected","superadmin-rejected"]}})
     .sort({createdAt: -1})
     .limit(responsePerPage)
     .skip(skip);

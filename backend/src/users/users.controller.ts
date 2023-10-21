@@ -35,29 +35,36 @@ export class UsersController {
     return this.usersService.newUser(user);
   }
 
-  @Get()
+  @Get('/admin-users')
+  @UseGuards(AuthGuard())
+  async getAdminUsers(
+    @Query() query: ExpressQuery,
+  ): Promise<User[]> {
+    return this.usersService.getAdminUsers(query);
+  }
+
+  @Get('/admin-pending-users')
+  @UseGuards(AuthGuard())
+  async getAdminPendingUsers(
+    @Query() query: ExpressQuery,
+  ): Promise<User[]> {
+    return this.usersService.getAdminPendingUsers(query);
+  }
+
+  @Get('admin-rejected-users')
+  @UseGuards(AuthGuard())
+  async getAdminRejectedUsers(
+    @Query() query: ExpressQuery,
+  ): Promise<User[]> {
+    return this.usersService.getAdminRejectedUsers(query);
+  }
+
+  @Get('admin-users')
   @UseGuards(AuthGuard())
   async getUsers(
     @Query() query: ExpressQuery,
-    @Req() request: Request,
   ): Promise<User[]> {
-    try {
-      const cookie = request.cookies['token'];
-
-      const data = await this.jwtService.verifyAsync(cookie);
-
-      if (!data) {
-        throw new UnauthorizedException();
-      }
-
-      const users = await this.usersService.getUsers(query);
-
-      return users;
-    } catch (e) {
-      throw new UnauthorizedException();
-    }
-
-    // return this.usersService.getUsers(query);
+    return this.usersService.getAdminUsers(query);
   }
 
   @Get(':id')

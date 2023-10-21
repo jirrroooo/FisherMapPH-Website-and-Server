@@ -6,12 +6,34 @@ import { useApiStore } from "../store/apiStore";
 import { useUserDataStore } from "../store/userDataStore";
 
 export default function Navbar() {
-  const [userType, setUserType] = useState(useUserDataStore.getState().userData.user_type);
+  const [userType, setUserType] = useState();
+  const [isVerified, setIsVerified] = useState();
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
 
+    fetch("/api/verify")
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body);
+        if (body.status == "success") {
+          setIsVerified(true);
+          useLoginStore.setState({
+            isVerifiedCookie: true,
+            token: body.token,
+            id: body.id,
+          });
+          getData();
+        } else {
+          setIsVerified(false);
+          useLoginStore.setState({ isVerifiedCookie: false });
+          router.push("/login");
+        }
+      });
     // Fetch User Data
+  }, []);
+
+  function getData(){
     fetch(
       `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
       {
@@ -26,7 +48,7 @@ export default function Navbar() {
           setUserType(user.user_type);
         }
       });
-  }, [useUserDataStore.getState.userData]);
+  }
 
   const router = useRouter();
 
@@ -93,12 +115,13 @@ export default function Navbar() {
 
               <ul className="dropdown-menu">
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <a className="dropdown-item" id="profile" href="#">
                     Profile
                   </a>
                 </li>
                 <li>
                   <a
+                    id="logout"
                     className="text-decoration-none text-black px-3"
                     onClick={logOut}
                   >

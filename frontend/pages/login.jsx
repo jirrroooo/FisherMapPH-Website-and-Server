@@ -75,15 +75,17 @@ export default function LoginPage() {
     })
       .then((response) => response.json())
       .then((body) => {
-        if (body.token && body.userType != "user") {
+        if (body.token && body.userType != "user" && body.isAuthenticated) {
           useLoginStore.setState({token: body.token, id: body.userId, isLoggedIn: true});
           setCookie();
           setIsLoggedIn(true);
           router.push("/homepage");
-        } else if(body.token == "" && body.userType != "user"){
+        } else if(body.token == "" && body.userType != "user" && body.isAuthenticated){
           alert("Unsuccessful Login Try Again.");
         } else if(body.userType == "user"){
           alert("You are only allowed to signin on FisherMap PH mobile application!")
+        } else if(body.userType != "user" && !body.isAuthenticated){
+          alert("Pending Account Approval. You cannot login as of this moment.");
         }
       });
   }
