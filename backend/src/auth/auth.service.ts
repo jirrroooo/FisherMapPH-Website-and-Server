@@ -11,6 +11,7 @@ import { ObjectId } from 'typeorm';
 
 @Injectable()
 export class AuthService {
+
   constructor(
     @InjectModel(User.name)
     private userModel: Model<User>,
@@ -64,12 +65,8 @@ export class AuthService {
     // const token = this.jwtService.sign({ id: user._id });
   }
 
-  async login(
-    loginDto: LogInDto,
-  ): Promise<{
+  async login(loginDto: LogInDto): Promise<{
     token: string;
-    userId: ObjectId;
-    userType: string;
     isAuthenticated: boolean;
   }> {
     const { email_address, password } = loginDto;
@@ -90,9 +87,14 @@ export class AuthService {
 
     return {
       token: token,
-      userId: user._id,
-      userType: user.user_type,
-      isAuthenticated: user.isAuthenticated,
+      isAuthenticated: user.isAuthenticated
     };
+  }
+
+  async profile(token: string): Promise<{}> {
+
+    const userId = this.jwtService.decode(token);
+
+    return userId;
   }
 }

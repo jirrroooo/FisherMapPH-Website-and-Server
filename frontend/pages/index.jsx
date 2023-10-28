@@ -8,7 +8,6 @@ import { useLoginStore } from "../store/loginStore";
 export default function Index() {
   const router = useRouter();
 
-  const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -16,14 +15,11 @@ export default function Index() {
     fetch("/api/verify")
     .then(response => response.json())
     .then(body => {
-        console.log(body);
         if(body.status == "success"){
-          setIsVerified(true);
-          useLoginStore.setState({isVerifiedCookie: true, token: body.token, id: body.id});
+          useLoginStore.setState({isVerifiedCookie: true, token: body.token});
           router.push('/homepage')
         }
         else{
-          setIsVerified(false);
           useLoginStore.setState({isVerifiedCookie: false});
           router.push("/login");
         }

@@ -10,25 +10,63 @@ export default function FisherfolkAccount() {
   const router = useRouter();
 
   const [isVerified, setIsVerified] = useState(false);
+  const [data, setData] = useState();
+  const [isViewModal, setIsViewModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState();
+  const [isRevertModal, setIsRevertModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
 
     fetch("/api/verify")
-    .then(response => response.json())
-    .then(body => {
+      .then((response) => response.json())
+      .then((body) => {
         console.log(body);
-        if(body.status == "success"){
+        if (body.status == "success") {
           setIsVerified(true);
-          useLoginStore.setState({isVerifiedCookie: true, token: body.token, id: body.id});
-        }
-        else{
+          useLoginStore.setState({
+            isVerifiedCookie: true,
+            token: body.token,
+          });
+          getUserId(body.id);
+        } else {
           setIsVerified(false);
-          useLoginStore.setState({isVerifiedCookie: false});
+          useLoginStore.setState({ isVerifiedCookie: false });
           router.push("/login");
         }
-    })
+      });
   }, []);
+
+  
+  function getUserId(token){
+    fetch(`http://localhost:3001/auth/profile/${token}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if(data){
+          useLoginStore.setState({
+            id: data.id
+          });
+          getData();
+        }
+      });
+  }
+
+  function getData(){
+    fetch(`${useApiStore.getState().apiUrl}users/admin-rejected-users`, {
+      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body);
+        setData(body);
+        setIsLoading(false);
+      });
+  }
 
   return (
     <>

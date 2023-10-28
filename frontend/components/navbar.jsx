@@ -15,23 +15,37 @@ export default function Navbar() {
     fetch("/api/verify")
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         if (body.status == "success") {
           setIsVerified(true);
           useLoginStore.setState({
             isVerifiedCookie: true,
             token: body.token,
-            id: body.id,
           });
-          getData();
+          getUserId(body.token);
         } else {
           setIsVerified(false);
           useLoginStore.setState({ isVerifiedCookie: false });
-          router.push("/login");
+          // router.push("/login");
         }
       });
     // Fetch User Data
   }, []);
+
+  function getUserId(token){
+    fetch(`http://localhost:3001/auth/profile/${token}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        useLoginStore.setState({
+          id: data.id
+        });
+        getData();
+      });
+
+  }
 
   function getData(){
     fetch(

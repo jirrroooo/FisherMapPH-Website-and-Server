@@ -27,9 +27,8 @@ export default function Homepage() {
           useLoginStore.setState({
             isVerifiedCookie: true,
             token: body.token,
-            id: body.id,
           });
-          getData();
+          getUserId(body.token);
         } else {
           setIsVerified(false);
           useLoginStore.setState({ isVerifiedCookie: false });
@@ -37,6 +36,23 @@ export default function Homepage() {
         }
       });
   }, []);
+
+  function getUserId(token){
+    fetch(`http://localhost:3001/auth/profile/${token}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if(data){
+          useLoginStore.setState({
+            id: data.id
+          });
+          getData();
+        }
+      });
+  }
 
 
   function getData(){

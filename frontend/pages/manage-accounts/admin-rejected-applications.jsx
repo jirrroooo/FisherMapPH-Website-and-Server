@@ -31,9 +31,8 @@ export default function AdminRejectedApplications() {
           useLoginStore.setState({
             isVerifiedCookie: true,
             token: body.token,
-            id: body.id,
           });
-          getData();
+          getUserId(body.id);
         } else {
           setIsVerified(false);
           useLoginStore.setState({ isVerifiedCookie: false });
@@ -41,6 +40,24 @@ export default function AdminRejectedApplications() {
         }
       });
   }, []);
+
+  
+  function getUserId(token){
+    fetch(`http://localhost:3001/auth/profile/${token}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if(data){
+          useLoginStore.setState({
+            id: data.id
+          });
+          getData();
+        }
+      });
+  }
 
   function getData(){
     fetch(`${useApiStore.getState().apiUrl}users/admin-rejected-users`, {

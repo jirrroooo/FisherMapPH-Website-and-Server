@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { useApiStore } from "../store/apiStore";
 
 export default function Homepage() {
-  const [isVerified, setIsVerified] = useState(false);
+  const [isVerified, setIsVerified] = useState(true);
 
   const router = useRouter();
 
@@ -86,10 +86,12 @@ export default function Homepage() {
       .then((response) => response.json())
       .then((body) => {
         console.log(body);
-        if (body.token && body.userType != "user") {
+        if (body.token != "" && body.userType != "user" && body.isAuthenticted) {
           useLoginStore.setState({token: body.token, id: body.userId});
           setCookie();
           router.push("/homepage");
+        } else if(body.token != "" && body.userType != "user" && !body.isAuthenticted){
+          alert("Successful signup. However, can't login as this moment. The account is not yet authenticated.");
         } else if(body.token == "" && body.userType != "user"){
           alert("Unsuccessful Login Try Again.");
         } else if(body.userType == "user"){

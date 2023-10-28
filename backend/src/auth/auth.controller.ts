@@ -6,6 +6,8 @@ import {
   Req,
   UnauthorizedException,
   Get,
+  UseGuards,
+  Param
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signUp.dto';
@@ -13,6 +15,7 @@ import { LogInDto } from './dto/logIn.dto';
 import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ObjectId } from 'typeorm';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +23,12 @@ export class AuthController {
     private authService: AuthService,
     private jwtService: JwtService,
   ) {}
+
+  @Get('profile/:id')
+  @UseGuards(AuthGuard())
+  getUserId(@Param('id') token: string): Promise<{}> {
+    return this.authService.profile(token);
+  }
 
   @Post('/signup')
   signUp(@Body() signUpDto: SignUpDto): Promise<{ status: string }> {
@@ -32,9 +41,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<{
     token: string;
-    userId: ObjectId;
-    userType: string;
-    isAuthenticated: boolean;
+    isAuthenticated: boolean
   }> {
     return this.authService.login(logInDto);
   }

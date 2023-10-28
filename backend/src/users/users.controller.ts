@@ -10,6 +10,7 @@ import {
   UseGuards,
   UnauthorizedException,
   Req,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,7 +21,6 @@ import { ObjectId } from 'mongoose';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -28,6 +28,7 @@ export class UsersController {
     private readonly usersService: UsersService,
     private jwtService: JwtService,
   ) {}
+
 
   @Post()
   @UseGuards(AuthGuard())

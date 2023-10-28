@@ -10,7 +10,7 @@ import { useLoginStore } from "../store/loginStore";
 import { useApiStore } from "../store/apiStore";
 
 export default function LoginPage() {
-  const [isVerified, setIsVerified] = useState(false);
+  const [isVerified, setIsVerified] = useState(true);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -75,8 +75,8 @@ export default function LoginPage() {
     })
       .then((response) => response.json())
       .then((body) => {
-        if (body.token && body.userType != "user" && body.isAuthenticated) {
-          useLoginStore.setState({token: body.token, id: body.userId, isLoggedIn: true});
+        if (body.token != "" && body.userType != "user" && body.isAuthenticated) {
+          useLoginStore.setState({token: body.token, isLoggedIn: true});
           setCookie();
           setIsLoggedIn(true);
           router.push("/homepage");
@@ -84,8 +84,11 @@ export default function LoginPage() {
           alert("Unsuccessful Login Try Again.");
         } else if(body.userType == "user"){
           alert("You are only allowed to signin on FisherMap PH mobile application!")
-        } else if(body.userType != "user" && !body.isAuthenticated){
+        } else if((body.userType == "admin" || body.userType == "superadmin") && !body.isAuthenticated){
           alert("Pending Account Approval. You cannot login as of this moment.");
+        }else{
+          console.log(body);
+          alert(body.message);
         }
       });
   }
