@@ -36,7 +36,7 @@ export class UsersController {
     return this.usersService.newUser(user);
   }
 
-  @Get('/admin-users')
+  @Get('admin-users')
   @UseGuards(AuthGuard())
   async getAdminUsers(
     @Query() query: ExpressQuery,
@@ -44,7 +44,7 @@ export class UsersController {
     return this.usersService.getAdminUsers(query);
   }
 
-  @Get('/admin-pending-users')
+  @Get('admin-pending-users')
   @UseGuards(AuthGuard())
   async getAdminPendingUsers(
     @Query() query: ExpressQuery,
@@ -60,13 +60,30 @@ export class UsersController {
     return this.usersService.getAdminRejectedUsers(query);
   }
 
-  @Get('admin-users')
+  @Get('fisherfolk-users')
   @UseGuards(AuthGuard())
-  async getUsers(
+  async getFisherfolkUsers(
     @Query() query: ExpressQuery,
   ): Promise<User[]> {
-    return this.usersService.getAdminUsers(query);
+    return this.usersService.getFisherfolkUsers(query);
   }
+
+  @Get('fisherfolk-pending-users')
+  @UseGuards(AuthGuard())
+  async getFisherfolkPendingUsers(
+    @Query() query: ExpressQuery,
+  ): Promise<User[]> {
+    return this.usersService.getFisherfolkPendingUsers(query);
+  }
+
+  @Get('fisherfolk-rejected-users')
+  @UseGuards(AuthGuard())
+  async getFisherfolkRejectedUsers(
+    @Query() query: ExpressQuery,
+  ): Promise<User[]> {
+    return this.usersService.getFisherfolkRejectedUsers(query);
+  }
+
 
   @Get(':id')
   @UseGuards(AuthGuard())

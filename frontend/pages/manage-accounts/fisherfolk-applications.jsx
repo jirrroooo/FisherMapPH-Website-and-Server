@@ -5,15 +5,19 @@ import Link from "next/link";
 import Navbar from "../../components/navbar";
 import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
+import { useApiStore } from "../../store/apiStore";
+import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
+import FormattedDate from "../../components/formatted-date";
 
 export default function FisherfolkApplications() {
   const router = useRouter();
 
   const [isVerified, setIsVerified] = useState(false);
   const [data, setData] = useState();
-  const [isViewModal, setIsViewModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState();
-  const [isRevertModal, setIsRevertModal] = useState(false);
+  const [action, setAction] = useState();
+  const [isViewModal, setIsViewModal] = useState(false);
+  const [isApprovedRejectModal, setIsApprovedRejectModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -22,14 +26,13 @@ export default function FisherfolkApplications() {
     fetch("/api/verify")
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         if (body.status == "success") {
           setIsVerified(true);
           useLoginStore.setState({
             isVerifiedCookie: true,
             token: body.token,
           });
-          getUserId(body.id);
+          getUserId(body.token);
         } else {
           setIsVerified(false);
           useLoginStore.setState({ isVerifiedCookie: false });
@@ -38,8 +41,7 @@ export default function FisherfolkApplications() {
       });
   }, []);
 
-  
-  function getUserId(token){
+  function getUserId(token) {
     fetch(`http://localhost:3001/auth/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -47,30 +49,66 @@ export default function FisherfolkApplications() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if(data){
+        if (data) {
           useLoginStore.setState({
-            id: data.id
+            id: data.id,
           });
           getData();
         }
       });
   }
 
-  function getData(){
-    fetch(`${useApiStore.getState().apiUrl}users/admin-rejected-users`, {
+  function getData() {
+    fetch(`${useApiStore.getState().apiUrl}users/fisherfolk-pending-users`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         setData(body);
         setIsLoading(false);
       });
   }
 
+  function approve() {
+    fetch(`${useApiStore.getState().apiUrl}users/${selectedUser._id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${useLoginStore.getState().token}`,
+      },
+      body: JSON.stringify({
+        fishing_vessel_type: selectedUser.fishing_vessel_type,
+        isAuthenticated: true,
+      }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        window.location.reload();
+      });
+  }
+
+  function reject() {
+    fetch(`${useApiStore.getState().apiUrl}users/${selectedUser._id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${useLoginStore.getState().token}`,
+      },
+      body: JSON.stringify({
+        fishing_vessel_type: selectedUser.fishing_vessel_type,
+        user_type: "user-rejected",
+        isAuthenticated: false,
+      }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        window.location.reload();
+      });
+  }
+
   return (
     <>
-      {isVerified? (
+      {!isLoading ? (
         <>
           <Navbar />
           <div className="container mt-4 text-center">
@@ -178,36 +216,207 @@ export default function FisherfolkApplications() {
               </div>
               <br />
 
-              <div className="row student-data">
-                <div className="col-2">
-                  <p>John Rommel Octavo</p>
-                </div>
-                <div className="col-3">
-                  <p>jboctavo@up.edu.ph</p>
-                </div>
-                <div className="col-2">
-                  <p>Small</p>
-                </div>
-                <div className="col-2">
-                  <button className="btn btn-light px-4 rounded-5 fw-semibold text-black">
-                    View
-                  </button>
-                </div>
-                <div className="col-3">
-                  <div className="row">
-                    <div className="col">
-                      <button className="btn btn-success px-3 rounded-5 fw-semibold text-white">
-                        Accept
-                      </button>
+              {data.map((info, i) => {
+                return (
+                  <>
+                    <div className="row student-data mt-2">
+                      <div className="col-2">
+                        <p>
+                          {info.first_name} {info.last_name}
+                        </p>
+                      </div>
+                      <div className="col-3">
+                        <p>{info.email_address}</p>
+                      </div>
+                      <div className="col-2 text-capitalize">
+                        {info.fishing_vessel_type}
+                      </div>
+                      <div className="col-2">
+                        <button
+                          className="btn btn-light px-4 rounded-5 fw-semibold text-black"
+                          onClick={() => {
+                            setIsViewModal(!isViewModal);
+                            setSelectedUser(info);
+                          }}
+                        >
+                          View
+                        </button>
+                      </div>
+                      <div className="col-3">
+                        <div className="row">
+                          <div className="col">
+                            <button
+                              className="btn btn-success px-3 rounded-5 fw-semibold text-white"
+                              onClick={() => {
+                                setIsApprovedRejectModal(true);
+                                setAction("approve");
+                                setSelectedUser(info);
+                              }}
+                            >
+                              Accept
+                            </button>
+                          </div>
+                          <div className="col">
+                            <button
+                              className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
+                              onClick={() => {
+                                setIsApprovedRejectModal(true);
+                                setAction("reject");
+                                setSelectedUser(info);
+                              }}
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="col">
-                      <button className="btn btn-danger px-4 text-white rounded-5 fw-semibold ">
-                        Reject
-                      </button>
+                  </>
+                );
+              })}
+
+              {isViewModal && (
+                <>
+                  <Modal
+                    toggle={() => setIsViewModal(!isViewModal)}
+                    isOpen={isViewModal}
+                  >
+                    <div className=" modal-header">
+                      <h5
+                        className=" modal-title text-center m-auto fw-bold"
+                        id="viewModal"
+                      >
+                        ACCOUNT INFORMATION
+                      </h5>
                     </div>
-                  </div>
-                </div>
-              </div>
+                    <ModalBody>
+                      <table className="table">
+                        <tbody>
+                          <tr>
+                            <td className="fw-bold">Name:</td>
+                            <td>
+                              {selectedUser.first_name} {selectedUser.last_name}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Email Address:</td>
+                            <td>{selectedUser.email_address}</td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Contact Number:</td>
+                            <td>{selectedUser.contact_number}</td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Address:</td>
+                            <td>{selectedUser.address}</td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Birthday:</td>
+                            <td>
+                              <FormattedDate date={selectedUser.birthday} />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Civil Status:</td>
+                            {selectedUser.civil_status == "single" ? (
+                              <td>Single</td>
+                            ) : selectedUser.civil_status == "married" ? (
+                              <td>Married</td>
+                            ) : selectedUser.civil_status == "separated" ? (
+                              <td>Separated</td>
+                            ) : (
+                              <td>Widowed</td>
+                            )}
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Vessel Type:</td>
+                            <td className="text-capitalize">
+                              {selectedUser.fishing_vessel_type}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Membership Date:</td>
+                            <td>
+                              <FormattedDate date={selectedUser.createdAt} />
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        className="btn-light m-auto px-5"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsViewModal(false);
+                        }}
+                      >
+                        Back
+                      </Button>
+                    </ModalFooter>
+                  </Modal>
+                </>
+              )}
+
+              {isApprovedRejectModal && (
+                <>
+                  <Modal
+                    toggle={() =>
+                      setIsApprovedRejectModal(!isApprovedRejectModal)
+                    }
+                    isOpen={isApprovedRejectModal}
+                  >
+                    <div className=" modal-header">
+                      {action == "approve" ? (
+                        <h5
+                          className=" modal-title text-center m-auto fw-bold text-uppercase"
+                          id="viewModal"
+                        >
+                          Do you want to Approve {selectedUser.first_name}'s
+                          Account?
+                        </h5>
+                      ) : (
+                        <h5
+                          className=" modal-title text-center m-auto fw-bold text-uppercase"
+                          id="viewModal"
+                        >
+                          Do you want to Reject {selectedUser.first_name}'s
+                          Account?
+                        </h5>
+                      )}
+                    </div>
+                    <ModalBody></ModalBody>
+                    <ModalFooter>
+                      <Button
+                        className="btn-light m-auto px-5 fw-semibold"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          if (action == "approve") {
+                            approve();
+                          } else {
+                            reject();
+                          }
+                          setIsApprovedRejectModal(false);
+                        }}
+                      >
+                        Yes
+                      </Button>
+                      <Button
+                        className="btn-light m-auto px-5 fw-semibold"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsApprovedRejectModal(false);
+                        }}
+                      >
+                        No
+                      </Button>
+                    </ModalFooter>
+                  </Modal>
+                </>
+              )}
 
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">

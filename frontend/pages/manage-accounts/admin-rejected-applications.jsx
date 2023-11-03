@@ -17,6 +17,7 @@ export default function AdminRejectedApplications() {
   const [isViewModal, setIsViewModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState();
   const [isRevertModal, setIsRevertModal] = useState(false);
+  const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -25,14 +26,13 @@ export default function AdminRejectedApplications() {
     fetch("/api/verify")
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         if (body.status == "success") {
           setIsVerified(true);
           useLoginStore.setState({
             isVerifiedCookie: true,
             token: body.token,
           });
-          getUserId(body.id);
+          getUserId(body.token);
         } else {
           setIsVerified(false);
           useLoginStore.setState({ isVerifiedCookie: false });
@@ -41,8 +41,7 @@ export default function AdminRejectedApplications() {
       });
   }, []);
 
-  
-  function getUserId(token){
+  function getUserId(token) {
     fetch(`http://localhost:3001/auth/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -50,32 +49,30 @@ export default function AdminRejectedApplications() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if(data){
+        if (data) {
           useLoginStore.setState({
-            id: data.id
+            id: data.id,
           });
           getData();
         }
       });
   }
 
-  function getData(){
+  function getData() {
     fetch(`${useApiStore.getState().apiUrl}users/admin-rejected-users`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         setData(body);
         setIsLoading(false);
       });
   }
 
   function revertUser() {
-
-    if(selectedUser.user_type == "admin-rejected"){
+    if (selectedUser.user_type == "admin-rejected") {
       selectedUser.user_type = "admin";
-    }else{
+    } else {
       selectedUser.user_type = "superadmin";
     }
 
@@ -87,8 +84,22 @@ export default function AdminRejectedApplications() {
       },
       body: JSON.stringify({
         user_type: selectedUser.user_type,
-        isAuthenticated: false
+        isAuthenticated: false,
       }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        window.location.reload();
+      });
+  }
+
+  function deleteUser() {
+    fetch(`${useApiStore.getState().apiUrl}users/${selectedUser._id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${useLoginStore.getState().token}`,
+      },
     })
       .then((response) => response.json())
       .then((body) => {
@@ -236,16 +247,29 @@ export default function AdminRejectedApplications() {
                       </button>
                     </div>
                     <div className="col-3">
-                      <div className="col">
-                        <button
-                          className="btn btn-warning px-4 text-black rounded-5 fw-semibold "
-                          onClick={() => {
-                            setSelectedUser(info);
-                            setIsRevertModal(true);
-                          }}
-                        >
-                          Revert
-                        </button>
+                      <div className="row">
+                        <div className="col">
+                          <button
+                            className="btn btn-warning px-3 rounded-5 fw-semibold text-black"
+                            onClick={() => {
+                              setSelectedUser(info);
+                              setIsRevertModal(!isRevertModal);
+                            }}
+                          >
+                            Revert
+                          </button>
+                        </div>
+                        <div className="col">
+                          <button
+                            className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
+                            onClick={() => {
+                              setSelectedUser(info);
+                              setIsDeleteModal(!isDeleteModal);
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -338,7 +362,7 @@ export default function AdminRejectedApplications() {
                 </>
               )}
 
-            {isRevertModal && (
+              {isRevertModal && (
                 <>
                   <Modal
                     toggle={() => setIsRevertModal(!isRevertModal)}
@@ -354,8 +378,11 @@ export default function AdminRejectedApplications() {
                       </h5>
                     </div>
                     <ModalBody>
-                      <p className="text-center">Reverting {selectedUser.first_name}'s account will turn it to pending status.
-                      This account will be transferred to the pending account list if you continue.</p>
+                      <p className="text-center">
+                        Reverting {selectedUser.first_name}'s account will turn
+                        it to pending status. This account will be transferred
+                        to the pending account list if you continue.
+                      </p>
                     </ModalBody>
                     <ModalFooter>
                       <Button
@@ -375,6 +402,55 @@ export default function AdminRejectedApplications() {
                         type="button"
                         onClick={() => {
                           setIsRevertModal(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </ModalFooter>
+                  </Modal>
+                </>
+              )}
+
+              {isDeleteModal && (
+                <>
+                  <Modal
+                    toggle={() => setIsDeleteModal(!isDeleteModal)}
+                    isOpen={isDeleteModal}
+                  >
+                    <div className=" modal-header">
+                      <h5
+                        className=" modal-title text-center m-auto fw-bold text-uppercase"
+                        id="viewModal"
+                      >
+                        ARE YOU SURE YOU WANT TO DELETE{" "}
+                        {selectedUser.first_name}'s ACCOUNT?
+                      </h5>
+                    </div>
+                    <ModalBody>
+                      <p className="text-center">
+                        Deleting {selectedUser.first_name}'s account will erase
+                        all the account information. This action is
+                        irreversible.
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        className="btn-danger text-white m-auto px-5 fw-semibold"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsDeleteModal(false);
+                          deleteUser();
+                        }}
+                      >
+                        Proceed Deleting
+                      </Button>
+                      <Button
+                        className="btn-light m-auto px-5 fw-semibold"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsDeleteModal(false);
                         }}
                       >
                         Cancel

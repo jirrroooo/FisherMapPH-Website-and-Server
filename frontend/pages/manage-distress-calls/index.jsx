@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "../../components/navbar";
 import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
+import { useApiStore } from "../../store/apiStore";
 
 export default function ManageDistressCalls() {
   const router = useRouter();

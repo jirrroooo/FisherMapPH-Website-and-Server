@@ -27,7 +27,6 @@ export default function AdminAccounts() {
     fetch("/api/verify")
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         if (body.status == "success") {
           setIsVerified(true);
           useLoginStore.setState({
@@ -67,7 +66,6 @@ export default function AdminAccounts() {
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         setData(body);
         setIsLoading(false);
       });
@@ -83,8 +81,6 @@ export default function AdminAccounts() {
     if (mm < 10) mm = "0" + mm;
 
     const formattedToday = yyyy + "-" + mm + "-" + dd;
-
-    console.log(formattedToday);
 
     return formattedToday;
   }
@@ -110,7 +106,6 @@ export default function AdminAccounts() {
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         // alert("Edit Successful!");
         // router.refresh();
         window.location.reload();
@@ -138,7 +133,6 @@ export default function AdminAccounts() {
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         // alert("Edit Successful!");
         // router.refresh();
         window.location.reload();
@@ -158,7 +152,6 @@ export default function AdminAccounts() {
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         window.location.reload();
       });
   }

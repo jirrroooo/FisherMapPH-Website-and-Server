@@ -24,7 +24,7 @@ export class AuthController {
     private jwtService: JwtService,
   ) {}
 
-  @Get('profile/:id')
+  @Get('/profile/:id')
   @UseGuards(AuthGuard())
   getUserId(@Param('id') token: string): Promise<{}> {
     return this.authService.profile(token);

@@ -5,6 +5,7 @@ import Navbar from "../../components/navbar";
 import Link from "next/link";
 import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
+import { useApiStore } from "../../store/apiStore";
 
 export default function ManageAlerts() {
   const router = useRouter();

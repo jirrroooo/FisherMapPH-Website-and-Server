@@ -26,7 +26,6 @@ export default function AdminApplications() {
     fetch("/api/verify")
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         if (body.status == "success") {
           setIsVerified(true);
           useLoginStore.setState({
@@ -66,7 +65,6 @@ export default function AdminApplications() {
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         setData(body);
         setIsLoading(false);
       });
