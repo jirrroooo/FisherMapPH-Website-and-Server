@@ -20,7 +20,7 @@ export class AlertsService {
   }
 
   async getAlerts(query: Query): Promise<Alert[]> {
-    const responsePerPage = 10;
+    const responsePerPage = 5;
     const currentPage = Number(query.page) || 1;
     const skip = responsePerPage * (currentPage - 1);
 

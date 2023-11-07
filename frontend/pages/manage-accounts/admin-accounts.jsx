@@ -318,7 +318,7 @@ export default function AdminAccounts() {
                                   setSelectedUser(info);
                                 }}
                               >
-                                Edit
+                                Configure
                               </button>
                             </div>
                           </div>

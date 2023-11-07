@@ -33,7 +33,7 @@ export class Alert{
     expires: Date;
 
     @Prop()
-    instruction: Date;
+    instruction: string;
 
 }
 

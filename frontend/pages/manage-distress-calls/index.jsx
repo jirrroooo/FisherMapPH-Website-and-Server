@@ -39,8 +39,7 @@ export default function ManageDistressCalls() {
       });
   }, []);
 
-  
-  function getUserId(token){
+  function getUserId(token) {
     fetch(`http://localhost:3001/auth/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -48,17 +47,17 @@ export default function ManageDistressCalls() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if(data){
+        if (data) {
           useLoginStore.setState({
-            id: data.id
+            id: data.id,
           });
           getData();
         }
       });
   }
 
-  function getData(){
-    fetch(`${useApiStore.getState().apiUrl}users/admin-rejected-users`, {
+  function getData() {
+    fetch(`${useApiStore.getState().apiUrl}reports`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
     })
       .then((response) => response.json())
@@ -71,7 +70,7 @@ export default function ManageDistressCalls() {
 
   return (
     <>
-      {isVerified? (
+      {!isLoading ? (
         <>
           <Navbar />
           <div className="container mt-4 text-center">
@@ -162,7 +161,7 @@ export default function ManageDistressCalls() {
             <div className="card mt-3 p-2">
               <div className="row">
                 <div className="col-2">
-                  <h6>Name</h6>
+                  <h6>Type</h6>
                 </div>
                 <div className="col-3">
                   <h6>Message</h6>
@@ -179,36 +178,45 @@ export default function ManageDistressCalls() {
               </div>
               <br />
 
-              <div className="row student-data">
-                <div className="col-2">
-                  <p>John Rommel Octavo</p>
-                </div>
-                <div className="col-3">
-                  <p>We are being intimidated by Chinese Coast Guard ...</p>
-                </div>
-                <div className="col-2">
-                  <p>150 km West of Palawan</p>
-                </div>
-                <div className="col-2">
-                  <button className="btn btn-success px-4 rounded-5 fw-semibold text-white">
-                    View
-                  </button>
-                </div>
-                <div className="col-3">
-                  <div className="row">
-                    <div className="col">
-                      <button className="btn btn-light px-3 rounded-5 fw-semibold">
-                        Respond
+              {data.map((info) => {
+                return (
+                  <div className="row student-data mb-3">
+                    <div className="col-2">
+                      <p className="text-uppercase ">
+                        {info.type}{" "}
+                        <span className="badge bg-success text-white">OK</span>
+                        <span className="badge bg-warning text-black">FWD</span>
+                        <span className="badge bg-danger">ASAP</span>
+                      </p>
+                    </div>
+                    <div className="col-3">
+                      <p>{info.content}</p>
+                    </div>
+                    <div className="col-2">
+                      <p>150 km West of Palawan</p>
+                    </div>
+                    <div className="col-2">
+                      <button className="btn btn-success px-4 rounded-5 fw-semibold text-white">
+                        View
                       </button>
                     </div>
-                    <div className="col">
-                      <button className="btn btn-danger px-4 text-white rounded-5 fw-semibold ">
-                        Archive
-                      </button>
+                    <div className="col-3">
+                      <div className="row">
+                        <div className="col">
+                          <button className="btn btn-light px-3 rounded-5 fw-semibold">
+                            Respond
+                          </button>
+                        </div>
+                        <div className="col">
+                          <button className="btn btn-danger px-4 text-white rounded-5 fw-semibold ">
+                            Archive
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                );
+              })}
 
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">

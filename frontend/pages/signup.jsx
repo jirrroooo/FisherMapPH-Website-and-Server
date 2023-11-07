@@ -56,69 +56,18 @@ export default function Homepage() {
         console.log(body);
 
         if (body.status == "success") {
-          useLoginStore.setState({ isLoggedIn: true, isVerifiedCookie: true });
-          setIsVerified(true);
-
-          logIn(e);
+          alert("Signup Successful! Your account will be reviewed for approval.");
+          document.getElementById("fname").value = '';
+          document.getElementById("lname").value = '';
+          document.getElementById("email").value = '';
+          document.getElementById("bday").value = '';
+          document.getElementById("contact").value = '';
+          document.getElementById("address").value = '';
+          document.getElementById("civilStatus").value = 'Please Select';
+          document.getElementById("password").value = '';
         } else {
           useLoginStore.setState({ isVerifiedCookie: false });
           alert("Signing up unsuccessful");
-        }
-      });
-  }
-
-  function logIn(e) {
-    e.preventDefault();
-
-    console.log(document.getElementById("email").value);
-    console.log(document.getElementById("password").value);
-
-    fetch(`${useApiStore.getState().apiUrl}auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email_address: document.getElementById("email").value,
-        password: document.getElementById("password").value,
-      }),
-    })
-      .then((response) => response.json())
-      .then((body) => {
-        console.log(body);
-        if (body.token != "" && body.userType != "user" && body.isAuthenticted) {
-          useLoginStore.setState({token: body.token, id: body.userId});
-          setCookie();
-          router.push("/homepage");
-        } else if(body.token != "" && body.userType != "user" && !body.isAuthenticted){
-          alert("Successful signup. However, can't login as this moment. The account is not yet authenticated.");
-        } else if(body.token == "" && body.userType != "user"){
-          alert("Unsuccessful Login Try Again.");
-        } else if(body.userType == "user"){
-          alert("You are only allowed to signin on FisherMap PH mobile application!")
-        }
-      });
-  }
-
-  function setCookie() {
-    fetch("/api/manage-cookie", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        tk: useLoginStore.getState().token,
-        id: useLoginStore.getState().id,
-      }),
-    })
-      .then((response) => response.json())
-      .then((body) => {
-        console.log(body);
-
-        if (body.status == "success") {
-          useLoginStore.setState({ isVerifiedCookie: true });
-        } else {
-          useLoginStore.setState({ isVerifiedCookie: false });
         }
       });
   }
@@ -157,7 +106,7 @@ export default function Homepage() {
                       className="form-control"
                       id="email"
                       name="email"
-                      placeholder="Enter Address"
+                      placeholder="Enter Email Address"
                       required
                     />
                     <label className="text-start mb-2 fst-italic" name="bday">
@@ -187,14 +136,17 @@ export default function Homepage() {
                       placeholder="Complete Address"
                       required
                     />
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="civilStatus"
-                      name="civilStatus"
-                      placeholder="Civil Status"
-                      required
-                    />
+                    <label htmlFor="civilStatus" className="label mb-2 fst-italic pb-2 px-3">
+                      Civil Status
+                    </label>
+                    <select id="civilStatus" name="civilStatus" className="px-5 py-2 border-1">
+                      <option value="single" className="text-center" selected>
+                        Single
+                      </option>
+                      <option value="married" className="text-center" >Married</option>
+                      <option value="widowed" className="text-center" >Widowed</option>
+                      <option value="separated" className="text-center" >Legally Separated</option>
+                    </select>
                     <input
                       type="password"
                       className="form-control"

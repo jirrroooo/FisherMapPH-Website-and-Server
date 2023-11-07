@@ -34,7 +34,6 @@ export class CreateAlertDto {
     @Type(() => Date)
     expires: Date;
 
-    @IsDate()
-    @Type(() => Date)
-    instruction: Date;
+    @IsString()
+    instruction: string;
 }
