@@ -4,11 +4,19 @@ import { ReportsController } from './report.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ReportSchema } from './schemas/reports.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { UsersModule } from 'src/users/users.module';
+import { PositionsModule } from 'src/positions/positions.module';
+import { UserSchema } from 'src/users/schemas/users.schema';
+import { PositionSchema } from 'src/positions/schemas/positions.schema';
 
 @Module({
   imports: [
+    UsersModule,
+    PositionsModule,
     AuthModule,
-    MongooseModule.forFeature([{name: 'Report', schema: ReportSchema}])
+    MongooseModule.forFeature([{name: 'Report', schema: ReportSchema}]),
+    MongooseModule.forFeature([{name: 'User', schema: UserSchema}]),
+    MongooseModule.forFeature([{name: 'Position', schema: PositionSchema}])
   ],
   controllers: [ReportsController],
   providers: [ReportsService],

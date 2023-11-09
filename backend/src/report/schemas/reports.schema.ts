@@ -19,6 +19,9 @@ export class Report{
     @Prop()
     content: string;
 
+    @Prop()
+    status: string;
+
 }
 
 export const ReportSchema = SchemaFactory.createForClass(Report);

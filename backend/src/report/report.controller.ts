@@ -20,8 +20,8 @@ export class ReportsController {
 
   @Get()
   @UseGuards(AuthGuard())
-  async getReports(@Query() query: ExpressQuery): Promise<Report[]> {
-    return this.reportsService.getReports(query);
+  async getReports(@Query() query: ExpressQuery) {
+    return await this.reportsService.getReports(query);
   }
 
   @Get(':id')

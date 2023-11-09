@@ -6,6 +6,11 @@ import Navbar from "../../components/navbar";
 import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
 import { useApiStore } from "../../store/apiStore";
+import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
+import FormattedDate, {
+  FormattedDateTime,
+} from "../../components/formatted-date";
+import ListFormat from "../../components/list";
 
 export default function ManageDistressCalls() {
   const router = useRouter();
@@ -167,7 +172,7 @@ export default function ManageDistressCalls() {
                   <h6>Message</h6>
                 </div>
                 <div className="col-2">
-                  <h6>Location</h6>
+                  <h6>Vessel Type</h6>
                 </div>
                 <div className="col-2">
                   <h6>Details</h6>
@@ -182,41 +187,211 @@ export default function ManageDistressCalls() {
                 return (
                   <div className="row student-data mb-3">
                     <div className="col-2">
-                      <p className="text-uppercase ">
-                        {info.type}{" "}
-                        <span className="badge bg-success text-white">OK</span>
-                        <span className="badge bg-warning text-black">FWD</span>
-                        <span className="badge bg-danger">ASAP</span>
-                      </p>
+                      {info.report.status == "no_response" && (
+                        <p className="text-uppercase ">
+                          {info.report.type}{" "}
+                          <span className="badge bg-danger">ASAP</span>
+                        </p>
+                      )}
+
+                      {info.report.status == "forwarded" && (
+                        <p className="text-uppercase ">
+                          {info.report.type}{" "}
+                          <span className="badge bg-warning text-black">
+                            FWD
+                          </span>
+                        </p>
+                      )}
+
+                      {info.report.status == "responded" && (
+                        <p className="text-uppercase ">
+                          {info.report.type}{" "}
+                          <span className="badge bg-success text-white">
+                            OK
+                          </span>
+                        </p>
+                      )}
+
+                      {info.report.status == "archive" && (
+                        <p className="text-uppercase ">
+                          {info.report.type}{" "}
+                          <span className="badge bg-light text-black">
+                            ARCH
+                          </span>
+                        </p>
+                      )}
                     </div>
                     <div className="col-3">
-                      <p>{info.content}</p>
+                      <p>{info.report.content}</p>
                     </div>
                     <div className="col-2">
-                      <p>150 km West of Palawan</p>
+                      <p className="text-capitalize">
+                        {info.userInfo.fishing_vessel_type}
+                      </p>
+                      <p></p>
                     </div>
                     <div className="col-2">
-                      <button className="btn btn-success px-4 rounded-5 fw-semibold text-white">
+                      <button
+                        className="btn btn-success px-4 rounded-5 fw-semibold text-white"
+                        onClick={() => {
+                          setSelectedUser(info);
+                          setIsViewModal(true);
+                        }}
+                      >
                         View
                       </button>
                     </div>
                     <div className="col-3">
                       <div className="row">
                         <div className="col">
-                          <button className="btn btn-light px-3 rounded-5 fw-semibold">
-                            Respond
-                          </button>
+                          {info.report.status == "responded" ? (
+                            <button
+                              className="btn btn-light px-3 rounded-5 fw-semibold"
+                              disabled
+                            >
+                              Responded
+                            </button>
+                          ) : info.report.status == "archive" ? (
+                            <button
+                              className="btn btn-light px-3 rounded-5 fw-semibold"
+                              disabled
+                            >
+                              Archived
+                            </button>
+                          ) : (
+                            <button className="btn btn-secondary px-3 rounded-5 fw-semibold">
+                              Respond
+                            </button>
+                          )}
                         </div>
+
                         <div className="col">
-                          <button className="btn btn-danger px-4 text-white rounded-5 fw-semibold ">
-                            Archive
-                          </button>
+                          {info.report.status == "archive" ? (
+                            <button className="btn btn-light px-4 text-black rounded-5 fw-semibold ">
+                              Unarchive
+                            </button>
+                          ) : (
+                            <button className="btn btn-danger px-4 text-white rounded-5 fw-semibold ">
+                              Archive
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
                 );
               })}
+
+              {isViewModal && (
+                <>
+                  <Modal
+                    toggle={() => setIsViewModal(!isViewModal)}
+                    isOpen={isViewModal}
+                  >
+                    <div className=" modal-header">
+                      <h5
+                        className=" modal-title text-center m-auto fw-bold"
+                        id="viewModal"
+                      >
+                        DISTRESS CALL INFORMATION
+                      </h5>
+                    </div>
+                    <ModalBody>
+                      <table className="table">
+                        <tbody>
+
+                          <tr>
+                            <td className="fw-bold">Date and Time:</td>
+                            <td>
+                              <FormattedDateTime
+                                date={selectedUser.report.createdAt}
+                              />
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td className="fw-bold">Type:</td>
+                            <td>{selectedUser.report.type}</td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Message:</td>
+                            <td>{selectedUser.report.content}</td>
+                          </tr>
+
+                          {selectedUser.report.status == "no_response" && (
+                            <tr>
+                              <td className="fw-bold">Status:</td>
+                              <td>Not Responded Yet</td>
+                            </tr>
+                          )}
+
+                          {selectedUser.report.status != "no_response" && (
+                            <tr>
+                              <td className="fw-bold">Status:</td>
+                              <td className="text-capitalize">
+                                {selectedUser.report.status}
+                              </td>
+                            </tr>
+                          )}
+
+                          <tr>
+                            <td className="fw-bold">Location:</td>
+                            <td>
+                              ({selectedUser.positionInfo.longitude},{" "}
+                              {selectedUser.positionInfo.longitude})
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td className="fw-bold">Fishing Vessel Type:</td>
+                            <td className="text-capitalize">
+                              {selectedUser.userInfo.fishing_vessel_type}
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td className="fw-bold">Sea Depth</td>
+                            <td>{selectedUser.positionInfo.sea_depth}</td>
+                          </tr>
+
+                          <tr>
+                            <td className="fw-bold">Fisherfolk Name:</td>
+                            <td className="text-capitalize">
+                              {selectedUser.userInfo.first_name}{" "}
+                              {selectedUser.userInfo.last_name}
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td className="fw-bold">Contact Number:</td>
+                            <td>{selectedUser.userInfo.contact_number}</td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Person to Notify: </td>
+                            <td>{selectedUser.userInfo.person_to_notify}</td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Address:</td>
+                            <td>{selectedUser.userInfo.address}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        className="btn-light m-auto px-5"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsViewModal(false);
+                        }}
+                      >
+                        Back
+                      </Button>
+                    </ModalFooter>
+                  </Modal>
+                </>
+              )}
 
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">
