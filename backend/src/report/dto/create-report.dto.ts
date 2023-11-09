@@ -15,4 +15,7 @@ export class CreateReportDto {
 
     @IsString()
     content: string;
+
+    @IsString()
+    status: string;
 }
