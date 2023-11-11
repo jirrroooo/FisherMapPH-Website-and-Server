@@ -43,7 +43,7 @@ export default function AdminApplications() {
 
 
   function getUserId(token){
-    fetch(`http://localhost:3001/auth/profile/${token}`, {
+    fetch(`${useApiStore.getState().apiUrl}auth/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

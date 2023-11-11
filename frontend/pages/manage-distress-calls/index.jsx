@@ -45,7 +45,7 @@ export default function ManageDistressCalls() {
   }, []);
 
   function getUserId(token) {
-    fetch(`http://localhost:3001/auth/profile/${token}`, {
+    fetch(`${useApiStore.getState().apiUrl}/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
