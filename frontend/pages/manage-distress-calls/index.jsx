@@ -11,6 +11,8 @@ import FormattedDate, {
   FormattedDateTime,
 } from "../../components/formatted-date";
 import ListFormat from "../../components/list";
+import { userInfo } from "os";
+import { useUserDataStore } from "../../store/userDataStore";
 
 export default function ManageDistressCalls() {
   const router = useRouter();
@@ -18,9 +20,19 @@ export default function ManageDistressCalls() {
   const [isVerified, setIsVerified] = useState(false);
   const [data, setData] = useState();
   const [isViewModal, setIsViewModal] = useState(false);
+  const [isRespondModal, setIsRespondModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState();
+  const [isArchiveModal, setIsArchiveModal] = useState(false);
+  const [isUnarchiveModal, setIsUnarchiveModal] = useState(false);
   const [isRevertModal, setIsRevertModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [emailInput, setEmailInput] = useState([
+    {
+      type: "text",
+      id: 1,
+      value: "",
+    },
+  ]);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -56,6 +68,27 @@ export default function ManageDistressCalls() {
           useLoginStore.setState({
             id: data.id,
           });
+          getUserData(token);
+          getData();
+        }
+      });
+  }
+
+  function getUserData(token) {
+    fetch(
+      `${useApiStore.getState().apiUrl}/user/${useLoginStore.getState().id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          useUserDataStore.setState({
+            userData: data,
+          });
           getData();
         }
       });
@@ -70,6 +103,202 @@ export default function ManageDistressCalls() {
         console.log(body);
         setData(body);
         setIsLoading(false);
+      });
+  }
+
+  function addEmailInput(e) {
+    e.preventDefault();
+
+    setEmailInput((info) => {
+      return [
+        ...info,
+        {
+          type: "text",
+          value: "",
+        },
+      ];
+    });
+  }
+
+  function handleChange(e) {
+    e.preventDefault();
+
+    const index = e.target.id;
+
+    setEmailInput((email) => {
+      const newArr = email.slice();
+      newArr[index].value = e.target.value;
+
+      return newArr;
+    });
+  }
+
+  function resetEmailInput() {
+    setEmailInput([
+      {
+        type: "text",
+        id: 1,
+        value: "",
+      },
+    ]);
+  }
+
+  async function sendInformation(email_list) {
+    const html_content = `
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 15px;
+        }
+        th, td {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        th {
+          background-color: #f2f2f2;
+        }
+      </style>
+    </head>
+    <body>
+      <p>Dear Ma'am/Sir:</p>
+      <p>Please be informed that there is an emergency situation for a fisherfolk that needs your attention. Below are the details of the distres call alert.</p>
+      
+      <p style="font-weight: bold; margin-top: 30px">Message from the Administrator:</p>
+      <p>${document.getElementById("emailContent").value}</p>
+
+      <h2 style="margin-top: 30px">Distress Call Report</h2>
+    
+      <table>
+        <tr>
+          <th>Date & Time</th>
+          <td>${selectedUser.report.createdAt}
+          </td>
+        </tr>
+        <tr>
+          <th>Type</th>
+          <td>${selectedUser.report.type}</td>
+        </tr>
+        <tr>
+          <th>Message</th>
+          <td>${selectedUser.report.content}</td>
+        </tr>
+        <tr>
+        <th>Status</th>
+        <td>${selectedUser.report.status}</td>
+      </tr>
+        <tr>
+          <th>Location</th>
+          <td>Latitude: ${selectedUser.positionInfo.latitude}, Longitude: ${
+      selectedUser.positionInfo.longitude
+    }</td>
+        </tr>
+        <tr>
+          <th>Fishing Vessel Type</th>
+          <td>${selectedUser.userInfo.fishing_vessel_type}
+          </td>
+        </tr>
+        <tr>
+          <th>Sea Depth</th>
+          <td> ${parseFloat(
+            selectedUser.positionInfo.sea_depth.toFixed(4)
+          )} meters</td>
+        </tr>
+        <tr>
+          <th>Fisherfolk Name</th>
+          <td>${selectedUser.userInfo.first_name} ${
+      selectedUser.userInfo.last_name
+    }</td>
+        </tr>
+        <tr>
+          <th>Contact Number</th>
+          <td>${selectedUser.userInfo.contact_number}</td>
+        </tr>
+        <tr>
+          <th>Person to Notify</th>
+          <td>${selectedUser.userInfo.person_to_notify}</td>
+        </tr>
+        <tr>
+          <th>Address</th>
+          <td>${selectedUser.userInfo.address}</td>
+        </tr>
+      </table>
+
+      <p style="margin-top: 30px">Sincerly yours,</p>
+      <p style="font-weight: bold; text-transform: uppercase; margin-bottom: 0px">${
+        useUserDataStore.getState().userData.first_name
+      } ${useUserDataStore.getState().userData.last_name}</p>
+      <p style="margin-top: 0px">FisherMap PH</p>
+    
+    </body>
+    </html>
+    `;
+
+    const emails = email_list.map((item) => {
+      return item.value;
+    });
+
+    const text = `
+    Distress Signal Call was initiated by ${selectedUser.userInfo.first_name} ${
+      selectedUser.userInfo.last_name
+    }
+    Distress Signal was received on: ${(
+      <FormattedDateTime date={selectedUser.report.createdAt} />
+    )}
+    Position: ${selectedUser.positionInfo.latitude}, ${
+      selectedUser.positionInfo.longitude
+    }
+    Message from the sender: ${selectedUser.report.content}
+    `;
+
+    const subject = document.getElementById("emailSubject").value;
+
+    await fetch(`${useApiStore.getState().apiUrl}contact`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${useLoginStore.getState().token}`,
+      },
+      body: JSON.stringify({
+        mail_list: emails,
+        email_subject: subject,
+        text_message: text,
+        html_message: html_content,
+      }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body);
+        updateStatus("forwarded");
+      });
+  }
+
+  async function updateStatus(status) {
+    await fetch(
+      `${useApiStore.getState().apiUrl}reports/${selectedUser.report._id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${useLoginStore.getState().token}`,
+        },
+        body: JSON.stringify({
+          status: status,
+        }),
+      }
+    )
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body);
+        window.location.reload();
       });
   }
 
@@ -259,7 +488,13 @@ export default function ManageDistressCalls() {
                               Archived
                             </button>
                           ) : (
-                            <button className="btn btn-secondary px-3 rounded-5 fw-semibold">
+                            <button
+                              className="btn btn-secondary px-3 rounded-5 fw-semibold"
+                              onClick={() => {
+                                setSelectedUser(info);
+                                setIsRespondModal(true);
+                              }}
+                            >
                               Respond
                             </button>
                           )}
@@ -267,11 +502,23 @@ export default function ManageDistressCalls() {
 
                         <div className="col">
                           {info.report.status == "archive" ? (
-                            <button className="btn btn-light px-4 text-black rounded-5 fw-semibold ">
+                            <button
+                              className="btn btn-light px-4 text-black rounded-5 fw-semibold "
+                              onClick={() => {
+                                setSelectedUser(info);
+                                setIsUnarchiveModal(true);
+                              }}
+                            >
                               Unarchive
                             </button>
                           ) : (
-                            <button className="btn btn-danger px-4 text-white rounded-5 fw-semibold ">
+                            <button
+                              className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
+                              onClick={() => {
+                                setSelectedUser(info);
+                                setIsArchiveModal(true);
+                              }}
+                            >
                               Archive
                             </button>
                           )}
@@ -299,7 +546,6 @@ export default function ManageDistressCalls() {
                     <ModalBody>
                       <table className="table">
                         <tbody>
-
                           <tr>
                             <td className="fw-bold">Date and Time:</td>
                             <td>
@@ -350,8 +596,13 @@ export default function ManageDistressCalls() {
                           </tr>
 
                           <tr>
-                            <td className="fw-bold">Sea Depth</td>
-                            <td>{selectedUser.positionInfo.sea_depth}</td>
+                            <td className="fw-bold">Sea Depth:</td>
+                            <td>
+                              {parseFloat(
+                                selectedUser.positionInfo.sea_depth.toFixed(4)
+                              )}{" "}
+                              meters
+                            </td>
                           </tr>
 
                           <tr>
@@ -393,6 +644,185 @@ export default function ManageDistressCalls() {
                 </>
               )}
 
+              {isRespondModal && (
+                <>
+                  <Modal
+                    toggle={() => setIsViewModal(!isRespondModal)}
+                    isOpen={isRespondModal}
+                  >
+                    <div className=" modal-header">
+                      <h5
+                        className=" modal-title text-center m-auto fw-bold"
+                        id="viewModal"
+                      >
+                        Send Distress Call Information to Authorities
+                      </h5>
+                    </div>
+                    <ModalBody>
+                      <form>
+                        <label>Email Subject:</label>
+                        <input
+                          className="form-control mt-2"
+                          type="text"
+                          placeholder="Subject of the Email"
+                          defaultValue="[URGENT] Distress Call Alert"
+                          id="emailSubject"
+                        />
+                        <label>Email Content:</label>
+                        <textarea
+                          className="form-control mt-2"
+                          placeholder="Optional Message to the Authorities"
+                          id="emailContent"
+                        />
+                        <label className="mt-4">
+                          The distress signal information will be sent to the
+                          following:
+                        </label>
+                        <div className="text-center">
+                          {emailInput.map((item, i) => {
+                            return (
+                              <input
+                                className="form-control mt-2"
+                                type="email"
+                                placeholder="Authority Email Address"
+                                onChange={handleChange}
+                                value={item.value}
+                                id={i}
+                              />
+                            );
+                          })}
+
+                          <button
+                            onClick={addEmailInput}
+                            className="btn btn-secondary text-center mt-2"
+                            onSubmit={null}
+                          >
+                            + Email Address
+                          </button>
+                        </div>
+                      </form>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        className="btn-primary m-auto px-5"
+                        color="primary"
+                        type="button"
+                        onClick={() => {
+                          setIsRespondModal(false);
+                          resetEmailInput();
+                          sendInformation(emailInput);
+                        }}
+                      >
+                        Send Information
+                      </Button>
+                      <Button
+                        className="btn-light m-auto px-5"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsRespondModal(false);
+                          resetEmailInput();
+                        }}
+                      >
+                        Back
+                      </Button>
+                    </ModalFooter>
+                  </Modal>
+                </>
+              )}
+
+              {isArchiveModal && (
+                <>
+                  <Modal
+                    toggle={() => setIsArchiveModal(!isArchiveModal)}
+                    isOpen={isArchiveModal}
+                  >
+                    <div className="modal-header">
+                      <h5
+                        className="modal-title text-center m-auto fw-bold text-uppercase"
+                        id="viewModal"
+                      >
+                        ARE YOU SURE YOU WANT TO ARCHIVE THIS REPORT?
+                      </h5>
+                    </div>
+                    <ModalBody>
+                      <p className="text-center">
+                        You can always unarchive this report anytime.
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        className="btn-danger text-white m-auto px-5 fw-semibold"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsArchiveModal(false);
+                          updateStatus("archive");
+                        }}
+                      >
+                        Proceed Archiving
+                      </Button>
+                      <Button
+                        className="btn-light m-auto px-5 fw-semibold"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsArchiveModal(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </ModalFooter>
+                  </Modal>
+                </>
+              )}
+
+              {isUnarchiveModal && (
+                <>
+                  <Modal
+                    toggle={() => setIsArchiveModal(!isUnarchiveModal)}
+                    isOpen={isUnarchiveModal}
+                  >
+                    <div className="modal-header">
+                      <h5
+                        className="modal-title text-center m-auto fw-bold text-uppercase"
+                        id="viewModal"
+                      >
+                        ARE YOU SURE YOU WANT TO UNARCHIVE THIS REPORT?
+                      </h5>
+                    </div>
+                    <ModalBody>
+                      <p className="text-center">
+                        You can always archive this report anytime.
+                      </p>
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        className="btn-danger text-white m-auto px-5 fw-semibold"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsUnarchiveModal(false);
+                          updateStatus("responded");
+                        }}
+                      >
+                        Proceed Unarchiving
+                      </Button>
+                      <Button
+                        className="btn-light m-auto px-5 fw-semibold"
+                        color="secondary"
+                        type="button"
+                        onClick={() => {
+                          setIsUnarchiveModal(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </ModalFooter>
+                  </Modal>
+                </>
+              )}
+
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">
                   <a className="page-link disabled" href="#">
@@ -422,28 +852,15 @@ export default function ManageDistressCalls() {
               </ul>
             </div>
 
-            <div className="row">
-              <div className="col-4"></div>
-              <div className="col-2">
-                <Link
-                  type="button"
-                  className="btn btn-primary mt-5"
-                  onClick={null}
-                  href="#"
-                >
-                  View Sea Map
-                </Link>
-              </div>
-              <div className="col-2">
-                <button
-                  type="button"
-                  className="btn btn-primary mt-5"
-                  onClick={null}
-                >
-                  Send All Data
-                </button>
-              </div>
-              <div className="col-4"></div>
+            <div className="m-auto">
+              <Link
+                type="button"
+                className="btn btn-primary mt-5"
+                onClick={null}
+                href="#"
+              >
+                View Sea Map
+              </Link>
             </div>
           </div>
         </>

@@ -10,17 +10,20 @@ import { ReportModule } from './report/report.module';
 import { LogsModule } from './logs/logs.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
+import { ContactModule } from './contact/contact.module';
 
 
 @Module({
-  imports: [ConfigModule.forRoot({
+  imports: [
+    ConfigModule.forRoot({
     envFilePath: ['.env'],
     isGlobal: true,
   }),
   AlertsModule, UsersModule, WeathersModule,
   PositionsModule, ReportModule, LogsModule,
   MongooseModule.forRoot(process.env.DB_URI),
-  AuthModule],
+  AuthModule,
+  ContactModule],
   controllers: [AppController],
   providers: [AppService],
 })
