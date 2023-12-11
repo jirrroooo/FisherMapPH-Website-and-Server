@@ -23,25 +23,6 @@ export class AlertsService {
     return res;
   }
 
-  // async getAlerts(query: Query): Promise<Alert[]> {
-  //   const responsePerPage = 5;
-  //   const currentPage = Number(query.page) || 1;
-  //   const skip = responsePerPage * (currentPage - 1);
-
-  //   const keyword = query.keyword ? {
-  //     title: {
-  //       $regex: query.keyword,
-  //       $options: 'i'
-  //     }
-  //   } : {}
-
-  //   const alerts = await this.alertModel.find({...keyword})
-  //   .sort({createdAt: -1})
-  //   .limit(responsePerPage)
-  //   .skip(skip);
-
-  //   return alerts;
-  // }
 
   async getAlerts(query: Query): Promise<Alert[]> {
     const responsePerPage = 5;
@@ -116,17 +97,8 @@ export class AlertsService {
       }
     }
 
-    // const keyword = query.keyword
-    //   ? {
-    //       title: {
-    //         $regex: query.keyword,
-    //         $options: 'i',
-    //       },
-    //     }
-    //   : {};
-
     const alerts = await this.alertModel
-      .find({})
+      .find({ })
       .sort({ createdAt: -1 })
       .limit(responsePerPage)
       .skip(skip);

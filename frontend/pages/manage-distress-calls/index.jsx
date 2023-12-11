@@ -26,6 +26,9 @@ export default function ManageDistressCalls() {
   const [isUnarchiveModal, setIsUnarchiveModal] = useState(false);
   const [isRevertModal, setIsRevertModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [searchBy, setSearchBy] = useState("Search by");
+  const [sortBy, setSortBy] = useState("Sort by");
   const [emailInput, setEmailInput] = useState([
     {
       type: "text",
@@ -57,7 +60,7 @@ export default function ManageDistressCalls() {
   }, []);
 
   function getUserId(token) {
-    fetch(`${useApiStore.getState().apiUrl}/profile/${token}`, {
+    fetch(`${useApiStore.getState().apiUrl}profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -76,7 +79,7 @@ export default function ManageDistressCalls() {
 
   function getUserData(token) {
     fetch(
-      `${useApiStore.getState().apiUrl}/user/${useLoginStore.getState().id}`,
+      `${useApiStore.getState().apiUrl}user/${useLoginStore.getState().id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,6 +107,51 @@ export default function ManageDistressCalls() {
         setData(body);
         setIsLoading(false);
       });
+  }
+
+  function getFilteredData() {
+
+    const search = document.getElementById("search").value;
+
+    console.log(`searchBy=${searchBy}, search=${search}, sortBy=${sortBy}`);
+
+    if (sortBy != "Sort By" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }reports?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (sortBy == "Sort by" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }reports?searchBy=${searchBy}&search=${search}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy == "Search by") {
+      getData();
+    }
   }
 
   function addEmailInput(e) {
@@ -316,14 +364,15 @@ export default function ManageDistressCalls() {
               assumenda, excepturi consequatur.
             </p>
 
-            <form className="my-5">
+            <form className="my-4">
               <div className="row">
                 <div className="col-6">
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Enter Name"
-                    name="seach"
+                    placeholder="Enter Search Query"
+                    name="search"
+                    id="search"
                   />
                 </div>
 
@@ -333,23 +382,55 @@ export default function ManageDistressCalls() {
                       type="button"
                       className="btn btn-light dropdown-toggle px-5 fw-bold "
                       data-bs-toggle="dropdown"
+                      id="searchBy"
                     >
-                      Search by
+                      {searchBy == "alert_type"
+                        ? "Alert Type"
+                        : searchBy == "message"
+                        ? "Message"
+                        : searchBy == "status"
+                        ? "Status"
+                        : searchBy}
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Name
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("alert_type")}
+                          value="alert_type"
+                        >
+                          Alert Type
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Vessel Type
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("message")}
+                          value="message"
+                        >
+                          Message
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Location
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("status")}
+                          value="status"
+                        >
+                          Status
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("Search by")}
+                          value=""
+                        >
+                          Remove Filter
                         </a>
                       </li>
                     </ul>
@@ -363,17 +444,38 @@ export default function ManageDistressCalls() {
                       className="btn btn-light dropdown-toggle px-5 fw-bold"
                       data-bs-toggle="dropdown"
                     >
-                      Sort by
+                      {sortBy == "alphabetical"
+                        ? "Alphabetical"
+                        : sortBy == "reverse_alphabetical"
+                        ? "Reverse Order"
+                        : "Sort by"}
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Ascending Alphabetical
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("alphabetical")}
+                        >
+                          Alphabetical
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Descending Alphabetical
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("reverse_alphabetical")}
+                        >
+                          Reverse Alphabetical
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("Sort by")}
+                        >
+                          Remove Filter
                         </a>
                       </li>
                     </ul>
@@ -384,7 +486,7 @@ export default function ManageDistressCalls() {
                   <button
                     type="button"
                     className="btn btn-primary px-5 fw-bold"
-                    onClick={null}
+                    onClick={getFilteredData}
                   >
                     Search
                   </button>
@@ -419,7 +521,7 @@ export default function ManageDistressCalls() {
                       {info.report.status == "no_response" && (
                         <p className="text-uppercase ">
                           {info.report.type}{" "}
-                          <span className="badge bg-danger">ASAP</span>
+                          <span className="badge bg-danger">NO RES</span>
                         </p>
                       )}
 
