@@ -356,28 +356,6 @@ export class UsersService {
     return users;
   }
 
-  // async getFisherfolkUsers(query: Query): Promise<User[]> {
-  //   const responsePerPage = 6;
-  //   const currentPage = Number(query.page) || 1;
-  //   const skip = responsePerPage * (currentPage - 1);
-
-  //   const keyword = query.keyword
-  //     ? {
-  //         title: {
-  //           $regex: query.keyword,
-  //           $options: 'i',
-  //         },
-  //       }
-  //     : {};
-
-  //   const users = await this.userModel
-  //     .find({ user_type: 'user', isAuthenticated: true })
-  //     .sort({ createdAt: -1 })
-  //     .limit(responsePerPage)
-  //     .skip(skip);
-
-  //   return users;
-  // }
 
   async getFisherfolkUsers(query: Query): Promise<User[]> {
     const responsePerPage = 5;
@@ -711,28 +689,6 @@ export class UsersService {
     return users;
   }
 
-  // async getFisherfolkRejectedUsers(query: Query): Promise<User[]> {
-  //   const responsePerPage = 5;
-  //   const currentPage = Number(query.page) || 1;
-  //   const skip = responsePerPage * (currentPage - 1);
-
-  //   const keyword = query.keyword
-  //     ? {
-  //         title: {
-  //           $regex: query.keyword,
-  //           $options: 'i',
-  //         },
-  //       }
-  //     : {};
-
-  //   const users = await this.userModel
-  //     .find({ user_type: 'user-rejected' })
-  //     .sort({ createdAt: -1 })
-  //     .limit(responsePerPage)
-  //     .skip(skip);
-
-  //   return users;
-  // }
 
   async getUser(id: ObjectId): Promise<User> {
     const isValidId = mongoose.isValidObjectId(id);

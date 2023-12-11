@@ -21,6 +21,9 @@ export default function ManageAlerts() {
   const [isEditModal, setIsEditModal] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [searchBy, setSearchBy] = useState("Search by");
+  const [sortBy, setSortBy] = useState("Sort by");
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -72,6 +75,50 @@ export default function ManageAlerts() {
         setIsLoading(false);
       });
   }
+
+  function getFilteredData() {
+
+    const search = document.getElementById("search").value;
+
+    if (sortBy != "Sort By" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }alerts?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (sortBy == "Sort by" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }alerts?searchBy=${searchBy}&search=${search}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy == "Search by") {
+      getData();
+    }
+  }
+
 
   function createAlert() {
     const isSpecific = document.getElementById("yes").checked ? true : false;
@@ -175,14 +222,15 @@ export default function ManageAlerts() {
               assumenda, excepturi consequatur.
             </p>
 
-            <form className="my-5">
+            <form className="my-4">
               <div className="row">
                 <div className="col-6">
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Enter Name"
-                    name="seach"
+                    placeholder="Enter Search Query"
+                    name="search"
+                    id="search"
                   />
                 </div>
 
@@ -192,23 +240,55 @@ export default function ManageAlerts() {
                       type="button"
                       className="btn btn-light dropdown-toggle px-5 fw-bold "
                       data-bs-toggle="dropdown"
+                      id="searchBy"
                     >
-                      Search by
+                      {searchBy == "title"
+                        ? "Title"
+                        : searchBy == "description"
+                        ? "Description"
+                        : searchBy == "level"
+                        ? "Level"
+                        : searchBy}
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("title")}
+                          value="title"
+                        >
                           Title
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("description")}
+                          value="description"
+                        >
+                          Description
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("level")}
+                          value="level"
+                        >
                           Level
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Location
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("search by")}
+                          value=""
+                        >
+                          Remove Filter
                         </a>
                       </li>
                     </ul>
@@ -222,17 +302,38 @@ export default function ManageAlerts() {
                       className="btn btn-light dropdown-toggle px-5 fw-bold"
                       data-bs-toggle="dropdown"
                     >
-                      Sort by
+                      {sortBy == "alphabetical"
+                        ? "Alphabetical"
+                        : sortBy == "reverse_alphabetical"
+                        ? "Reverse Order"
+                        : "Sort by"}
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Ascending Alphabetical
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("alphabetical")}
+                        >
+                          Alphabetical
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Descending Alphabetical
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("reverse_alphabetical")}
+                        >
+                          Reverse Alphabetical
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("Sort by")}
+                        >
+                          Remove Filter
                         </a>
                       </li>
                     </ul>
@@ -243,7 +344,7 @@ export default function ManageAlerts() {
                   <button
                     type="button"
                     className="btn btn-primary px-5 fw-bold"
-                    onClick={null}
+                    onClick={getFilteredData}
                   >
                     Search
                   </button>
