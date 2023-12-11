@@ -480,12 +480,22 @@ export default function ManageDistressCalls() {
                             >
                               Responded
                             </button>
+                          ) : info.report.status == "forwarded" ? (
+                            <button
+                              className="btn btn-light px-3 rounded-5 fw-semibold"
+                              onClick={() => {
+                                setSelectedUser(info);
+                                setIsRespondModal(true);
+                              }}
+                            >
+                              Forwarded
+                            </button>
                           ) : info.report.status == "archive" ? (
                             <button
                               className="btn btn-light px-3 rounded-5 fw-semibold"
                               disabled
                             >
-                              Archived
+                              Responded
                             </button>
                           ) : (
                             <button
@@ -629,6 +639,30 @@ export default function ManageDistressCalls() {
                       </table>
                     </ModalBody>
                     <ModalFooter>
+                      {selectedUser.report.status == "forwarded" && (
+                        <Button
+                          className="btn btn-secondary m-auto px-5"
+                          type="button"
+                          onClick={() => {
+                            updateStatus("responded");
+                          }}
+                        >
+                          Mark as Responded
+                        </Button>
+                      )}
+
+                      {selectedUser.report.status == "archieve"  || selectedUser.report.status == "responded"   && (
+                        <Button
+                          className="btn btn-danger m-auto px-5 text-white fw-semibold"
+                          type="button"
+                          onClick={() => {
+                            updateStatus("no_response");
+                          }}
+                        >
+                          Mark as Not Responded
+                        </Button>
+                      )}
+
                       <Button
                         className="btn-light m-auto px-5"
                         color="secondary"

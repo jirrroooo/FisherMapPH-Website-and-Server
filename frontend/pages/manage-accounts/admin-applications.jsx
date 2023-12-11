@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { useApiStore } from "../../store/apiStore";
 import FormattedDate from "../../components/formatted-date";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
+import { useUserDataStore } from "../../store/userDataStore";
 
 export default function AdminApplications() {
   const router = useRouter();
@@ -19,6 +20,9 @@ export default function AdminApplications() {
   const [isViewModal, setIsViewModal] = useState(false);
   const [isApprovedRejectModal, setIsApprovedRejectModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [searchBy, setSearchBy] = useState("Search by");
+  const [sortBy, setSortBy] = useState("Sort by");
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -41,8 +45,17 @@ export default function AdminApplications() {
       });
   }, []);
 
+  useEffect(() => {
+    if (useUserDataStore.getState().pageData != null) {
+      console.log("this executes");
+      console.log(useUserDataStore.getState().pageData);
+      setIsLoading(true);
+      setData(useUserDataStore.getState().pageData);
+      setIsLoading(false);
+    }
+  }, [useUserDataStore.getState().pageData]);
 
-  function getUserId(token){
+  function getUserId(token) {
     fetch(`${useApiStore.getState().apiUrl}auth/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -50,19 +63,24 @@ export default function AdminApplications() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if(data){
+        if (data) {
           useLoginStore.setState({
-            id: data.id
+            id: data.id,
           });
           getData();
         }
       });
   }
 
-  function getData(){
-    fetch(`${useApiStore.getState().apiUrl}users/admin-pending-users`, {
-      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
-    })
+  function getData() {
+    setIsLoading(true);
+
+    fetch(
+      `${useApiStore.getState().apiUrl}users/admin-pending-users?page=${page}`,
+      {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      }
+    )
       .then((response) => response.json())
       .then((body) => {
         setData(body);
@@ -70,7 +88,49 @@ export default function AdminApplications() {
       });
   }
 
-  
+  function getFilteredData() {
+
+    const search = document.getElementById("search").value;
+
+    if (sortBy != "Sort By" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/admin-pending-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (sortBy == "Sort by" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/admin-pending-users?searchBy=${searchBy}&search=${search}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy == "Search by") {
+      getData();
+    }
+  }
+
   function approve() {
     fetch(`${useApiStore.getState().apiUrl}users/${selectedUser._id}`, {
       method: "PATCH",
@@ -79,7 +139,7 @@ export default function AdminApplications() {
         Authorization: `Bearer ${useLoginStore.getState().token}`,
       },
       body: JSON.stringify({
-        isAuthenticated: true
+        isAuthenticated: true,
       }),
     })
       .then((response) => response.json())
@@ -89,10 +149,9 @@ export default function AdminApplications() {
   }
 
   function reject() {
-
-    if(selectedUser.user_type == "admin"){
+    if (selectedUser.user_type == "admin") {
       selectedUser.user_type = "admin-rejected";
-    }else{
+    } else {
       selectedUser.user_type = "superadmin-rejected";
     }
 
@@ -104,7 +163,7 @@ export default function AdminApplications() {
       },
       body: JSON.stringify({
         user_type: selectedUser.user_type,
-        isAuthenticated: false
+        isAuthenticated: false,
       }),
     })
       .then((response) => response.json())
@@ -133,8 +192,9 @@ export default function AdminApplications() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Enter Name"
+                    placeholder="Enter Search Query"
                     name="search"
+                    id="search"
                   />
                 </div>
 
@@ -144,23 +204,55 @@ export default function AdminApplications() {
                       type="button"
                       className="btn btn-light dropdown-toggle px-5 fw-bold "
                       data-bs-toggle="dropdown"
+                      id="searchBy"
                     >
-                      Search by
+                      {searchBy == "first_name"
+                        ? "First Name"
+                        : searchBy == "last_name"
+                        ? "Last Name"
+                        : searchBy == "email"
+                        ? "Email Address"
+                        : searchBy}
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Name
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("first_name")}
+                          value="first_name"
+                        >
+                          First Name
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("last_name")}
+                          value="last_name"
+                        >
+                          Last Name
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("email")}
+                          value="email_address"
+                        >
                           Email Address
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Application Date
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("Search by")}
+                          value="email_address"
+                        >
+                          Remove Filter
                         </a>
                       </li>
                     </ul>
@@ -174,17 +266,38 @@ export default function AdminApplications() {
                       className="btn btn-light dropdown-toggle px-5 fw-bold"
                       data-bs-toggle="dropdown"
                     >
-                      Sort by
+                      {sortBy == "alphabetical"
+                        ? "Alphabetical"
+                        : sortBy == "reverse_alphabetical"
+                        ? "Reverse Order"
+                        : "Sort by"}
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Ascending Alphabetical
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("alphabetical")}
+                        >
+                          Alphabetical
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Descending Alphabetical
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("reverse_alphabetical")}
+                        >
+                          Reverse Alphabetical
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("Sort by")}
+                        >
+                          Remove Filter
                         </a>
                       </li>
                     </ul>
@@ -195,7 +308,7 @@ export default function AdminApplications() {
                   <button
                     type="button"
                     className="btn btn-primary px-5 fw-bold"
-                    onClick={null}
+                    onClick={getFilteredData}
                   >
                     Search
                   </button>
@@ -227,20 +340,23 @@ export default function AdminApplications() {
                 return (
                   <div className="row student-data" key={info._id}>
                     <div className="col-2">
-                      <p>{info.first_name} {info.last_name}</p>
+                      <p>
+                        {info.first_name} {info.last_name}
+                      </p>
                     </div>
                     <div className="col-3">
                       <p>{info.email_address}</p>
                     </div>
                     <div className="col-2">
-                      <FormattedDate date={info.createdAt}/>
+                      <FormattedDate date={info.createdAt} />
                     </div>
                     <div className="col-2">
-                      <button className="btn btn-light px-4 rounded-5 fw-semibold text-black"
-                      onClick={() => {
-                        setSelectedUser(info);
-                        setIsViewModal(true);
-                      }}
+                      <button
+                        className="btn btn-light px-4 rounded-5 fw-semibold text-black"
+                        onClick={() => {
+                          setSelectedUser(info);
+                          setIsViewModal(true);
+                        }}
                       >
                         View
                       </button>
@@ -248,23 +364,25 @@ export default function AdminApplications() {
                     <div className="col-3">
                       <div className="row">
                         <div className="col">
-                          <button className="btn btn-success px-3 rounded-5 fw-semibold text-white"
-                          onClick={() => {
-                            setSelectedUser(info);
-                            setAction("approve");
-                            setIsApprovedRejectModal(true);
-                          }}
+                          <button
+                            className="btn btn-success px-3 rounded-5 fw-semibold text-white"
+                            onClick={() => {
+                              setSelectedUser(info);
+                              setAction("approve");
+                              setIsApprovedRejectModal(true);
+                            }}
                           >
                             Accept
                           </button>
                         </div>
                         <div className="col">
-                          <button className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
-                          onClick={() => {
-                            setSelectedUser(info);
-                            setAction("reject");
-                            setIsApprovedRejectModal(true);
-                          }}
+                          <button
+                            className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
+                            onClick={() => {
+                              setSelectedUser(info);
+                              setAction("reject");
+                              setIsApprovedRejectModal(true);
+                            }}
                           >
                             Reject
                           </button>
@@ -275,41 +393,43 @@ export default function AdminApplications() {
                 );
               })}
 
-            {isApprovedRejectModal && (
+              {isApprovedRejectModal && (
                 <>
                   <Modal
-                    toggle={() => setIsApprovedRejectModal(!isApprovedRejectModal)}
+                    toggle={() =>
+                      setIsApprovedRejectModal(!isApprovedRejectModal)
+                    }
                     isOpen={isApprovedRejectModal}
                   >
                     <div className=" modal-header">
-                      {
-                        action == "approve" ? 
+                      {action == "approve" ? (
                         <h5
-                        className=" modal-title text-center m-auto fw-bold text-uppercase"
-                        id="viewModal"
-                      >
-                        Do you want to Approve {selectedUser.first_name}'s Account?
-                      </h5>
-                       :
-                       <h5
-                       className=" modal-title text-center m-auto fw-bold text-uppercase"
-                       id="viewModal"
-                     >
-                       Do you want to Reject {selectedUser.first_name}'s Account?
-                     </h5>
-                      }
+                          className=" modal-title text-center m-auto fw-bold text-uppercase"
+                          id="viewModal"
+                        >
+                          Do you want to Approve {selectedUser.first_name}'s
+                          Account?
+                        </h5>
+                      ) : (
+                        <h5
+                          className=" modal-title text-center m-auto fw-bold text-uppercase"
+                          id="viewModal"
+                        >
+                          Do you want to Reject {selectedUser.first_name}'s
+                          Account?
+                        </h5>
+                      )}
                     </div>
-                    <ModalBody>
-                    </ModalBody>
+                    <ModalBody></ModalBody>
                     <ModalFooter>
                       <Button
                         className="btn-light m-auto px-5 fw-semibold"
                         color="secondary"
                         type="button"
                         onClick={() => {
-                          if(action == "approve"){
+                          if (action == "approve") {
                             approve();
-                          }else{
+                          } else {
                             reject();
                           }
                           setIsApprovedRejectModal(false);
@@ -332,7 +452,7 @@ export default function AdminApplications() {
                 </>
               )}
 
-            {isViewModal && (
+              {isViewModal && (
                 <>
                   <Modal
                     toggle={() => setIsViewModal(!isViewModal)}
@@ -420,7 +540,21 @@ export default function AdminApplications() {
 
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">
-                  <a className="page-link disabled" href="#">
+                  <a
+                    className="page-link"
+                    href="#"
+                    onClick={() => {
+                      if (page > 0) {
+                        setPage(page - 1);
+
+                        if (searchBy != "Search by") {
+                          getFilteredData();
+                        } else {
+                          getData();
+                        }
+                      }
+                    }}
+                  >
                     Previous
                   </a>
                 </li>
@@ -440,7 +574,20 @@ export default function AdminApplications() {
                   </a>
                 </li>
                 <li className="page-item">
-                  <a className="page-link disabled" href="#">
+                  <a
+                    className="page-link"
+                    href="#"
+                    onClick={() => {
+                      setPage(page + 1);
+
+                      if (searchBy != "Search by") {
+                        getFilteredData();
+                      } else {
+                        setIsLoading(true);
+                        getData();
+                      }
+                    }}
+                  >
                     Next
                   </a>
                 </li>
