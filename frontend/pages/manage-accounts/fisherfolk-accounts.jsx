@@ -20,6 +20,9 @@ export default function FisherfolkAccount() {
   const [isEditModal, setIsEditModal] = useState(false);
   const [isSuspendModal, setIsSuspendModal] = useState(false);
   const [isCreateModal, setIsCreateModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const [searchBy, setSearchBy] = useState("Search by");
+  const [sortBy, setSortBy] = useState("Sort by");
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -68,6 +71,49 @@ export default function FisherfolkAccount() {
         setData(body);
         setIsLoading(false);
       });
+  }
+
+  function getFilteredData() {
+
+    const search = document.getElementById("search").value;
+
+    if (sortBy != "Sort By" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/fisherfolk-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (sortBy == "Sort by" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/fisherfolk-users?searchBy=${searchBy}&search=${search}&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy == "Search by") {
+      getData();
+    }
   }
 
   function fetchDate(date) {
@@ -174,14 +220,15 @@ export default function FisherfolkAccount() {
               assumenda, excepturi consequatur.
             </p>
 
-            <form className="my-5">
+            <form className="my-4">
               <div className="row">
                 <div className="col-6">
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Enter Name"
-                    name="seach"
+                    placeholder="Enter Search Query"
+                    name="search"
+                    id="search"
                   />
                 </div>
 
@@ -191,23 +238,55 @@ export default function FisherfolkAccount() {
                       type="button"
                       className="btn btn-light dropdown-toggle px-5 fw-bold "
                       data-bs-toggle="dropdown"
+                      id="searchBy"
                     >
-                      Search by
+                      {searchBy == "first_name"
+                        ? "First Name"
+                        : searchBy == "last_name"
+                        ? "Last Name"
+                        : searchBy == "email"
+                        ? "Email Address"
+                        : searchBy}
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Name
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("first_name")}
+                          value="first_name"
+                        >
+                          First Name
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Vessel Type
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("last_name")}
+                          value="last_name"
+                        >
+                          Last Name
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Location
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("email")}
+                          value="email_address"
+                        >
+                          Email Address
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSearchBy("Search by")}
+                          value="email_address"
+                        >
+                          Remove Filter
                         </a>
                       </li>
                     </ul>
@@ -221,17 +300,38 @@ export default function FisherfolkAccount() {
                       className="btn btn-light dropdown-toggle px-5 fw-bold"
                       data-bs-toggle="dropdown"
                     >
-                      Sort by
+                      {sortBy == "alphabetical"
+                        ? "Alphabetical"
+                        : sortBy == "reverse_alphabetical"
+                        ? "Reverse Order"
+                        : "Sort by"}
                     </button>
                     <ul className="dropdown-menu">
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Ascending Alphabetical
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("alphabetical")}
+                        >
+                          Alphabetical
                         </a>
                       </li>
                       <li>
-                        <a className="dropdown-item" href="#" onClick={null}>
-                          Descending Alphabetical
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("reverse_alphabetical")}
+                        >
+                          Reverse Alphabetical
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          className="dropdown-item"
+                          href="#"
+                          onClick={() => setSortBy("Sort by")}
+                        >
+                          Remove Filter
                         </a>
                       </li>
                     </ul>
@@ -242,7 +342,7 @@ export default function FisherfolkAccount() {
                   <button
                     type="button"
                     className="btn btn-primary px-5 fw-bold"
-                    onClick={null}
+                    onClick={getFilteredData}
                   >
                     Search
                   </button>
