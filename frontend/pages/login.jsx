@@ -84,7 +84,7 @@ export default function LoginPage() {
           alert("Unsuccessful Login Try Again.");
         } else if(body.userType == "user"){
           alert("You are only allowed to signin on FisherMap PH mobile application!")
-        } else if((body.userType == "admin" || body.userType == "superadmin") && !body.isAuthenticated){
+        } else if(!body.isAuthenticated){
           alert("Pending Account Approval. You cannot login as of this moment.");
         }else{
           console.log(body);

@@ -22,6 +22,17 @@ export class UsersService {
     return res;
   }
 
+  async getTotalFisherfolkPendingUsers(){
+    return (await this.userModel.find({user_type: "user", isAuthenticated: false})).length;
+  }
+
+  async getTotalFisherfolkUsers(){
+    return (await this.userModel.find({user_type: "user", isAuthenticated: true})).length;
+  }
+
+  async getTotalAdminPendingUsers(){
+    return (await this.userModel.find({user_type: "admin", isAuthenticated: false})).length;
+  }
 
   async getAdminUsers(query: Query): Promise<User[]> {
     const responsePerPage = 5;

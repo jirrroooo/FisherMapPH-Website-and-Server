@@ -24,6 +24,12 @@ export class AlertsController {
     return this.alertsService.getAlerts(query);
   }
 
+  @Get('total')
+  @UseGuards(AuthGuard())
+  async getTotalAlerts() {
+    return this.alertsService.getTotalAlerts();
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard())
   async getAlert(@Param('id') id: ObjectId): Promise<Alert> {

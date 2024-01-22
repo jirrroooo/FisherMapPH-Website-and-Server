@@ -25,6 +25,10 @@ export class ReportsService {
     private positionModel: mongoose.Model<Position>,
   ) {}
 
+  async getTotalReports(){
+    return (await this.reportModel.find()).length;
+  }
+
   async newReport(report: Report): Promise<Report> {
     const res = await this.reportModel.create(report);
     return res;

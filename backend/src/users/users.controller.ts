@@ -84,6 +84,24 @@ export class UsersController {
     return this.usersService.getFisherfolkRejectedUsers(query);
   }
 
+  @Get('total-fisherfolk-users')
+  @UseGuards(AuthGuard())
+  async getTotalFisherfolkUsers(){
+    return this.usersService.getTotalFisherfolkUsers();
+  }
+
+  @Get('total-fisherfolk-pending-users')
+  @UseGuards(AuthGuard())
+  async getTotalFisherfolkPendingUsers(){
+    return this.usersService.getTotalFisherfolkPendingUsers();
+  }
+
+  @Get('total-admin-pending-users')
+  @UseGuards(AuthGuard())
+  async getTotalAdminPendingUsers(){
+    return this.usersService.getTotalAdminPendingUsers();
+  }
+
 
   @Get(':id')
   @UseGuards(AuthGuard())

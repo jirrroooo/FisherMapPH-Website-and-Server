@@ -106,6 +106,10 @@ export class AlertsService {
     return alerts;
   }
 
+  async getTotalAlerts(){
+    return (await this.alertModel.find()).length;
+  }
+
   async getAlert(id: ObjectId): Promise<Alert> {
     const isValidId = mongoose.isValidObjectId(id);
 

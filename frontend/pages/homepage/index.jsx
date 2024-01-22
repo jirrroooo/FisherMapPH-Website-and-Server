@@ -14,6 +14,12 @@ export default function Homepage() {
   const [isVerified, setIsVerified] = useState(false);
   const [name, setName] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [totalFisherfolkUsers, setTotalFisherfolkUsers] = useState(0);
+  const [totalFisherfolkPendingUsers, setTotalFisherfolkPendingUsers] =
+    useState(0);
+  const [totalAdminPendingUsers, setTotalAdminPendingUsers] = useState(0);
+  const [totalAlerts, setTotalAlerts] = useState(0);
+  const [totalReports, setTotalReports] = useState(0);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -37,7 +43,7 @@ export default function Homepage() {
       });
   }, []);
 
-  function getUserId(token){
+  function getUserId(token) {
     fetch(`${useApiStore.getState().apiUrl}auth/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -45,17 +51,16 @@ export default function Homepage() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if(data){
+        if (data) {
           useLoginStore.setState({
-            id: data.id
+            id: data.id,
           });
-          getData();
+          getStatistics();
         }
       });
   }
 
-
-  function getData(){
+  function getData() {
     fetch(
       `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
       {
@@ -71,6 +76,61 @@ export default function Homepage() {
           setIsLoading(false);
         }
       });
+  }
+
+  async function getStatistics() {
+    // Total Fisherfolk Pending Users
+    await fetch(
+      `${useApiStore.getState().apiUrl}users/total-fisherfolk-pending-users`,
+      {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setTotalFisherfolkPendingUsers(data);
+      });
+
+    // Total Fisherfolk Users
+    await fetch(`${useApiStore.getState().apiUrl}users/total-fisherfolk-users`, {
+      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setTotalFisherfolkUsers(data);
+      });
+
+    // Total Admin Pending Users
+    await fetch(`${useApiStore.getState().apiUrl}users/total-admin-pending-users`, {
+      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setTotalAdminPendingUsers(data);
+      });
+
+
+    // Total Alerts
+    await fetch(`${useApiStore.getState().apiUrl}alerts/total`, {
+      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setTotalAlerts(data);
+      });
+
+
+    // Total Reports
+    await fetch(`${useApiStore.getState().apiUrl}reports/total`, {
+      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setTotalReports(data);
+      });
+
+
+      getData();
   }
 
   return (
@@ -92,7 +152,7 @@ export default function Homepage() {
                   <div className="col-6">
                     <div className="card" style={{ width: "16rem" }}>
                       <div className="card-body">
-                        <h1>143</h1>
+                        <h1>{totalFisherfolkPendingUsers}</h1>
                         <p>Pending Fisherfolk Accounts</p>
                         <Link
                           className="btn btn-warning admin-btn"
@@ -106,8 +166,10 @@ export default function Homepage() {
 
                   <div className="col-6">
                     <div className="card" style={{ width: "16rem" }}>
-                      <div className="card-body">
-                        <h1>32</h1>
+                      {
+                        useUserDataStore.getState().userData.user_type == "superadmin" ?
+                        <div className="card-body">
+                        <h1>{totalAdminPendingUsers}</h1>
                         <p>Pending Admin Accounts</p>
                         <Link
                           className="btn btn-warning admin-btn"
@@ -116,6 +178,18 @@ export default function Homepage() {
                           Manage
                         </Link>
                       </div>
+                      :
+                      <div className="card-body">
+                        <h1>{totalFisherfolkUsers}</h1>
+                        <p>Fisherfolk Active Accounts</p>
+                        <Link
+                          className="btn btn-warning admin-btn"
+                          href="/manage-accounts/fisherfolk-applications"
+                        >
+                          Manage
+                        </Link>
+                      </div>
+                      }
                     </div>
                   </div>
                 </div>
@@ -123,8 +197,8 @@ export default function Homepage() {
                   <div className="col-6">
                     <div className="card" style={{ width: "16rem" }}>
                       <div className="card-body">
-                        <h1>60</h1>
-                        <p>Current Active Alerts</p>
+                        <h1>{totalAlerts}</h1>
+                        <p>List of Alerts</p>
                         <Link
                           className="btn btn-warning admin-btn"
                           href="/manage-alerts"
@@ -138,7 +212,7 @@ export default function Homepage() {
                   <div className="col-6">
                     <div className="card" style={{ width: "16rem" }}>
                       <div className="card-body">
-                        <h1>2</h1>
+                        <h1>{totalReports}</h1>
                         <p>Distress Call Logs</p>
                         <Link
                           className="btn btn-warning admin-btn"
