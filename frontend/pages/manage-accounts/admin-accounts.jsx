@@ -45,8 +45,7 @@ export default function AdminAccounts() {
       });
   }, []);
 
-  
-  function getUserId(token){
+  function getUserId(token) {
     fetch(`${useApiStore.getState().apiUrl}auth/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -54,9 +53,9 @@ export default function AdminAccounts() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if(data){
+        if (data) {
           useLoginStore.setState({
-            id: data.id
+            id: data.id,
           });
           getData();
         }
@@ -75,7 +74,6 @@ export default function AdminAccounts() {
   }
 
   function getFilteredData() {
-
     const search = document.getElementById("search").value;
 
     if (sortBy != "Sort By" && searchBy != "Search by") {
@@ -203,6 +201,84 @@ export default function AdminAccounts() {
         window.location.reload();
       });
   }
+
+  function getDataByPage(pageNumber) {
+    setPage(pageNumber);
+    setIsLoading(true);
+
+    fetch(
+      `${useApiStore.getState().apiUrl}users/admin-users?page=${pageNumber}`,
+      {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      }
+    )
+      .then((response) => response.json())
+      .then((body) => {
+        setData(body);
+        setIsLoading(false);
+      });
+
+  }
+
+  function getFilteredDataByPageNumber(pageNumber) {
+    setPage(pageNumber);
+
+    const search = document.getElementById("search").value;
+
+    if (sortBy != "Sort By" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/admin-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (sortBy == "Sort by" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/admin-users?searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy == "Search by") {
+      getDataByPage(pageNumber);
+    }
+  }
+
+  const handleNextPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page + 1);
+    } else {
+      getDataByPage(page + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page - 1);
+    } else {
+      getDataByPage(page - 1);
+    }
+  };
 
   return (
     <>
@@ -369,66 +445,72 @@ export default function AdminAccounts() {
               <br />
 
               {data.map((info, i) => {
-                if (info._id != useLoginStore.getState().id) {
-                  return (
-                    <>
-                      <div className="row student-data mt-2">
-                        <div className="col-2">
+                // if (info._id != useLoginStore.getState().id) {
+                return (
+                  <>
+                    <div className="row student-data mt-2">
+                      <div className="col-2">
+                        {info._id == useLoginStore.getState().id ? (
+                          <p className="fw-bold">
+                            {info.first_name} {info.last_name} (You)
+                          </p>
+                        ) : (
                           <p>
                             {info.first_name} {info.last_name}
                           </p>
-                        </div>
-                        <div className="col-3">
-                          <p>{info.email_address}</p>
-                        </div>
-                        <div className="col-2">
-                          {info.user_type == "superadmin" ? (
-                            <p>Super Administrator</p>
-                          ) : (
-                            <p>Administrator</p>
-                          )}
-                        </div>
-                        <div className="col-2">
-                          <button
-                            className="btn btn-success px-4 rounded-5 fw-semibold text-white"
-                            onClick={() => {
-                              setIsViewModal(!isViewModal);
-                              setSelectedUser(info);
-                            }}
-                          >
-                            View
-                          </button>
-                        </div>
-                        <div className="col-3">
-                          <div className="row">
-                            <div className="col">
-                              <button
-                                className="btn btn-warning px-3 rounded-5 fw-semibold text-black"
-                                onClick={() => {
-                                  setIsSuspendModal(!isSuspendModal);
-                                  setSelectedUser(info);
-                                }}
-                              >
-                                Suspend
-                              </button>
-                            </div>
-                            <div className="col">
-                              <button
-                                className="btn btn-light px-4 text-black rounded-5 fw-semibold "
-                                onClick={() => {
-                                  setIsEditModal(!isEditModal);
-                                  setSelectedUser(info);
-                                }}
-                              >
-                                Configure
-                              </button>
-                            </div>
+                        )}
+                      </div>
+                      <div className="col-3">
+                        <p className={info._id == useLoginStore.getState().id ? "fw-bold " : ""}>{info.email_address}</p>
+                      </div>
+                      <div className="col-2">
+                        {info.user_type == "superadmin" ? (
+                          <p className={info._id == useLoginStore.getState().id ? "fw-bold " : ""}>Super Administrator</p>
+                        ) : (
+                          <p className={info._id == useLoginStore.getState().id ? "fw-bold " : ""}>Administrator</p>
+                        )}
+                      </div>
+                      <div className="col-2">
+                        <button
+                          className="btn btn-success px-4 rounded-5 fw-semibold text-white"
+                          onClick={() => {
+                            setIsViewModal(!isViewModal);
+                            setSelectedUser(info);
+                          }}
+                        >
+                          View
+                        </button>
+                      </div>
+                      <div className="col-3">
+                        <div className="row">
+                          <div className="col">
+                            <button
+                              className="btn btn-warning px-3 rounded-5 fw-semibold text-black"
+                              onClick={() => {
+                                setIsSuspendModal(!isSuspendModal);
+                                setSelectedUser(info);
+                              }}
+                            >
+                              Suspend
+                            </button>
+                          </div>
+                          <div className="col">
+                            <button
+                              className="btn btn-light px-4 text-black rounded-5 fw-semibold "
+                              onClick={() => {
+                                setIsEditModal(!isEditModal);
+                                setSelectedUser(info);
+                              }}
+                            >
+                              Configure
+                            </button>
                           </div>
                         </div>
                       </div>
-                    </>
-                  );
-                }
+                    </div>
+                  </>
+                );
+                // }
               })}
 
               {isViewModal && (
@@ -929,31 +1011,63 @@ export default function AdminAccounts() {
 
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    Previous
-                  </a>
+                  {page != 1 ? (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
+                        }
+                      }}
+                    >
+                      Previous
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
+                        }
+                      }}
+                      disabled
+                    >
+                      Previous
+                    </button>
+                  )}
                 </li>
                 <li className="page-item">
                   <a className="page-link text-white pg-active" href="#">
-                    1
+                    {page}
                   </a>
                 </li>
                 <li className="page-item">
-                  <a className="page-link disabled " href="#">
-                    2
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    3
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    Next
-                  </a>
+                  {
+                    // kapag lima ang data sa page
+                    Object.keys(data).length == 5 ? (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                      >
+                        Next
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                        disabled
+                      >
+                        Next
+                      </button>
+                    )
+                  }
                 </li>
               </ul>
+              
             </div>
 
             <div className="row">

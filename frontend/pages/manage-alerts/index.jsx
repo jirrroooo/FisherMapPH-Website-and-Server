@@ -77,7 +77,6 @@ export default function ManageAlerts() {
   }
 
   function getFilteredData() {
-
     const search = document.getElementById("search").value;
 
     if (sortBy != "Sort By" && searchBy != "Search by") {
@@ -118,7 +117,6 @@ export default function ManageAlerts() {
       getData();
     }
   }
-
 
   function createAlert() {
     const isSpecific = document.getElementById("yes").checked ? true : false;
@@ -207,6 +205,81 @@ export default function ManageAlerts() {
 
     return formattedToday;
   }
+
+  function getDataByPage(pageNumber) {
+    setPage(pageNumber);
+    setIsLoading(true);
+
+    fetch(`${useApiStore.getState().apiUrl}alerts?page=${pageNumber}`, {
+      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        setData(body);
+        setIsLoading(false);
+      });
+
+  }
+
+  function getFilteredDataByPageNumber(pageNumber) {
+    setPage(pageNumber);
+
+    const search = document.getElementById("search").value;
+
+    if (sortBy != "Sort By" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }alerts?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (sortBy == "Sort by" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }alerts?searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy == "Search by") {
+      getDataByPage(pageNumber);
+    }
+  }
+
+  const handleNextPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page + 1);
+    } else {
+      getDataByPage(page + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page - 1);
+    } else {
+      getDataByPage(page - 1);
+    }
+  };
 
   return (
     <>
@@ -482,7 +555,9 @@ export default function ManageAlerts() {
                           </tr>
                           <tr>
                             <td className="fw-bold">Alert Level:</td>
-                            <td className="text-capitalize">{selectedUser.level}</td>
+                            <td className="text-capitalize">
+                              {selectedUser.level}
+                            </td>
                           </tr>
                           <tr>
                             <td className="fw-bold">Specific:</td>
@@ -828,39 +903,43 @@ export default function ManageAlerts() {
                             <label htmlFor="level" className="label">
                               Select Alert Level
                             </label>
-                    
+
                             <br />
 
-                            {
-                              selectedUser.level == "high" && (
-                                <select id="level" name="level" className="px-3" defaultChecked={selectedUser.level}>
-                                  <option value="low">Low</option>
-                                  <option value="moderate">Moderate</option>
-                                  <option value="high" selected>High</option>
+                            {selectedUser.level == "high" && (
+                              <select
+                                id="level"
+                                name="level"
+                                className="px-3"
+                                defaultChecked={selectedUser.level}
+                              >
+                                <option value="low">Low</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="high" selected>
+                                  High
+                                </option>
                               </select>
-                              )
-                            }
+                            )}
 
-                            {
-                              selectedUser.level == "low" && (
-                                <select id="level" name="level" className="px-3">
-                                  <option value="low" selected>Low</option>
-                                  <option value="moderate">Moderate</option>
-                                  <option value="high">High</option>
+                            {selectedUser.level == "low" && (
+                              <select id="level" name="level" className="px-3">
+                                <option value="low" selected>
+                                  Low
+                                </option>
+                                <option value="moderate">Moderate</option>
+                                <option value="high">High</option>
                               </select>
-                              )
-                            }
+                            )}
 
-                            {
-                              selectedUser.level == "moderate" && (
-                                <select id="level" name="level" className="px-3">
-                                  <option value="low">Low</option>
-                                  <option value="moderate" selected>Moderate</option>
-                                  <option value="high">High</option>
+                            {selectedUser.level == "moderate" && (
+                              <select id="level" name="level" className="px-3">
+                                <option value="low">Low</option>
+                                <option value="moderate" selected>
+                                  Moderate
+                                </option>
+                                <option value="high">High</option>
                               </select>
-                              )
-                            }
-
+                            )}
                           </div>
 
                           <div className="mb-3 mt-3">
@@ -1014,31 +1093,63 @@ export default function ManageAlerts() {
 
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    Previous
-                  </a>
+                  {page != 1 ? (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
+                        }
+                      }}
+                    >
+                      Previous
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
+                        }
+                      }}
+                      disabled
+                    >
+                      Previous
+                    </button>
+                  )}
                 </li>
                 <li className="page-item">
                   <a className="page-link text-white pg-active" href="#">
-                    1
+                    {page}
                   </a>
                 </li>
                 <li className="page-item">
-                  <a className="page-link disabled " href="#">
-                    2
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    3
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    Next
-                  </a>
+                  {
+                    // kapag lima ang data sa page
+                    Object.keys(data).length == 5 ? (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                      >
+                        Next
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                        disabled
+                      >
+                        Next
+                      </button>
+                    )
+                  }
                 </li>
               </ul>
+
             </div>
 
             <div className="row">

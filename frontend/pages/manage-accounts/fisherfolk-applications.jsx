@@ -73,7 +73,6 @@ export default function FisherfolkApplications() {
   }
 
   function getFilteredData() {
-
     const search = document.getElementById("search").value;
 
     if (sortBy != "Sort By" && searchBy != "Search by") {
@@ -151,6 +150,86 @@ export default function FisherfolkApplications() {
         window.location.reload();
       });
   }
+
+  function getDataByPage(pageNumber) {
+    setPage(pageNumber);
+    setIsLoading(true);
+
+    fetch(
+      `${
+        useApiStore.getState().apiUrl
+      }users/fisherfolk-pending-users?page=${pageNumber}`,
+      {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      }
+    )
+      .then((response) => response.json())
+      .then((body) => {
+        setData(body);
+        setIsLoading(false);
+      });
+
+  }
+
+  function getFilteredDataByPageNumber(pageNumber) {
+    setPage(pageNumber);
+
+    const search = document.getElementById("search").value;
+
+    if (sortBy != "Sort By" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/fisherfolk-pending-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (sortBy == "Sort by" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/fisherfolk-pending-users?searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy == "Search by") {
+      getDataByPage(pageNumber);
+    }
+  }
+
+  const handleNextPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page + 1);
+    } else {
+      getDataByPage(page + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page - 1);
+    } else {
+      getDataByPage(page - 1);
+    }
+  };
 
   return (
     <>
@@ -520,31 +599,63 @@ export default function FisherfolkApplications() {
 
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    Previous
-                  </a>
+                  {page != 1 ? (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
+                        }
+                      }}
+                    >
+                      Previous
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
+                        }
+                      }}
+                      disabled
+                    >
+                      Previous
+                    </button>
+                  )}
                 </li>
                 <li className="page-item">
                   <a className="page-link text-white pg-active" href="#">
-                    1
+                    {page}
                   </a>
                 </li>
                 <li className="page-item">
-                  <a className="page-link disabled " href="#">
-                    2
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    3
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    Next
-                  </a>
+                  {
+                    // kapag lima ang data sa page
+                    Object.keys(data).length == 5 ? (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                      >
+                        Next
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                        disabled
+                      >
+                        Next
+                      </button>
+                    )
+                  }
                 </li>
               </ul>
+              
             </div>
 
             <div className="row">

@@ -1,3 +1,5 @@
+// "use client";
+
 import { useEffect, useState } from "react";
 import "./style.css";
 import "../../styles/custom.scss";
@@ -75,6 +77,8 @@ export default function AdminApplications() {
   function getData() {
     setIsLoading(true);
 
+    console.log("page " + page);
+
     fetch(
       `${useApiStore.getState().apiUrl}users/admin-pending-users?page=${page}`,
       {
@@ -86,10 +90,13 @@ export default function AdminApplications() {
         setData(body);
         setIsLoading(false);
       });
+
+    console.log("page " + page);
   }
 
-  function getFilteredData() {
 
+
+  function getFilteredData() {
     const search = document.getElementById("search").value;
 
     if (sortBy != "Sort By" && searchBy != "Search by") {
@@ -171,6 +178,86 @@ export default function AdminApplications() {
         window.location.reload();
       });
   }
+
+  function getDataByPage(pageNumber) {
+    setPage(pageNumber);
+    setIsLoading(true);
+
+    fetch(
+      `${
+        useApiStore.getState().apiUrl
+      }users/admin-pending-users?page=${pageNumber}`,
+      {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      }
+    )
+      .then((response) => response.json())
+      .then((body) => {
+        setData(body);
+        setIsLoading(false);
+      });
+
+  }
+
+  function getFilteredDataByPageNumber(pageNumber) {
+    setPage(pageNumber);
+
+    const search = document.getElementById("search").value;
+
+    if (sortBy != "Sort By" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/admin-pending-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (sortBy == "Sort by" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/admin-pending-users?searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy == "Search by") {
+      getDataByPage(pageNumber);
+    }
+  }
+
+  const handleNextPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page + 1);
+    } else {
+      getDataByPage(page +1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page - 1);
+    } else {
+      getDataByPage(page - 1);
+    }
+  };
 
   return (
     <>
@@ -337,60 +424,61 @@ export default function AdminApplications() {
               <br />
 
               {data.map((info) => {
-                return (
-                  <div className="row student-data" key={info._id}>
-                    <div className="col-2">
-                      <p>
-                        {info.first_name} {info.last_name}
-                      </p>
-                    </div>
-                    <div className="col-3">
-                      <p>{info.email_address}</p>
-                    </div>
-                    <div className="col-2">
-                      <FormattedDate date={info.createdAt} />
-                    </div>
-                    <div className="col-2">
-                      <button
-                        className="btn btn-light px-4 rounded-5 fw-semibold text-black"
-                        onClick={() => {
-                          setSelectedUser(info);
-                          setIsViewModal(true);
-                        }}
-                      >
-                        View
-                      </button>
-                    </div>
-                    <div className="col-3">
-                      <div className="row">
-                        <div className="col">
-                          <button
-                            className="btn btn-success px-3 rounded-5 fw-semibold text-white"
-                            onClick={() => {
-                              setSelectedUser(info);
-                              setAction("approve");
-                              setIsApprovedRejectModal(true);
-                            }}
-                          >
-                            Accept
-                          </button>
-                        </div>
-                        <div className="col">
-                          <button
-                            className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
-                            onClick={() => {
-                              setSelectedUser(info);
-                              setAction("reject");
-                              setIsApprovedRejectModal(true);
-                            }}
-                          >
-                            Reject
-                          </button>
+
+                  return (
+                    <div className="row student-data" key={info._id}>
+                      <div className="col-2">
+                        <p>
+                          {info.first_name} {info.last_name}
+                        </p>
+                      </div>
+                      <div className="col-3">
+                        <p>{info.email_address}</p>
+                      </div>
+                      <div className="col-2">
+                        <FormattedDate date={info.createdAt} />
+                      </div>
+                      <div className="col-2">
+                        <button
+                          className="btn btn-light px-4 rounded-5 fw-semibold text-black"
+                          onClick={() => {
+                            setSelectedUser(info);
+                            setIsViewModal(true);
+                          }}
+                        >
+                          View
+                        </button>
+                      </div>
+                      <div className="col-3">
+                        <div className="row">
+                          <div className="col">
+                            <button
+                              className="btn btn-success px-3 rounded-5 fw-semibold text-white"
+                              onClick={() => {
+                                setSelectedUser(info);
+                                setAction("approve");
+                                setIsApprovedRejectModal(true);
+                              }}
+                            >
+                              Accept
+                            </button>
+                          </div>
+                          <div className="col">
+                            <button
+                              className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
+                              onClick={() => {
+                                setSelectedUser(info);
+                                setAction("reject");
+                                setIsApprovedRejectModal(true);
+                              }}
+                            >
+                              Reject
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
+                  );
               })}
 
               {isApprovedRejectModal && (
@@ -540,58 +628,63 @@ export default function AdminApplications() {
 
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">
-                  <a
-                    className="page-link"
-                    href="#"
-                    onClick={() => {
-                      if (page > 0) {
-                        setPage(page - 1);
-
-                        if (searchBy != "Search by") {
-                          getFilteredData();
-                        } else {
-                          getData();
+                  {page != 1 ? (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
                         }
-                      }
-                    }}
-                  >
-                    Previous
-                  </a>
+                      }}
+                    >
+                      Previous
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
+                        }
+                      }}
+                      disabled
+                    >
+                      Previous
+                    </button>
+                  )}
                 </li>
                 <li className="page-item">
                   <a className="page-link text-white pg-active" href="#">
-                    1
+                    {page}
                   </a>
                 </li>
                 <li className="page-item">
-                  <a className="page-link disabled " href="#">
-                    2
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    3
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a
-                    className="page-link"
-                    href="#"
-                    onClick={() => {
-                      setPage(page + 1);
-
-                      if (searchBy != "Search by") {
-                        getFilteredData();
-                      } else {
-                        setIsLoading(true);
-                        getData();
-                      }
-                    }}
-                  >
-                    Next
-                  </a>
+                  {
+                    // kapag lima ang data sa page
+                    Object.keys(data).length == 5 ? (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                      >
+                        Next
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                        disabled
+                      >
+                        Next
+                      </button>
+                    )
+                  }
                 </li>
               </ul>
+
             </div>
 
             <div className="row">

@@ -10,8 +10,6 @@ import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 import FormattedDate, {
   FormattedDateTime,
 } from "../../components/formatted-date";
-import ListFormat from "../../components/list";
-import { userInfo } from "os";
 import { useUserDataStore } from "../../store/userDataStore";
 
 export default function ManageDistressCalls() {
@@ -110,10 +108,7 @@ export default function ManageDistressCalls() {
   }
 
   function getFilteredData() {
-
     const search = document.getElementById("search").value;
-
-    console.log(`searchBy=${searchBy}, search=${search}, sortBy=${sortBy}`);
 
     if (sortBy != "Sort By" && searchBy != "Search by") {
       fetch(
@@ -349,6 +344,80 @@ export default function ManageDistressCalls() {
         window.location.reload();
       });
   }
+
+  function getDataByPage(pageNumber) {
+    setPage(pageNumber);
+    setIsLoading(true);
+
+    fetch(`${useApiStore.getState().apiUrl}reports?page=${pageNumber}`, {
+      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        setData(body);
+        setIsLoading(false);
+      });
+  }
+
+  function getFilteredDataByPageNumber(pageNumber) {
+    setPage(pageNumber);
+
+    const search = document.getElementById("search").value;
+
+    if (sortBy != "Sort By" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }reports?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (sortBy == "Sort by" && searchBy != "Search by") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }reports?searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setIsLoading(true);
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy == "Search by") {
+      getDataByPage(pageNumber);
+    }
+  }
+
+  const handleNextPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page + 1);
+    } else {
+      getDataByPage(page + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (searchBy != "Search by") {
+      getFilteredDataByPageNumber(page - 1);
+    } else {
+      getDataByPage(page - 1);
+    }
+  };
 
   return (
     <>
@@ -753,17 +822,18 @@ export default function ManageDistressCalls() {
                         </Button>
                       )}
 
-                      {selectedUser.report.status == "archieve"  || selectedUser.report.status == "responded"   && (
-                        <Button
-                          className="btn btn-danger m-auto px-5 text-white fw-semibold"
-                          type="button"
-                          onClick={() => {
-                            updateStatus("no_response");
-                          }}
-                        >
-                          Mark as Not Responded
-                        </Button>
-                      )}
+                      {selectedUser.report.status == "archieve" ||
+                        (selectedUser.report.status == "responded" && (
+                          <Button
+                            className="btn btn-danger m-auto px-5 text-white fw-semibold"
+                            type="button"
+                            onClick={() => {
+                              updateStatus("no_response");
+                            }}
+                          >
+                            Mark as Not Responded
+                          </Button>
+                        ))}
 
                       <Button
                         className="btn-light m-auto px-5"
@@ -961,31 +1031,63 @@ export default function ManageDistressCalls() {
 
               <ul className="pagination m-auto mt-5">
                 <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    Previous
-                  </a>
+                  {page != 1 ? (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
+                        }
+                      }}
+                    >
+                      Previous
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-light"
+                      onClick={() => {
+                        if (page > 0) {
+                          handlePrevPage();
+                        }
+                      }}
+                      disabled
+                    >
+                      Previous
+                    </button>
+                  )}
                 </li>
                 <li className="page-item">
                   <a className="page-link text-white pg-active" href="#">
-                    1
+                    {page}
                   </a>
                 </li>
                 <li className="page-item">
-                  <a className="page-link disabled " href="#">
-                    2
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    3
-                  </a>
-                </li>
-                <li className="page-item">
-                  <a className="page-link disabled" href="#">
-                    Next
-                  </a>
+                  {
+                    // kapag lima ang data sa page
+                    Object.keys(data).length == 5 ? (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                      >
+                        Next
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-light"
+                        onClick={() => {
+                          handleNextPage();
+                        }}
+                        disabled
+                      >
+                        Next
+                      </button>
+                    )
+                  }
                 </li>
               </ul>
+
             </div>
 
             <div className="m-auto">
