@@ -9,6 +9,7 @@ import Router, { useRouter } from "next/router";
 import { useApiStore } from "../../store/apiStore";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 import FormattedDate from "../../components/formatted-date";
+import { useUserDataStore } from "../../store/userDataStore";
 
 export default function AdminAccounts() {
   const router = useRouter();
@@ -26,8 +27,7 @@ export default function AdminAccounts() {
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
-
-    fetch("/api/verify")
+      fetch("/api/verify")
       .then((response) => response.json())
       .then((body) => {
         if (body.status == "success") {
@@ -57,18 +57,41 @@ export default function AdminAccounts() {
           useLoginStore.setState({
             id: data.id,
           });
-          getData();
+          getUserType(token);
+        }
+      });
+  }
+
+  async function getUserType(token){
+    fetch(`${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          if(data.user_type == "admin"){
+            router.push("/homepage");
+          }else{
+            getData();
+          }
         }
       });
   }
 
   async function getData() {
+
     await fetch(`${useApiStore.getState().apiUrl}users/admin-users`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
     })
       .then((response) => response.json())
       .then((body) => {
-        setData(body);
+        if(useUserDataStore.getState().userData.user_type == "admin"){
+          setData(null);
+        }else{
+          setData(body);
+        }
         setIsLoading(false);
       });
   }

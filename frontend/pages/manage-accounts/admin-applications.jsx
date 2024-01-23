@@ -69,7 +69,25 @@ export default function AdminApplications() {
           useLoginStore.setState({
             id: data.id,
           });
-          getData();
+          getUserType(token);
+        }
+      });
+  }
+
+  async function getUserType(token){
+    fetch(`${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          if(data.user_type == "admin"){
+            router.push("/homepage");
+          }else{
+            getData();
+          }
         }
       });
   }
