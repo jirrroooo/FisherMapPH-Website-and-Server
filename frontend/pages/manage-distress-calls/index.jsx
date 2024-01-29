@@ -27,6 +27,7 @@ export default function ManageDistressCalls() {
   const [page, setPage] = useState(1);
   const [searchBy, setSearchBy] = useState("Search by");
   const [sortBy, setSortBy] = useState("Sort by");
+  const [hasEmail, setHasEmail] = useState(true);
   const [emailInput, setEmailInput] = useState([
     {
       type: "text",
@@ -588,7 +589,7 @@ export default function ManageDistressCalls() {
                   <div className="row student-data mb-3">
                     <div className="col-2">
                       {info.report.status == "no_response" && (
-                        <p className="text-uppercase ">
+                        <p className="text-uppercase fw-bold">
                           {info.report.type}{" "}
                           <span className="badge bg-danger">NO RES</span>
                         </p>
@@ -622,10 +623,22 @@ export default function ManageDistressCalls() {
                       )}
                     </div>
                     <div className="col-3">
-                      <p>{info.report.content}</p>
+                      <p
+                        className={
+                          info.report.status == "no_response" ? "fw-bold" : ""
+                        }
+                      >
+                        {info.report.content}
+                      </p>
                     </div>
                     <div className="col-2">
-                      <p className="text-capitalize">
+                      <p
+                        className={
+                          info.report.status == "no_response"
+                            ? "text-capitalize fw-bold "
+                            : "text-capitalize"
+                        }
+                      >
                         {info.userInfo.fishing_vessel_type}
                       </p>
                       <p></p>
@@ -670,7 +683,7 @@ export default function ManageDistressCalls() {
                             </button>
                           ) : (
                             <button
-                              className="btn btn-secondary px-3 rounded-5 fw-semibold"
+                              className="btn btn-danger text-white px-3 rounded-5 fw-semibold"
                               onClick={() => {
                                 setSelectedUser(info);
                                 setIsRespondModal(true);
@@ -692,9 +705,20 @@ export default function ManageDistressCalls() {
                             >
                               Unarchive
                             </button>
+                          ) : info.report.status == "no_response" ? (
+                            <button
+                              className="btn btn-light px-4 text-black rounded-5 fw-semibold "
+                              disabled
+                              onClick={() => {
+                                setSelectedUser(info);
+                                setIsArchiveModal(true);
+                              }}
+                            >
+                              Archive
+                            </button>
                           ) : (
                             <button
-                              className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
+                              className="btn btn-light px-4 text-black rounded-5 fw-semibold "
                               onClick={() => {
                                 setSelectedUser(info);
                                 setIsArchiveModal(true);
@@ -909,18 +933,42 @@ export default function ManageDistressCalls() {
                       </form>
                     </ModalBody>
                     <ModalFooter>
-                      <Button
-                        className="btn-primary m-auto px-5"
-                        color="primary"
-                        type="button"
-                        onClick={() => {
-                          setIsRespondModal(false);
-                          resetEmailInput();
-                          sendInformation(emailInput);
-                        }}
-                      >
-                        Send Information
-                      </Button>
+                      {/* {emailInput.map((item, i) => {
+                        if (i == 0 && item.value == "") {
+                          setHasEmail(false);
+                        }
+                      })} */}
+
+                      {emailInput[0].value.includes("@") &&
+                      emailInput[0].value.includes(".") ? (
+                        <Button
+                          className="btn-primary m-auto px-5"
+                          color="primary"
+                          type="button"
+                          onClick={() => {
+                            setIsRespondModal(false);
+                            resetEmailInput();
+                            sendInformation(emailInput);
+                          }}
+                        >
+                          Send Information
+                        </Button>
+                      ) : (
+                        <Button
+                          className="btn-primary m-auto px-5"
+                          color="primary"
+                          type="button"
+                          disabled
+                          onClick={() => {
+                            setIsRespondModal(false);
+                            resetEmailInput();
+                            sendInformation(emailInput);
+                          }}
+                        >
+                          Send Information
+                        </Button>
+                      )}
+
                       <Button
                         className="btn-light m-auto px-5"
                         color="secondary"
@@ -1087,7 +1135,6 @@ export default function ManageDistressCalls() {
                   }
                 </li>
               </ul>
-
             </div>
 
             <div className="m-auto">
@@ -1103,7 +1150,14 @@ export default function ManageDistressCalls() {
           </div>
         </>
       ) : (
-        <div className="loader m-auto mt-5"></div>
+        <>
+          <div className="m-auto mt-5">
+            <h1 className="text-center" style={{ marginTop: "150px" }}>
+              FisherMap PH
+            </h1>
+          </div>
+          <div className="loader m-auto mt-5"></div>
+        </>
       )}
     </>
   );

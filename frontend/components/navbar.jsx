@@ -93,13 +93,11 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="navbar navbar-expand-sm bg-dark navbar-dark">
+    <nav className="navbar navbar-expand-sm bg-dark navbar-dark" style={{width:"100%"}}>
       <div className="container-fluid">
-        {/* <a className="navbar-brand" href="#"> */}
         <Link className="text-decoration-none text-white" href="/homepage">
           <h4>FisherMap PH</h4>
         </Link>
-        {/* </a> */}
 
         {router.pathname != "/login" && router.pathname != "/signup" && (
           <ul className="navbar-nav">

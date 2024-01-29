@@ -92,23 +92,28 @@ export default function Homepage() {
       });
 
     // Total Fisherfolk Users
-    await fetch(`${useApiStore.getState().apiUrl}users/total-fisherfolk-users`, {
-      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
-    })
+    await fetch(
+      `${useApiStore.getState().apiUrl}users/total-fisherfolk-users`,
+      {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
         setTotalFisherfolkUsers(data);
       });
 
     // Total Admin Pending Users
-    await fetch(`${useApiStore.getState().apiUrl}users/total-admin-pending-users`, {
-      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
-    })
+    await fetch(
+      `${useApiStore.getState().apiUrl}users/total-admin-pending-users`,
+      {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
         setTotalAdminPendingUsers(data);
       });
-
 
     // Total Alerts
     await fetch(`${useApiStore.getState().apiUrl}alerts/total`, {
@@ -119,7 +124,6 @@ export default function Homepage() {
         setTotalAlerts(data);
       });
 
-
     // Total Reports
     await fetch(`${useApiStore.getState().apiUrl}reports/total`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
@@ -129,8 +133,7 @@ export default function Homepage() {
         setTotalReports(data);
       });
 
-
-      getData();
+    getData();
   }
 
   return (
@@ -166,30 +169,30 @@ export default function Homepage() {
 
                   <div className="col-6">
                     <div className="card" style={{ width: "16rem" }}>
-                      {
-                        useUserDataStore.getState().userData.user_type == "superadmin" ?
+                      {useUserDataStore.getState().userData.user_type ==
+                      "superadmin" ? (
                         <div className="card-body">
-                        <h1>{totalAdminPendingUsers}</h1>
-                        <p>Pending Admin Accounts</p>
-                        <Link
-                          className="btn btn-warning admin-btn"
-                          href="/manage-accounts/admin-applications"
-                        >
-                          Manage
-                        </Link>
-                      </div>
-                      :
-                      <div className="card-body">
-                        <h1>{totalFisherfolkUsers}</h1>
-                        <p>Fisherfolk Active Accounts</p>
-                        <Link
-                          className="btn btn-warning admin-btn"
-                          href="/manage-accounts/fisherfolk-applications"
-                        >
-                          Manage
-                        </Link>
-                      </div>
-                      }
+                          <h1>{totalAdminPendingUsers}</h1>
+                          <p>Pending Admin Accounts</p>
+                          <Link
+                            className="btn btn-warning admin-btn"
+                            href="/manage-accounts/admin-applications"
+                          >
+                            Manage
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="card-body">
+                          <h1>{totalFisherfolkUsers}</h1>
+                          <p>Fisherfolk Active Accounts</p>
+                          <Link
+                            className="btn btn-warning admin-btn"
+                            href="/manage-accounts/fisherfolk-applications"
+                          >
+                            Manage
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -240,7 +243,9 @@ export default function Homepage() {
                 <div className="mt-3">
                   <button
                     className="btn btn-secondary px-4 py-2 fw-bold"
-                    onClick={null}
+                    onClick={() => {
+                      router.push("/map");
+                    }}
                   >
                     View Map
                   </button>
@@ -250,7 +255,14 @@ export default function Homepage() {
           </div>
         </>
       ) : (
-        <div className="loader text-center m-auto m-5"></div>
+        <>
+          <div className="m-auto mt-5">
+            <h1 className="text-center" style={{ marginTop: "150px" }}>
+              FisherMap PH
+            </h1>
+          </div>
+          <div className="loader m-auto mt-5"></div>
+        </>
       )}
     </>
   );

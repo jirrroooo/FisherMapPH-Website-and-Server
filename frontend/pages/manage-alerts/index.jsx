@@ -218,7 +218,6 @@ export default function ManageAlerts() {
         setData(body);
         setIsLoading(false);
       });
-
   }
 
   function getFilteredDataByPageNumber(pageNumber) {
@@ -1149,7 +1148,6 @@ export default function ManageAlerts() {
                   }
                 </li>
               </ul>
-
             </div>
 
             <div className="row">
@@ -1162,7 +1160,7 @@ export default function ManageAlerts() {
                     setIsCreateModal(true);
                   }}
                 >
-                  Create New Alerts
+                  Create New Alert
                 </button>
               </div>
               <div className="col-2">
@@ -1180,7 +1178,14 @@ export default function ManageAlerts() {
           </div>
         </>
       ) : (
-        <div className="loader m-auto mt-5"></div>
+        <>
+          <div className="m-auto mt-5">
+            <h1 className="text-center" style={{ marginTop: "150px" }}>
+              FisherMap PH
+            </h1>
+          </div>
+          <div className="loader m-auto mt-5"></div>
+        </>
       )}
     </>
   );
