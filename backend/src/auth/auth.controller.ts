@@ -16,6 +16,7 @@ import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ObjectId } from 'typeorm';
 import { AuthGuard } from '@nestjs/passport';
+import { CreateLogDto } from 'src/logs/dto/create-log.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -31,7 +32,7 @@ export class AuthController {
   }
 
   @Post('/signup')
-  signUp(@Body() signUpDto: SignUpDto): Promise<{ status: string }> {
+  signUp(@Body() signUpDto: SignUpDto): Promise<{ status: string, id: ObjectId }> {
     return this.authService.signUp(signUpDto);
   }
 

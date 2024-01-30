@@ -12,8 +12,7 @@ export class LogsController {
   constructor(private readonly logsService: LogsService) {}
 
   @Post()
-  @UseGuards(AuthGuard())
-  async newLog(@Body() log: CreateLogDto) {
+  async newLog(@Body() log: CreateLogDto): Promise<{status: string}> {
     return this.logsService.newLog(log);
   }
 
@@ -21,6 +20,30 @@ export class LogsController {
   @UseGuards(AuthGuard())
   async getLogs(@Query() query: ExpressQuery): Promise<Log[]> {
     return this.logsService.getLogs(query);
+  }
+
+  @Get('fisherfolkLogs')
+  @UseGuards(AuthGuard())
+  async getFisherfolkLogs() {
+    return this.logsService.getFisherfolkLogs();
+  }
+
+  @Get('totalFisherfolkLogs')
+  @UseGuards(AuthGuard())
+  async getTotalFisherfolkLogs() {
+    return this.logsService.getTotalFisherfolkLogs();
+  }
+
+  @Get('adminLogs')
+  @UseGuards(AuthGuard())
+  async getAdminLogs() {
+    return this.logsService.getAdminLogs();
+  }
+
+  @Get('totalAdminLogs')
+  @UseGuards(AuthGuard())
+  async getTotalAdminLogs() {
+    return this.logsService.getTotalAdminLogs();
   }
 
   @Get(':id')

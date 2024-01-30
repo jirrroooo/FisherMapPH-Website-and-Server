@@ -20,7 +20,6 @@ export default function Homepage() {
     fetch("/api/verify")
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         if (body.status == "success") {
           setIsVerified(true);
           useLoginStore.setState({ isLoggedIn: true, token: body.token });
@@ -53,7 +52,6 @@ export default function Homepage() {
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
 
         if (body.status == "success") {
           alert("Signup Successful! Your account will be reviewed for approval.");
@@ -65,9 +63,31 @@ export default function Homepage() {
           document.getElementById("address").value = '';
           document.getElementById("civilStatus").value = 'Please Select';
           document.getElementById("password").value = '';
+
+          createLog(body.id);
         } else {
           useLoginStore.setState({ isVerifiedCookie: false });
           alert("Signing up unsuccessful");
+        }
+      });
+  }
+
+  function createLog(id) {
+    fetch(`${useApiStore.getState().apiUrl}logs`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id: id,
+      }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        if(body.status){
+          router.push("/login");
+        }else{
+          alert("User Log is not properly created!");
         }
       });
   }

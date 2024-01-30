@@ -104,7 +104,7 @@ export default function LoginPage() {
             <div className="row">
               <div className="col-sm-4">
                 <div className="text-center loginForm">
-                  <h5>Register an Administrator Account</h5>
+                  <h5>Login to your Administrator Account</h5>
                   <form action="" id="signupForm">
                     <input
                       type="email"

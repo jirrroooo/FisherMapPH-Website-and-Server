@@ -6,14 +6,14 @@ import mongoose, { ObjectId } from "mongoose";
 })
 export class Log{
 
-    // @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
-    // user_id: User;
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
+    user_id: ObjectId;
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     manage_user: [ObjectId];
 
-    @Prop()
-    manage_alert: [string];
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Alert'})
+    manage_alert: [ObjectId];
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Position'})
     location_log: [ObjectId];

@@ -6,8 +6,8 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './dto/signUp.dto';
 import { LogInDto } from './dto/logIn.dto';
-import { Response } from 'express';
 import { ObjectId } from 'typeorm';
+import { CreateLogDto } from 'src/logs/dto/create-log.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(signUpDto: SignUpDto): Promise<{ status: string }> {
+  async signUp(signUpDto: SignUpDto): Promise<{ status: string, id: ObjectId }> {
     const {
       first_name,
       last_name,
@@ -54,12 +54,12 @@ export class AuthService {
         fishing_vessel_type,
       });
       if (user._id) {
-        return { status: 'success' };
+        return { status: 'success', id: user._id };
       } else {
-        return { status: 'failed' };
+        return { status: 'failed', id: null };
       }
     } catch {
-      return { status: 'failed' };
+      return { status: 'failed', id: null };
     }
 
     // const token = this.jwtService.sign({ id: user._id });

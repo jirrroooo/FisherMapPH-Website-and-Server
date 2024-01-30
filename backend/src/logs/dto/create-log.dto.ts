@@ -5,11 +5,11 @@ import { ObjectId } from "mongoose";
 export class CreateLogDto {
 
     @IsNotEmpty()
-    user_id: ObjectId
+    user_id: ObjectId;
 
     manage_user: [ObjectId];
 
-    manage_alert: [string];
+    manage_alert: [ObjectId];
 
     location_log: [ObjectId];
 
