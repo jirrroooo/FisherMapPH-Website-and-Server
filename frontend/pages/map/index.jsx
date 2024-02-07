@@ -38,6 +38,22 @@ export default function FisherMap() {
       });
   }, []);
 
+  function getFisherfolkLogs(){
+    fetch(
+      `${
+        useApiStore.getState().apiUrl}logs/fisherfolkLogs`,
+      {
+        headers: {
+          Authorization: `Bearer ${useLoginStore.getState().token}`,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body);
+      });
+  }
+
   function getUserId(token) {
     fetch(`${useApiStore.getState().apiUrl}auth/profile/${token}`, {
       headers: {
@@ -72,6 +88,7 @@ export default function FisherMap() {
       .then((response) => response.json())
       .then((body) => {
         setData(body);
+        getFisherfolkLogs();
         setIsLoading(false);
       });
   }

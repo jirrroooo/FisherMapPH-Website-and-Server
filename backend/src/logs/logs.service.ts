@@ -7,10 +7,12 @@ import { UpdateLogDto } from './dto/update-log.dto';
 import { Log } from './schemas/logs.schema';
 import * as mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { ObjectId } from 'mongoose';
+// import { ObjectId } from 'mongoose';
+import { ObjectId } from 'mongodb';
 import { Query } from 'express-serve-static-core';
 import { CreateLogDto } from './dto/create-log.dto';
 import { User } from 'src/users/schemas/users.schema';
+import { Position } from 'src/positions/schemas/positions.schema';
 @Injectable()
 export class LogsService {
   constructor(
@@ -19,6 +21,9 @@ export class LogsService {
 
     @InjectModel(User.name)
     private userModel: mongoose.Model<User>,
+
+    @InjectModel(Position.name)
+    private positionModel: mongoose.Model<User>,
   ) {}
 
   async newLog(log: CreateLogDto): Promise<{ status: string }> {
@@ -54,23 +59,31 @@ export class LogsService {
     return logs;
   }
 
-  async getFisherfolkLogs() {
+  async getFisherfolkLogs() {  
+    // Fetch logs from the database
     const logs = await this.logModel.find().sort({ createdAt: -1 });
 
+    const serializedData = logs.map(doc => JSON.stringify(doc));
+    const objectData = serializedData.map(doc => JSON.parse(doc));
+    
     let fisherfolkLogs = [];
-
-    for (let i = 0; i < logs.length; i++) {
-      let user = await this.userModel.findOne({ _id: logs[i].user_id });
-
-      if (
-        user.user_type == 'user' && user.isAuthenticated == true
-      ) {
-        fisherfolkLogs.push(logs[i]);
+    let position: any;
+    let user: any;
+  
+    for (const log of objectData) {
+      user = await this.userModel.findOne({ _id: log.user_id }).select('-password');
+  
+      if(log.location_log != undefined){
+        position = await this.positionModel.findOne({ _id: log.location_log[0] });
+      }
+  
+      if (user && user.user_type == 'user' && user.isAuthenticated == true) {
+        fisherfolkLogs.push({ log: log, user: user, position: position });
       }
     }
-
     return fisherfolkLogs;
   }
+
 
   async getTotalFisherfolkLogs() {
     const logs = await this.logModel.find().sort({ createdAt: -1 });
@@ -80,9 +93,7 @@ export class LogsService {
     for (let i = 0; i < logs.length; i++) {
       let user = await this.userModel.findOne({ _id: logs[i].user_id });
 
-      if (
-        user.user_type == 'user' && user.isAuthenticated == true
-      ) {
+      if (user.user_type == 'user' && user.isAuthenticated == true) {
         fisherfolkLogs.push(logs[i]);
       }
     }
@@ -98,9 +109,7 @@ export class LogsService {
     for (let i = 0; i < logs.length; i++) {
       let user = await this.userModel.findOne({ _id: logs[i].user_id });
 
-      if (
-        user.user_type == 'admin' && user.isAuthenticated == true
-      ) {
+      if (user.user_type == 'admin' && user.isAuthenticated == true) {
         adminLogs.push(logs[i]);
       }
     }
@@ -116,16 +125,13 @@ export class LogsService {
     for (let i = 0; i < logs.length; i++) {
       let user = await this.userModel.findOne({ _id: logs[i].user_id });
 
-      if (
-        user.user_type == 'admin' && user.isAuthenticated == true
-      ) {
+      if (user.user_type == 'admin' && user.isAuthenticated == true) {
         adminLogs.push(logs[i]);
       }
     }
 
     return adminLogs.length;
   }
-
 
   async getLog(id: ObjectId): Promise<Log> {
     const isValidId = mongoose.isValidObjectId(id);

@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { SignUpDto } from './dto/signUp.dto';
 import { LogInDto } from './dto/logIn.dto';
 import { ObjectId } from 'typeorm';
-import { CreateLogDto } from 'src/logs/dto/create-log.dto';
 
 @Injectable()
 export class AuthService {

@@ -286,7 +286,7 @@ export default function ManageDistressCalls() {
     </html>
     `;
 
-    const emails = email_list.map((item) => {
+    let emails = email_list.map((item) => {
       return item.value;
     });
 
