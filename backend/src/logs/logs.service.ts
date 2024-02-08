@@ -76,8 +76,8 @@ export class LogsService {
         position = await this.positionModel.findOne({ _id: log.location_log[0] });
       }
   
-      if (user && user.user_type == 'user' && user.isAuthenticated == true) {
-        fisherfolkLogs.push({ log: log, user: user, position: position ? position : null });
+      if (user && user.user_type == 'user' && user.isAuthenticated == true && position != null && position != undefined) {
+        fisherfolkLogs.push({ log: log, user: user, position: position});
       }
     }
     return fisherfolkLogs;

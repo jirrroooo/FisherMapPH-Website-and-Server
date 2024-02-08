@@ -5,16 +5,20 @@ import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
 import Navbar from "../../components/navbar";
 import Image from "next/image";
+import "./style.css";
 
 export default function FisherMap() {
   const [isVerified, setIsVerified] = useState(false);
   const [filter, setFilter] = useState("fisherfolk");
   const [isLoading, setIsLoading] = useState(true);
+  const [isMapLoading, setIsMapLoading] = useState(false);
   const [data, setData] = useState(null);
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [searchBy, setSearchBy] = useState("Search by");
   const [search, setSearch] = useState("");
+  const [markerData, setMarkerData] = useState();
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -37,22 +41,6 @@ export default function FisherMap() {
         }
       });
   }, []);
-
-  function getFisherfolkLogs(){
-    fetch(
-      `${
-        useApiStore.getState().apiUrl}logs/fisherfolkLogs`,
-      {
-        headers: {
-          Authorization: `Bearer ${useLoginStore.getState().token}`,
-        },
-      }
-    )
-      .then((response) => response.json())
-      .then((body) => {
-        console.log(body);
-      });
-  }
 
   function getUserId(token) {
     fetch(`${useApiStore.getState().apiUrl}auth/profile/${token}`, {
@@ -89,7 +77,21 @@ export default function FisherMap() {
       .then((body) => {
         setData(body);
         getFisherfolkLogs();
-        setIsLoading(false);
+      });
+  }
+
+  async function getFisherfolkLogs() {
+    await fetch(`${useApiStore.getState().apiUrl}logs/fisherfolkLogs`, {
+      headers: {
+        Authorization: `Bearer ${useLoginStore.getState().token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        if (body) {
+          setMarkerData(body);
+          setIsLoading(false);
+        }
       });
   }
 
@@ -130,7 +132,7 @@ export default function FisherMap() {
       setSearchBy("alert_type");
     }
 
-    if(document.getElementById("search").value == ""){
+    if (document.getElementById("search").value == "") {
       setSearchBy("Search by");
     }
 
@@ -225,10 +227,9 @@ export default function FisherMap() {
     data == null;
 
     await getDataByFilter(filter);
-
   }
 
-  function handleSearch(){
+  function handleSearch() {
     getSearchedData(document.getElementById("search").value);
   }
 
@@ -236,57 +237,56 @@ export default function FisherMap() {
     console.log(searchBy);
     console.log(search);
 
+    setSelectedUser(null);
+
     if (searchBy != "Search by") {
-      getSearchedDataByPageNumber(page + 1, document.getElementById("search").value);
+      getSearchedDataByPageNumber(
+        page + 1,
+        document.getElementById("search").value
+      );
     } else {
       getDataByPage(page + 1);
     }
   };
 
   const handlePrevPage = () => {
+    setSelectedUser(null);
+
     if (searchBy != "Search by") {
-      getSearchedDataByPageNumber(page - 1, document.getElementById("search").value);
+      getSearchedDataByPageNumber(
+        page - 1,
+        document.getElementById("search").value
+      );
     } else {
       getDataByPage(page - 1);
     }
   };
 
-  const markers = [
-    {
-      position: [3.1113888888888888, 119.92611111111112],
-      text: "Marker 1 - Masarawag",
-    },
-    {
-      position: [3.4433333333333334, 121.35861111111111],
-      text: "Marker 2 - Philippine Sea",
-    },
-    {
-      position: [3.816111111111111, 122.93416666666666],
-      text: "Marker 3 - Philippine Sea",
-    },
-    {
-      position: [4.961666666666667, 124.85472222222222],
-      text: "Marker 4 - Philippine Sea",
-    },
-    {
-      position: [5.046666666666667, 125.47222222222223],
-      text: "Marker 5 - Philippine Sea",
-    },
-    { position: [6.4225, 127.195], text: "Marker 6 - Philippine Sea" },
-    {
-      position: [6.406944444444445, 128.65055555555554],
-      text: "Marker 7 - Philippine Sea",
-    },
-    {
-      position: [6.405555555555556, 129.52527777777777],
-      text: "Marker 8 - Philippine Sea",
-    },
-  ];
-
-  const handleSubmit = (event) => {
-    // Prevent the default form submission behavior
+  function handleSubmit(event) {
     event.preventDefault();
-  };
+  }
+
+  function handleNavigate(userId) {
+    let checker = false;
+
+    markerData.map((marker) => {
+      if(marker.user._id == userId){
+        checker = true;
+      }
+    });
+
+    setIsMapLoading(true);
+
+    setSelectedUser(checker ? userId : null);
+
+    setTimeout(() => {
+      setIsMapLoading(false);
+    }, 500);
+
+    if(!checker){
+      alert("Navigation Failed: No logged position yet for the account.")
+    }
+  }
 
   return (
     <>
@@ -432,14 +432,26 @@ export default function FisherMap() {
                         </div>
                         <div className="col-4">
                           <p>
-                            {info.fishing_vessel_type.charAt(0).toUpperCase() +
-                              info.fishing_vessel_type.substring(1)}
+                            {info.fishing_vessel_type.charAt(0).toUpperCase()}
+                            {info.fishing_vessel_type.substring(1)}
                           </p>
                         </div>
                         <div className="col-4">
-                          <button className="btn btn-secondary">
-                            Navigate
-                          </button>
+                          {selectedUser == info._id ? (
+                            <button
+                              className="btn btn-dark fw-bold "
+                              onClick={() => handleNavigate(info._id)}
+                            >
+                              Navigate
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn-secondary"
+                              onClick={() => handleNavigate(info._id)}
+                            >
+                              Navigate
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -545,11 +557,18 @@ export default function FisherMap() {
                     }
                   </li>
                 </ul>
-
               </div>
             </div>
-            <div className="col-7 container mt-0 p-0">
-              <Map markers={markers} />
+            <div className="col-7 container">
+              {!isMapLoading ? (
+                <div className="mt-0 p-0">
+                  <Map markerData={markerData} selectedUser={selectedUser} />
+                </div>
+              ) : (
+                <div className="mapLoader">
+                  <div className="loader m-auto"></div>
+                </div>
+              )}
             </div>
           </div>
         </>

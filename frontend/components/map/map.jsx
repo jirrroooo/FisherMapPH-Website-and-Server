@@ -3,12 +3,57 @@ import "./style.css";
 
 import { MapContainer, TileLayer, Marker, Popup, Polygon } from "react-leaflet";
 import leaflet from "leaflet";
+import { FormattedDateTime } from "../formatted-date";
+import { useEffect, useRef, useState } from "react";
 
-// import locationImage from '/images/locationMarker.png';
+export default function Map({ markerData, selectedUser }) {
+  const [navigatedUser, setNavigatedUser] = useState(selectedUser);
+  const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
+  const markerReference = useRef({});
 
-export default function Map({ markers }) {
+  // useEffect(() => {
+  //   // Function to open popup for marker with specific key
+  //   function openPopupForKey(key) {
+  //     const markerRef = markerReference.current[key];
+  //     if (markerRef) {
+  //       markerRef.openPopup();
+  //     }
+  //   }
+
+  //   if (selectedMarkerKey != null) {
+  //     openPopupForKey(selectedMarkerKey);
+  //   }
+  // }, [selectedUser]);
+
+     function openPopupForKey(key) {
+      const markerRef = markerReference.current[key];
+      if (markerRef) {
+        markerRef.openPopup();
+      }
+    }
+
+    if (selectedMarkerKey != null) {
+      openPopupForKey(selectedMarkerKey);
+    }
+
+  if (navigatedUser !== null) {
+    markerData.map((marker, index) => {
+      if (marker.user._id == navigatedUser) {
+        setNavigatedUser(marker);
+        setSelectedMarkerKey(index);
+      }
+    });
+  }
+
   const locationMarker = leaflet.icon({
     iconUrl: "/images/fishing.png",
+    iconSize: [35, 33],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
+
+  const specifiedUser = leaflet.icon({
+    iconUrl: "/images/locationMarker.png",
     iconSize: [35, 33],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
@@ -34,8 +79,15 @@ export default function Map({ markers }) {
     <>
       <MapContainer
         className="map"
-        center={[12.8797, 121.7740]}
-        zoom={6}
+        center={
+          navigatedUser == null || typeof navigatedUser == "string"
+            ? [12.8797, 121.774]
+            : [
+                Number(navigatedUser.position.longitude),
+                Number(navigatedUser.position.latitude),
+              ]
+        }
+        zoom={navigatedUser == null ? 6 : 10}
         scrollWheelZoom={true}
       >
         <TileLayer
@@ -63,18 +115,75 @@ export default function Map({ markers }) {
           </Popup>
         </Polygon>
 
-        {markers.map((marker, index) => (
-          <Marker key={index} position={marker.position} icon={locationMarker}>
+        {markerData.map((marker, index) => (
+          <Marker
+            key={index}
+            position={[
+              Number(marker.position.longitude),
+              Number(marker.position.latitude),
+            ]}
+            icon={
+              marker.user._id == selectedUser ? specifiedUser : locationMarker
+            }
+            ref={(ref) => {
+              markerReference.current[index] = ref;
+            }}
+          >
             <Popup>
-              <div className="text-center">
-                <h5>{marker.text}</h5>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-                  sunt eius eum ipsum magnam doloribus, iusto porro corporis
-                  iure tempora? Aliquid sint voluptatum amet, laboriosam
-                  expedita aut officiis sapiente ut.
-                </p>
-                <button className="btn btn-secondary">Send Alert</button>
+              <div>
+                <h5 className="text-center fw-bold text-uppercase  py-1">
+                  {marker.user.first_name} {marker.user.last_name}
+                </h5>
+
+                <hr />
+
+                <table>
+                  <tr>
+                    <th>Longitude:</th>
+                    <td>{marker.position.longitude}</td>
+                  </tr>
+                  <tr>
+                    <th>Latitude:</th>
+                    <td>{marker.position.latitude}</td>
+                  </tr>
+                  <tr>
+                    <th>Last Located:</th>
+                    <td>
+                      <FormattedDateTime date={marker.position.timestamp} />
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Sea Depth:</th>
+                    <td>{marker.position.sea_depth.toFixed(4)}</td>
+                  </tr>
+                  <tr>
+                    <th>Fishing Vessel Type:</th>
+                    <td>
+                      {marker.user.fishing_vessel_type.charAt(0).toUpperCase()}
+                      {marker.user.fishing_vessel_type.substring(1)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Email Address:</th>
+                    <td>{marker.user.email_address}</td>
+                  </tr>
+                  <tr>
+                    <th>Contact Number:</th>
+                    <td>{marker.user.contact_number}</td>
+                  </tr>
+                  <tr>
+                    <th>Address:</th>
+                    <td>{marker.user.address}</td>
+                  </tr>
+                </table>
+
+                <hr />
+
+                <div className="text-center py-2">
+                  <button className="btn btn-danger text-white fw-bold">
+                    Send Alert
+                  </button>
+                </div>
               </div>
             </Popup>
           </Marker>
