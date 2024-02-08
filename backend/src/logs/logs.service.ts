@@ -77,7 +77,7 @@ export class LogsService {
       }
   
       if (user && user.user_type == 'user' && user.isAuthenticated == true) {
-        fisherfolkLogs.push({ log: log, user: user, position: position });
+        fisherfolkLogs.push({ log: log, user: user, position: position ? position : null });
       }
     }
     return fisherfolkLogs;
