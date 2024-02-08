@@ -60,7 +60,6 @@ export class LogsService {
   }
 
   async getFisherfolkLogs() {  
-    // Fetch logs from the database
     const logs = await this.logModel.find().sort({ createdAt: -1 });
 
     const serializedData = logs.map(doc => JSON.stringify(doc));
@@ -83,7 +82,6 @@ export class LogsService {
     }
     return fisherfolkLogs;
   }
-
 
   async getTotalFisherfolkLogs() {
     const logs = await this.logModel.find().sort({ createdAt: -1 });
@@ -170,5 +168,39 @@ export class LogsService {
     }
 
     return await this.logModel.findByIdAndRemove(id);
+  }
+
+  async usersLogCorrection(): Promise<{success: string}>{
+    const users = await this.userModel.find().select('-password');
+    let result: any;
+
+    users.forEach( async(user) => {
+      result = await this.logModel.find({user_id: user._id});
+
+      if(result.length == 0){
+        const newLog: CreateLogDto = {
+          user_id: user.id,
+          manage_user: null,
+          manage_alert: null,
+          location_log: null,
+          alert_log: null,
+          permission: null,
+          report_log: null,
+        }
+
+        this.newLog(newLog);
+      }
+    });
+
+    users.forEach( async(user) => {
+      result = await this.logModel.find({user_id: user._id});
+
+      if(result.length == 0){
+        return {success: "false"};
+      }
+    });
+
+    return {success: "true"};
+
   }
 }

@@ -47,6 +47,12 @@ export class LogsController {
     return this.logsService.getTotalAdminLogs();
   }
 
+  @Get('usersLogCorrection')
+  @UseGuards(AuthGuard())
+  async usersLogCorrection(): Promise<{success: string}>{
+    return this.logsService.usersLogCorrection();
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard())
   async getLog(@Param('id') id: ObjectId) {
@@ -64,4 +70,5 @@ export class LogsController {
   async removeLog(@Param('id') id: ObjectId) {
     return this.logsService.removeLog(id);
   }
+
 }
