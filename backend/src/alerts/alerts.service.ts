@@ -23,11 +23,12 @@ export class AlertsService {
     return res;
   }
 
-
-  async getAlerts(query: Query): Promise<Alert[]> {
+  async getAlerts(query: Query) {
     const responsePerPage = 5;
     const currentPage = Number(query.page) || 1;
     const skip = responsePerPage * (currentPage - 1);
+
+    let alerts: any;
 
     if (query.search) {
       if (query.searchBy != 'level') {
@@ -45,8 +46,7 @@ export class AlertsService {
             .sort(
               query.sort == 'alphabetical' && query.searchBy == 'title'
                 ? { title: 1 }
-                : query.sort != 'alphabetical' &&
-                  query.searchBy == 'title'
+                : query.sort != 'alphabetical' && query.searchBy == 'title'
                 ? { title: -1 }
                 : query.sort == 'alphabetical' &&
                   query.searchBy == 'description'
@@ -95,18 +95,18 @@ export class AlertsService {
 
         return searchByLevel;
       }
+    } else if (!query.search) {
+      alerts = await this.alertModel
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(responsePerPage)
+        .skip(skip);
     }
-
-    const alerts = await this.alertModel
-      .find({ })
-      .sort({ createdAt: -1 })
-      .limit(responsePerPage)
-      .skip(skip);
 
     return alerts;
   }
 
-  async getTotalAlerts(){
+  async getTotalAlerts() {
     return (await this.alertModel.find()).length;
   }
 

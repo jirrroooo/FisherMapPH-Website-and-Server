@@ -24,6 +24,13 @@ export default function ManageAlerts() {
   const [page, setPage] = useState(1);
   const [searchBy, setSearchBy] = useState("Search by");
   const [sortBy, setSortBy] = useState("Sort by");
+  const [latLongInput, setLatLongInput] = useState([
+    {
+      type: "text",
+      id: 1,
+      value: "",
+    },
+  ]);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -121,6 +128,14 @@ export default function ManageAlerts() {
   function createAlert() {
     const isSpecific = document.getElementById("yes").checked ? true : false;
 
+    let locationList = [];
+    
+    latLongInput.map((loc) => {
+      let str = loc.value.trim();
+      str = str.split(',').map(parseFloat);
+      locationList.push(str)
+    });
+
     fetch(`${useApiStore.getState().apiUrl}alerts`, {
       method: "POST",
       headers: {
@@ -130,9 +145,10 @@ export default function ManageAlerts() {
       body: JSON.stringify({
         title: document.getElementById("c_title").value,
         description: document.getElementById("c_description").value,
-        location: document.getElementById("c_location").value,
+        location: locationList,
         level: document.getElementById("c_level").value,
         isSpecific: isSpecific,
+        radius: parseFloat(document.getElementById("c_radius").value),
         // specified_user: document.getElementById("c_specified_user").value,
         // notified_user: document.getElementById("c_notified_useer").value,
         effective: document.getElementById("c_effective").value,
@@ -144,7 +160,8 @@ export default function ManageAlerts() {
       .then((body) => {
         // alert("Edit Successful!");
         // router.refresh();
-        window.location.reload();
+        console.log(body);
+        // window.location.reload();
       });
   }
 
@@ -163,6 +180,14 @@ export default function ManageAlerts() {
   }
 
   function editAlert() {
+    let locationList = [];
+
+    latLongInput.map((loc) => {
+      let str = loc.value.trim();
+      str = str.split(',').map(parseFloat);
+      locationList.push(str)
+    });
+
     const isSpecific = document.getElementById("yes").checked ? true : false;
 
     fetch(`${useApiStore.getState().apiUrl}alerts/${selectedUser._id}`, {
@@ -174,9 +199,10 @@ export default function ManageAlerts() {
       body: JSON.stringify({
         title: document.getElementById("title").value,
         description: document.getElementById("description").value,
-        location: document.getElementById("location").value,
+        location: locationList,
         level: document.getElementById("level").value,
         isSpecific: isSpecific,
+        radius: parseFloat(document.getElementById("c_radius").value),
         // specified_user: document.getElementById("c_birthday").value,
         // notified_user: document.getElementById("c_password").value,
         effective: document.getElementById("effective").value,
@@ -279,6 +305,43 @@ export default function ManageAlerts() {
       getDataByPage(page - 1);
     }
   };
+
+  function addLatLongInput(e) {
+    e.preventDefault();
+
+    setLatLongInput((info) => {
+      return [
+        ...info,
+        {
+          type: "text",
+          value: "",
+        },
+      ];
+    });
+  }
+
+  function handleChange(e) {
+    e.preventDefault();
+
+    const index = e.target.id;
+
+    setLatLongInput((latlong) => {
+      const newArr = latlong.slice();
+      newArr[index].value = e.target.value;
+
+      return newArr;
+    });
+  }
+
+  function resetLatLongInput() {
+    setLatLongInput([
+      {
+        type: "text",
+        id: 1,
+        value: "",
+      },
+    ]);
+  }
 
   return (
     <>
@@ -501,6 +564,17 @@ export default function ManageAlerts() {
                             onClick={() => {
                               setSelectedUser(info);
                               setIsEditModal(true);
+                              
+                              let locationInfo = [];
+
+                              info.location.map((loc, index)=>{
+                                locationInfo.push({
+                                  id: index,
+                                  value: `${loc[0]}, ${loc[1]}`
+                                });
+                              })
+
+                              setLatLongInput(locationInfo);
                             }}
                           >
                             Edit Alert
@@ -550,8 +624,23 @@ export default function ManageAlerts() {
                           </tr>
                           <tr>
                             <td className="fw-bold">Location:</td>
-                            <td>{selectedUser.location}</td>
+                            <td>
+                              {selectedUser.location.map((loc) => {
+                                return (
+                                  <p>
+                                    [{loc[0]}, {loc[1]}]
+                                  </p>
+                                );
+                              })}
+                            </td>
                           </tr>
+                          {selectedUser.location.length == 1 ? (
+                            <tr>
+                              <td className="fw-bold">Alert Radius:</td>
+                              <td>{selectedUser.radius} Kilometers</td>
+                            </tr>
+                          ) : null}
+
                           <tr>
                             <td className="fw-bold">Alert Level:</td>
                             <td className="text-capitalize">
@@ -653,14 +742,46 @@ export default function ManageAlerts() {
                           </div>
                           <div className="mb-3 mt-3">
                             <label htmlFor="c_location" className="label">
-                              Enter Location
+                              Enter Longitude and Latitude Pair (separated by
+                              comma)
+                            </label>
+
+                            <div className="text-center">
+                              {latLongInput.map((item, i) => {
+                                return (
+                                  <input
+                                    className="form-control mt-2"
+                                    type="text"
+                                    placeholder="Longitude, Latitude"
+                                    onChange={handleChange}
+                                    value={item.value}
+                                    id={i}
+                                  />
+                                );
+                              })}
+
+                              <button
+                                onClick={addLatLongInput}
+                                className="btn btn-secondary text-center mt-2"
+                                onSubmit={null}
+                              >
+                                + Longitude Latitude Pair
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="mb-3 mt-3">
+                            <label htmlFor="c_radius" className="label">
+                              Enter Radius
                             </label>
                             <input
-                              type="text"
-                              id="c_location"
+                              disabled={latLongInput.length == 1 ? false: true}
+                              type="number"
+                              id="c_radius"
                               className="form-control"
-                              placeholder="Location"
-                              name="c_location"
+                              placeholder="Radius"
+                              name="c_radius"
+                              defaultValue={0}
                             />
                           </div>
 
@@ -884,17 +1005,49 @@ export default function ManageAlerts() {
                               name="description"
                             />
                           </div>
+
                           <div className="mb-3 mt-3">
-                            <label htmlFor="location" className="label">
-                              Enter Location
+                            <label htmlFor="c_location" className="label">
+                              Enter Longitude and Latitude Pair (separated by
+                              comma)
+                            </label>
+
+                            <div className="text-center">
+                              {latLongInput.map((item, i) => {
+                                return (
+                                  <input
+                                    className="form-control mt-2"
+                                    type="text"
+                                    placeholder="Longitude, Latitude"
+                                    onChange={handleChange}
+                                    value={item.value}
+                                    id={i}
+                                  />
+                                );
+                              })}
+
+                              <button
+                                onClick={addLatLongInput}
+                                className="btn btn-secondary text-center mt-2"
+                                onSubmit={null}
+                              >
+                                + Longitude Latitude Pair
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="mb-3 mt-3">
+                            <label htmlFor="c_radius" className="label">
+                              Enter Radius
                             </label>
                             <input
-                              type="text"
-                              id="location"
+                              disabled={latLongInput.length == 1 ? false: true}
+                              type="number"
+                              id="c_radius"
                               className="form-control"
-                              placeholder={selectedUser.location}
-                              defaultValue={selectedUser.location}
-                              name="location"
+                              placeholder="Radius"
+                              name="c_radius"
+                              defaultValue={selectedUser.radius}
                             />
                           </div>
 
@@ -1158,6 +1311,7 @@ export default function ManageAlerts() {
                   className="btn btn-primary mt-5"
                   onClick={() => {
                     setIsCreateModal(true);
+                    resetLatLongInput();
                   }}
                 >
                   Create New Alert

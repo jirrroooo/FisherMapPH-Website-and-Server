@@ -14,13 +14,13 @@ export class AlertsController {
 
   @Post()
   @UseGuards(AuthGuard())
-  async newAlert(@Body() alert: CreateAlertDto): Promise<Alert> {
+  async newAlert(@Body() alert: CreateAlertDto) {
     return this.alertsService.newAlert(alert);
   }
 
   @Get()
   @UseGuards(AuthGuard())
-  async getAlerts(@Query() query: ExpressQuery): Promise<Alert[]> {
+  async getAlerts(@Query() query: ExpressQuery) {
     return this.alertsService.getAlerts(query);
   }
 

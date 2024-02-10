@@ -5,42 +5,17 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon } from "react-leaflet";
 import leaflet from "leaflet";
 import { FormattedDateTime } from "../formatted-date";
 import { useEffect, useRef, useState } from "react";
+import { computeCircleAlertBounds } from "../math-function";
 
 export default function Map({ markerData, selectedUser }) {
   const [navigatedUser, setNavigatedUser] = useState(selectedUser);
-  const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
-  const markerReference = useRef({});
-
-  // useEffect(() => {
-  //   // Function to open popup for marker with specific key
-  //   function openPopupForKey(key) {
-  //     const markerRef = markerReference.current[key];
-  //     if (markerRef) {
-  //       markerRef.openPopup();
-  //     }
-  //   }
-
-  //   if (selectedMarkerKey != null) {
-  //     openPopupForKey(selectedMarkerKey);
-  //   }
-  // }, [selectedUser]);
-
-     function openPopupForKey(key) {
-      const markerRef = markerReference.current[key];
-      if (markerRef) {
-        markerRef.openPopup();
-      }
-    }
-
-    if (selectedMarkerKey != null) {
-      openPopupForKey(selectedMarkerKey);
-    }
+  // const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
 
   if (navigatedUser !== null) {
     markerData.map((marker, index) => {
       if (marker.user._id == navigatedUser) {
         setNavigatedUser(marker);
-        setSelectedMarkerKey(index);
+        // setSelectedMarkerKey(index);
       }
     });
   }
@@ -53,8 +28,8 @@ export default function Map({ markerData, selectedUser }) {
   });
 
   const specifiedUser = leaflet.icon({
-    iconUrl: "/images/locationMarker.png",
-    iconSize: [35, 33],
+    iconUrl: "/images/fishing.png",
+    iconSize: [45, 43],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
   });
@@ -74,6 +49,9 @@ export default function Map({ markerData, selectedUser }) {
     [13.20885798061333, 123.76453927381931],
     [13.20870230810157, 123.76437937089966],
   ];
+
+  const testPolygon = computeCircleAlertBounds(123.5933, 17.0972, 100);
+  // console.log(testPolygon);
 
   return (
     <>
@@ -115,6 +93,26 @@ export default function Map({ markerData, selectedUser }) {
           </Popup>
         </Polygon>
 
+        <Polygon
+          positions={testPolygon}
+          color="red"
+          weight={2}
+          fillOpacity={0.4}
+        >
+          <Popup>
+            <div className="text-center">
+              <h5>Test Alert Bounds</h5>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
+                sunt eius eum ipsum magnam doloribus, iusto porro corporis iure
+                tempora? Aliquid sint voluptatum amet, laboriosam expedita aut
+                officiis sapiente ut.
+              </p>
+              <button className="btn btn-secondary">View Information</button>
+            </div>
+          </Popup>
+        </Polygon>
+
         {markerData.map((marker, index) => (
           <Marker
             key={index}
@@ -125,9 +123,6 @@ export default function Map({ markerData, selectedUser }) {
             icon={
               marker.user._id == selectedUser ? specifiedUser : locationMarker
             }
-            ref={(ref) => {
-              markerReference.current[index] = ref;
-            }}
           >
             <Popup>
               <div>

@@ -27,7 +27,6 @@ export default function ManageDistressCalls() {
   const [page, setPage] = useState(1);
   const [searchBy, setSearchBy] = useState("Search by");
   const [sortBy, setSortBy] = useState("Sort by");
-  const [hasEmail, setHasEmail] = useState(true);
   const [emailInput, setEmailInput] = useState([
     {
       type: "text",
@@ -933,16 +932,10 @@ export default function ManageDistressCalls() {
                       </form>
                     </ModalBody>
                     <ModalFooter>
-                      {/* {emailInput.map((item, i) => {
-                        if (i == 0 && item.value == "") {
-                          setHasEmail(false);
-                        }
-                      })} */}
-
-                      {emailInput[0].value.includes("@") &&
-                      emailInput[0].value.includes(".") ? (
                         <Button
                           className="btn-primary m-auto px-5"
+                          disabled={emailInput[0].value.includes("@") &&
+                          emailInput[0].value.includes(".") ? false : true}
                           color="primary"
                           type="button"
                           onClick={() => {
@@ -953,21 +946,6 @@ export default function ManageDistressCalls() {
                         >
                           Send Information
                         </Button>
-                      ) : (
-                        <Button
-                          className="btn-primary m-auto px-5"
-                          color="primary"
-                          type="button"
-                          disabled
-                          onClick={() => {
-                            setIsRespondModal(false);
-                            resetEmailInput();
-                            sendInformation(emailInput);
-                          }}
-                        >
-                          Send Information
-                        </Button>
-                      )}
 
                       <Button
                         className="btn-light m-auto px-5"
@@ -1142,7 +1120,7 @@ export default function ManageDistressCalls() {
                 type="button"
                 className="btn btn-primary mt-5"
                 onClick={null}
-                href="#"
+                href="/map"
               >
                 View Sea Map
               </Link>
