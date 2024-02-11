@@ -15,12 +15,13 @@ export default function FisherMap() {
   const [isSearchInterfaceLoading, setIsSearchInterfaceLoading] =
     useState(false);
   const [data, setData] = useState(null);
+  const [mapData, setMapData] = useState(null);
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [searchBy, setSearchBy] = useState("Search by");
   const [search, setSearch] = useState("");
   const [markerData, setMarkerData] = useState();
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedData, setSelectedData] = useState(null);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -226,20 +227,41 @@ export default function FisherMap() {
   async function handleDataChange(filter) {
     setIsSearchInterfaceLoading(true);
 
-    if(selectedUser != null){
-      setIsMapLoading(true);
-      setSelectedUser(null);
-      
-      setTimeout(() => {
-        setIsMapLoading(false);
-      }, 500);
-    }
+    setIsMapLoading(true);
+    setSelectedData(null);
+
+    await getMapData(filter);
+
+    setTimeout(() => {
+      setIsMapLoading(false);
+    }, 500);
 
     setPage(1);
     setFilter(filter);
     data == null;
 
     await getDataByFilter(filter);
+  }
+
+  async function getMapData(filter) {
+    let linkString = "";
+
+    console.log(filter);
+
+    if (filter == "alerts") {
+      linkString = "alerts?map=true";
+    } else {
+      linkString = "reports?map=true";
+    }
+
+    await fetch(`${useApiStore.getState().apiUrl}${linkString}`, {
+      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        setMapData(body);
+        console.log(body);
+      });
   }
 
   function handleSearch() {
@@ -250,7 +272,7 @@ export default function FisherMap() {
     console.log(searchBy);
     console.log(search);
 
-    setSelectedUser(null);
+    setSelectedData(null);
 
     if (searchBy != "Search by") {
       getSearchedDataByPageNumber(
@@ -263,7 +285,7 @@ export default function FisherMap() {
   };
 
   const handlePrevPage = () => {
-    setSelectedUser(null);
+    setSelectedData(null);
 
     if (searchBy != "Search by") {
       getSearchedDataByPageNumber(
@@ -279,18 +301,32 @@ export default function FisherMap() {
     event.preventDefault();
   }
 
-  function handleNavigate(userId) {
+  function handleNavigate(dataId, filter) {
     let checker = false;
 
-    markerData.map((marker) => {
-      if (marker.user._id == userId) {
-        checker = true;
-      }
-    });
+    if (filter == "fisherfolk") {
+      markerData.map((marker) => {
+        if (marker.user._id == dataId) {
+          checker = true;
+        }
+      });
+    } else if (filter == "alerts") {
+      mapData.map((marker) => {
+        if (marker._id == dataId) {
+          checker = true;
+        }
+      });
+    } else if (filter == "reports") {
+      mapData.map((marker) => {
+        if (marker.report._id == dataId) {
+          checker = true;
+        }
+      });
+    }
 
     setIsMapLoading(true);
 
-    setSelectedUser(checker ? userId : null);
+    setSelectedData(checker ? dataId : null);
 
     setTimeout(() => {
       setIsMapLoading(false);
@@ -456,21 +492,18 @@ export default function FisherMap() {
                               </p>
                             </div>
                             <div className="col-4">
-                              {selectedUser == info._id ? (
-                                <button
-                                  className="btn btn-dark fw-bold "
-                                  onClick={() => handleNavigate(info._id)}
-                                >
-                                  Navigate
-                                </button>
-                              ) : (
-                                <button
-                                  className="btn btn-secondary"
-                                  onClick={() => handleNavigate(info._id)}
-                                >
-                                  Navigate
-                                </button>
-                              )}
+                              <button
+                                className={
+                                  selectedData == info._id
+                                    ? "btn btn-dark fw-bold "
+                                    : "btn btn-secondary"
+                                }
+                                onClick={() =>
+                                  handleNavigate(info._id, "fisherfolk")
+                                }
+                              >
+                                Navigate
+                              </button>
                             </div>
                           </div>
                         );
@@ -490,7 +523,16 @@ export default function FisherMap() {
                               <p>{info.description}</p>
                             </div>
                             <div className="col-4">
-                              <button className="btn btn-secondary">
+                              <button
+                                className={
+                                  selectedData == info._id
+                                    ? "btn btn-dark fw-bold "
+                                    : "btn btn-secondary"
+                                }
+                                onClick={() =>
+                                  handleNavigate(info._id, "alerts")
+                                }
+                              >
                                 Locate
                               </button>
                             </div>
@@ -512,7 +554,16 @@ export default function FisherMap() {
                               <p>{info.report.content}</p>
                             </div>
                             <div className="col-4">
-                              <button className="btn btn-secondary">
+                              <button
+                                className={
+                                  selectedData == info.report._id
+                                    ? "btn btn-dark fw-bold"
+                                    : "btn btn-secondary"
+                                }
+                                onClick={() => {
+                                  handleNavigate(info.report._id, "reports");
+                                }}
+                              >
                                 Navigate
                               </button>
                             </div>
@@ -553,29 +604,26 @@ export default function FisherMap() {
                         </a>
                       </li>
                       <li className="page-item">
-                        {
-                          // kapag lima ang data sa page
-                          Object.keys(data).length == 5 ? (
-                            <button
-                              className="btn btn-light"
-                              onClick={() => {
-                                handleNextPage();
-                              }}
-                            >
-                              Next
-                            </button>
-                          ) : (
-                            <button
-                              className="btn btn-light"
-                              onClick={() => {
-                                handleNextPage();
-                              }}
-                              disabled
-                            >
-                              Next
-                            </button>
-                          )
-                        }
+                        {Object.keys(data).length == 5 ? (
+                          <button
+                            className="btn btn-light"
+                            onClick={() => {
+                              handleNextPage();
+                            }}
+                          >
+                            Next
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-light"
+                            onClick={() => {
+                              handleNextPage();
+                            }}
+                            disabled
+                          >
+                            Next
+                          </button>
+                        )}
                       </li>
                     </ul>
                   </div>
@@ -590,7 +638,12 @@ export default function FisherMap() {
             <div className="col-7 container">
               {!isMapLoading ? (
                 <div className="mt-0 p-0">
-                  <Map markerData={markerData} selectedUser={selectedUser} />
+                  <Map
+                    markerData={markerData}
+                    selectedData={selectedData}
+                    data={mapData}
+                    filter={filter}
+                  />
                 </div>
               ) : (
                 <div className="mapLoader">

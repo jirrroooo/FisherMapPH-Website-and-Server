@@ -95,12 +95,13 @@ export class AlertsService {
 
         return searchByLevel;
       }
-    } else if (!query.search) {
+    } else if (!query.search && !query.map) {
       alerts = await this.alertModel
         .find()
-        .sort({ createdAt: -1 })
         .limit(responsePerPage)
         .skip(skip);
+    }else if(query.map){
+      alerts = await this.alertModel.find();
     }
 
     return alerts;

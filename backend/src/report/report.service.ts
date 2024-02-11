@@ -104,16 +104,16 @@ export class ReportsService {
   
         }
       }
-    } else if (!query.search) {
+    } else if (!query.search && !query.map) {
 
       reports = await this.reportModel
         .find()
         .sort({ createdAt: -1 })
         .limit(responsePerPage)
         .skip(skip);
-
+    }else if(query.map){
+      reports = await this.reportModel.find().sort({ createdAt: -1 })
     }
-
 
     reports = await reports.reduce(
       (promise: any, report: any) =>

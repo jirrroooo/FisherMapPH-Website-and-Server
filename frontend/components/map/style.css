@@ -14,3 +14,7 @@ td{
     /* padding-left: 10px; */
     text-align: center;
 }
+
+.mapLoader{
+    margin-top: 15rem;
+}
