@@ -27,6 +27,16 @@ export default function Map({ markerData, selectedData, data, filter }) {
   const [isUnarchiveModal, setIsUnarchiveModal] = useState(false);
   const [isMarkResponded, setIsMarkResponded] = useState(false);
   const [isMarkNotResponded, setIsMarkNotResponded] = useState(false);
+  const [isEditModal, setIsEditModal] = useState(false);
+
+  const [latLongInput, setLatLongInput] = useState([
+    {
+      type: "text",
+      id: 1,
+      value: "",
+    },
+  ]);
+
   const [emailInput, setEmailInput] = useState([
     {
       type: "text",
@@ -323,9 +333,79 @@ export default function Map({ markerData, selectedData, data, filter }) {
 
         router.push({
           pathname: "/map-redirect",
-          query: {filterValue: "reports"}
+          query: { filterValue: "reports" },
         });
       });
+  }
+
+  function editAlert() {
+    let locationList = [];
+
+    latLongInput.map((loc) => {
+      let str = loc.value.trim();
+      str = str.split(",").map(parseFloat);
+      locationList.push(str);
+    });
+
+    const isSpecific = document.getElementById("yes").checked ? true : false;
+
+    fetch(`${useApiStore.getState().apiUrl}alerts/${selectedUser._id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${useLoginStore.getState().token}`,
+      },
+      body: JSON.stringify({
+        title: document.getElementById("title").value,
+        description: document.getElementById("description").value,
+        location: locationList,
+        level: document.getElementById("level").value,
+        isSpecific: isSpecific,
+        radius: parseFloat(document.getElementById("c_radius").value),
+        // specified_user: document.getElementById("c_birthday").value,
+        // notified_user: document.getElementById("c_password").value,
+        effective: document.getElementById("effective").value,
+        expires: document.getElementById("expiry").value,
+        instruction: document.getElementById("instruction").value,
+      }),
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        router.push({
+          pathname: "/map-redirect",
+          query: {
+            filterValue: "alerts"
+          }
+        })
+      });
+  }
+
+  function addLatLongInput(e) {
+    e.preventDefault();
+
+    setLatLongInput((info) => {
+      return [
+        ...info,
+        {
+          type: "text",
+          value: "",
+        },
+      ];
+    });
+  }
+
+  function fetchDate(date) {
+    const today = new Date(date);
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1; // Months start at 0!
+    let dd = today.getDate();
+
+    if (dd < 10) dd = "0" + dd;
+    if (mm < 10) mm = "0" + mm;
+
+    const formattedToday = yyyy + "-" + mm + "-" + dd;
+
+    return formattedToday;
   }
 
   return !isMapLoading ? (
@@ -463,10 +543,24 @@ export default function Map({ markerData, selectedData, data, filter }) {
 
                   <div className="text-center py-2">
                     <button
-                      className="btn btn-danger text-white fw-bold"
-                      onClick={() => router.push("manage-accounts")}
+                      className="btn btn-secondary text-white fw-bold"
+                      onClick={() => {
+                        setSelectedUser(alert);
+                        setIsEditModal(true);
+
+                        let locationInfo = [];
+
+                        alert.location.map((loc, index) => {
+                          locationInfo.push({
+                            id: index,
+                            value: `${loc[0]}, ${loc[1]}`,
+                          });
+                        });
+
+                        setLatLongInput(locationInfo);
+                      }}
                     >
-                      Edit Alert
+                      Edit Alert Details
                     </button>
                   </div>
                 </div>
@@ -650,7 +744,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
                         </button>
 
                         <button
-                          className= "btn btn-secondary text-white fw-bold mx-2"
+                          className="btn btn-secondary text-white fw-bold mx-2"
                           onClick={() => {
                             setSelectedUser(report);
                             setIsRespondModal(true);
@@ -702,6 +796,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
             </Marker>
           ))}
       </MapContainer>
+
       {isRespondModal && (
         <>
           <Modal
@@ -973,6 +1068,286 @@ export default function Map({ markerData, selectedData, data, filter }) {
                 }}
               >
                 Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </>
+      )}
+
+      {isEditModal && (
+        <>
+          <Modal
+            toggle={() => setIsEditModal(!isEditModal)}
+            isOpen={isEditModal}
+          >
+            <div className=" modal-header">
+              <h5
+                className=" modal-title text-center m-auto fw-bold"
+                id="editModal"
+              >
+                EDIT ALERT INFORMATION
+              </h5>
+            </div>
+            <ModalBody>
+              <div className="container">
+                <form>
+                  <div className="mb-3 mt-3">
+                    <label htmlFor="title" className="label">
+                      Enter Alert Title
+                    </label>
+                    <input
+                      type="text"
+                      id="title"
+                      className="form-control"
+                      placeholder={selectedUser.title}
+                      defaultValue={selectedUser.title}
+                      name="title"
+                    />
+                  </div>
+                  <div className="mb-3 mt-3">
+                    <label htmlFor="description" className="label">
+                      Enter Description
+                    </label>
+                    <input
+                      type="text"
+                      id="description"
+                      className="form-control"
+                      placeholder={selectedUser.title}
+                      defaultValue={selectedUser.description}
+                      name="description"
+                    />
+                  </div>
+
+                  <div className="mb-3 mt-3">
+                    <label htmlFor="c_location" className="label">
+                      Enter Longitude and Latitude Pair (separated by comma)
+                    </label>
+
+                    <div className="text-center">
+                      {latLongInput.map((item, i) => {
+                        return (
+                          <input
+                            className="form-control mt-2"
+                            type="text"
+                            placeholder="Longitude, Latitude"
+                            onChange={handleChange}
+                            value={item.value}
+                            id={i}
+                          />
+                        );
+                      })}
+
+                      <button
+                        onClick={addLatLongInput}
+                        className="btn btn-secondary text-center mt-2"
+                        onSubmit={null}
+                      >
+                        + Longitude Latitude Pair
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mb-3 mt-3">
+                    <label htmlFor="c_radius" className="label">
+                      Enter Radius
+                    </label>
+                    <input
+                      disabled={latLongInput.length == 1 ? false : true}
+                      type="number"
+                      id="c_radius"
+                      className="form-control"
+                      placeholder="Radius"
+                      name="c_radius"
+                      defaultValue={selectedUser.radius}
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="level" className="label">
+                      Select Alert Level
+                    </label>
+
+                    <br />
+
+                    {selectedUser.level == "high" && (
+                      <select
+                        id="level"
+                        name="level"
+                        className="px-3"
+                        defaultChecked={selectedUser.level}
+                      >
+                        <option value="low">Low</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="high" selected>
+                          High
+                        </option>
+                      </select>
+                    )}
+
+                    {selectedUser.level == "low" && (
+                      <select id="level" name="level" className="px-3">
+                        <option value="low" selected>
+                          Low
+                        </option>
+                        <option value="moderate">Moderate</option>
+                        <option value="high">High</option>
+                      </select>
+                    )}
+
+                    {selectedUser.level == "moderate" && (
+                      <select id="level" name="level" className="px-3">
+                        <option value="low">Low</option>
+                        <option value="moderate" selected>
+                          Moderate
+                        </option>
+                        <option value="high">High</option>
+                      </select>
+                    )}
+                  </div>
+
+                  <div className="mb-3 mt-3">
+                    <label for="specific_user">Specific User: </label>
+                    <br />
+                    {selectedUser.isSpecific ? (
+                      <>
+                        <div className="px-3">
+                          <div>
+                            <input
+                              type="radio"
+                              id="yes"
+                              name="specific_user"
+                              value="true"
+                              checked
+                            />{" "}
+                            Yes
+                          </div>
+                          <div>
+                            <input
+                              type="radio"
+                              id="no"
+                              name="specific_user"
+                              value="false"
+                            />{" "}
+                            No
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="px-3">
+                        <div>
+                          <input
+                            type="radio"
+                            id="yes"
+                            name="specific_user"
+                            value="true"
+                          />{" "}
+                          Yes
+                        </div>
+                        <div>
+                          <input
+                            type="radio"
+                            id="no"
+                            name="specific_user"
+                            value="false"
+                            checked
+                          />{" "}
+                          No
+                        </div>
+                      </div>
+                    )}
+
+                    <br />
+                  </div>
+
+                  <div className="mb-3 mt-3">
+                    <label htmlFor="" className="label">
+                      Specified Users
+                    </label>
+                    <input
+                      type="text"
+                      id="specified_users"
+                      className="form-control"
+                      placeholder="Specified User - Feature Not Working"
+                      name="specified_users"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="mb-3 mt-3">
+                    <label htmlFor="notified_users" className="label">
+                      Notified Users
+                    </label>
+                    <input
+                      type="text"
+                      id="notified_users"
+                      className="form-control"
+                      placeholder="Notified User - Feature Not Working"
+                      name="notified_users"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="effective" className="label">
+                      Effectivity Date
+                    </label>
+                    <input
+                      type="date"
+                      id="effective"
+                      className="form-control"
+                      defaultValue={fetchDate(selectedUser.effective)}
+                      name="effective"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="expiry" className="label">
+                      Expiry Date
+                    </label>
+                    <input
+                      type="date"
+                      id="expiry"
+                      className="form-control"
+                      defaultValue={fetchDate(selectedUser.expires)}
+                      name="expiry"
+                    />
+                  </div>
+                  <div className="mb-3 mt-3">
+                    <label htmlFor="instruction" className="label">
+                      Instruction
+                    </label>
+                    <input
+                      type="text"
+                      id="instruction"
+                      className="form-control"
+                      placeholder={selectedUser.instruction}
+                      defaultValue={selectedUser.instruction}
+                      name="instruction"
+                    />
+                  </div>
+                </form>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                className="btn-light m-auto px-5 fw-semibold "
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  editAlert();
+                  setIsEditModal(false);
+                }}
+              >
+                Save Changes
+              </Button>
+              <Button
+                className="btn-light m-auto px-5 fw-semibold"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsEditModal(false);
+                }}
+              >
+                Back
               </Button>
             </ModalFooter>
           </Modal>
