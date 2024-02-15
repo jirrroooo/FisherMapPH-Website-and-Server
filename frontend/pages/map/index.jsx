@@ -8,15 +8,23 @@ import Image from "next/image";
 import "./style.css";
 
 export default function FisherMap() {
+  const router = useRouter();
+
+  const filterValue =
+    router.query.filterValue === null ||
+    router.query.filterValue === undefined ||
+    router.query.filterValue === ""
+      ? "fisherfolk"
+      : router.query.filterValue;
+
   const [isVerified, setIsVerified] = useState(false);
-  const [filter, setFilter] = useState("fisherfolk");
+  const [filter, setFilter] = useState(filterValue);
   const [isLoading, setIsLoading] = useState(true);
   const [isMapLoading, setIsMapLoading] = useState(false);
   const [isSearchInterfaceLoading, setIsSearchInterfaceLoading] =
     useState(false);
   const [data, setData] = useState(null);
   const [mapData, setMapData] = useState(null);
-  const router = useRouter();
   const [page, setPage] = useState(1);
   const [searchBy, setSearchBy] = useState("Search by");
   const [search, setSearch] = useState("");
@@ -84,6 +92,7 @@ export default function FisherMap() {
   }
 
   async function getFisherfolkLogs() {
+    console.log("at getFisherfolkLogs");
     await fetch(`${useApiStore.getState().apiUrl}logs/fisherfolkLogs`, {
       headers: {
         Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -93,7 +102,7 @@ export default function FisherMap() {
       .then((body) => {
         if (body) {
           setMarkerData(body);
-          setIsLoading(false);
+          getMapData(filter);
         }
       });
   }
@@ -244,6 +253,8 @@ export default function FisherMap() {
   }
 
   async function getMapData(filter) {
+    console.log("at getMapData");
+
     let linkString = "";
 
     console.log(filter);
@@ -260,7 +271,7 @@ export default function FisherMap() {
       .then((response) => response.json())
       .then((body) => {
         setMapData(body);
-        console.log(body);
+        setIsLoading(false);
       });
   }
 
@@ -629,9 +640,16 @@ export default function FisherMap() {
                   </div>
                 </>
               ) : (
-                <div className="mapLoader">
+                <>
+                  <h3
+                    className="text-center mb-3 "
+                    style={{ marginTop: "150px" }}
+                  >
+                    Search Interface Loading...
+                  </h3>
+
                   <div className="loader m-auto"></div>
-                </div>
+                </>
               )}
             </div>
 
@@ -646,9 +664,15 @@ export default function FisherMap() {
                   />
                 </div>
               ) : (
-                <div className="mapLoader">
+                <>
+                  <h3
+                    className="text-center mb-3 "
+                    style={{ marginTop: "150px" }}
+                  >
+                    Map Loading...
+                  </h3>
                   <div className="loader m-auto"></div>
-                </div>
+                </>
               )}
             </div>
           </div>

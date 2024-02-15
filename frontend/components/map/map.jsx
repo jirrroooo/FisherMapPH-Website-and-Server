@@ -12,6 +12,9 @@ import {
 } from "../math-function";
 import { useRouter } from "next/router";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
+import { useUserDataStore } from "../../store/userDataStore";
+import { useApiStore } from "../../store/apiStore";
+import { useLoginStore } from "../../store/loginStore";
 
 export default function Map({ markerData, selectedData, data, filter }) {
   const [navigatedData, setNavigatedData] = useState(selectedData);
@@ -19,6 +22,11 @@ export default function Map({ markerData, selectedData, data, filter }) {
   const router = useRouter();
   const [selectedUser, setSelectedUser] = useState();
   const [isRespondModal, setIsRespondModal] = useState(false);
+  const [isViewModal, setIsViewModal] = useState(false);
+  const [isArchiveModal, setIsArchiveModal] = useState(false);
+  const [isUnarchiveModal, setIsUnarchiveModal] = useState(false);
+  const [isMarkResponded, setIsMarkResponded] = useState(false);
+  const [isMarkNotResponded, setIsMarkNotResponded] = useState(false);
   const [emailInput, setEmailInput] = useState([
     {
       type: "text",
@@ -295,6 +303,31 @@ export default function Map({ markerData, selectedData, data, filter }) {
       });
   }
 
+  async function updateStatus(status) {
+    await fetch(
+      `${useApiStore.getState().apiUrl}reports/${selectedUser.report._id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${useLoginStore.getState().token}`,
+        },
+        body: JSON.stringify({
+          status: status,
+        }),
+      }
+    )
+      .then((response) => response.json())
+      .then((body) => {
+        console.log(body);
+
+        router.push({
+          pathname: "/map-redirect",
+          query: {filterValue: "reports"}
+        });
+      });
+  }
+
   return !isMapLoading ? (
     <>
       <MapContainer
@@ -543,7 +576,9 @@ export default function Map({ markerData, selectedData, data, filter }) {
                     </tr>
                     <tr>
                       <th>Status:</th>
-                      <td>{report.report.status}</td>
+                      <td className="fw-bold text-uppercase text-danger">
+                        {report.report.status}
+                      </td>
                     </tr>
                     <tr>
                       <th>Longitude:</th>
@@ -591,15 +626,76 @@ export default function Map({ markerData, selectedData, data, filter }) {
                   <hr />
 
                   <div className="text-center py-2">
-                    <button
-                      className="btn btn-danger text-white fw-bold"
-                      onClick={() => {
-                        setSelectedUser(report);
-                        setIsRespondModal(true);
-                      }}
-                    >
-                      Respond
-                    </button>
+                    {report.report.status == "no_response" && (
+                      <button
+                        className="btn btn-danger text-white fw-bold"
+                        onClick={() => {
+                          setSelectedUser(report);
+                          setIsRespondModal(true);
+                        }}
+                      >
+                        Respond
+                      </button>
+                    )}
+
+                    {report.report.status == "forwarded" && (
+                      <>
+                        <button
+                          className="btn btn-secondary text-white fw-bold"
+                          onClick={() => {
+                            setIsMarkResponded(true);
+                          }}
+                        >
+                          Mark As Responded
+                        </button>
+
+                        <button
+                          className= "btn btn-secondary text-white fw-bold mx-2"
+                          onClick={() => {
+                            setSelectedUser(report);
+                            setIsRespondModal(true);
+                          }}
+                        >
+                          Respond
+                        </button>
+                      </>
+                    )}
+
+                    {report.report.status == "responded" && (
+                      <>
+                        <button
+                          className="btn btn-secondary text-white"
+                          onClick={() => {
+                            setSelectedUser(report);
+                            setIsMarkNotResponded(true);
+                          }}
+                        >
+                          Mark Not Responded
+                        </button>
+
+                        <button
+                          className="btn btn-secondary text-white mx-3"
+                          onClick={() => {
+                            setSelectedUser(report);
+                            setIsArchiveModal(true);
+                          }}
+                        >
+                          Archive
+                        </button>
+                      </>
+                    )}
+
+                    {report.report.status == "archive" && (
+                      <button
+                        className="btn btn-secondary text-white fw-bold mx-3"
+                        onClick={() => {
+                          setSelectedUser(report);
+                          setIsUnarchiveModal(true);
+                        }}
+                      >
+                        Unarchive
+                      </button>
+                    )}
                   </div>
                 </div>
               </Popup>
@@ -607,97 +703,287 @@ export default function Map({ markerData, selectedData, data, filter }) {
           ))}
       </MapContainer>
       {isRespondModal && (
-                <>
-                  <Modal
-                    toggle={() => setIsViewModal(!isRespondModal)}
-                    isOpen={isRespondModal}
+        <>
+          <Modal
+            toggle={() => setIsViewModal(!isRespondModal)}
+            isOpen={isRespondModal}
+          >
+            <div className=" modal-header">
+              <h5
+                className=" modal-title text-center m-auto fw-bold"
+                id="viewModal"
+              >
+                Send Distress Call Information to Authorities
+              </h5>
+            </div>
+            <ModalBody>
+              <form>
+                <label>Email Subject:</label>
+                <input
+                  className="form-control mt-2"
+                  type="text"
+                  placeholder="Subject of the Email"
+                  defaultValue="[URGENT] Distress Call Alert"
+                  id="emailSubject"
+                />
+                <label>Email Content:</label>
+                <textarea
+                  className="form-control mt-2"
+                  placeholder="Optional Message to the Authorities"
+                  id="emailContent"
+                />
+                <label className="mt-4">
+                  The distress signal information will be sent to the following:
+                </label>
+                <div className="text-center">
+                  {emailInput.map((item, i) => {
+                    return (
+                      <input
+                        className="form-control mt-2"
+                        type="email"
+                        placeholder="Authority Email Address"
+                        onChange={handleChange}
+                        value={item.value}
+                        id={i}
+                      />
+                    );
+                  })}
+
+                  <button
+                    onClick={addEmailInput}
+                    className="btn btn-secondary text-center mt-2"
+                    onSubmit={null}
                   >
-                    <div className=" modal-header">
-                      <h5
-                        className=" modal-title text-center m-auto fw-bold"
-                        id="viewModal"
-                      >
-                        Send Distress Call Information to Authorities
-                      </h5>
-                    </div>
-                    <ModalBody>
-                      <form>
-                        <label>Email Subject:</label>
-                        <input
-                          className="form-control mt-2"
-                          type="text"
-                          placeholder="Subject of the Email"
-                          defaultValue="[URGENT] Distress Call Alert"
-                          id="emailSubject"
-                        />
-                        <label>Email Content:</label>
-                        <textarea
-                          className="form-control mt-2"
-                          placeholder="Optional Message to the Authorities"
-                          id="emailContent"
-                        />
-                        <label className="mt-4">
-                          The distress signal information will be sent to the
-                          following:
-                        </label>
-                        <div className="text-center">
-                          {emailInput.map((item, i) => {
-                            return (
-                              <input
-                                className="form-control mt-2"
-                                type="email"
-                                placeholder="Authority Email Address"
-                                onChange={handleChange}
-                                value={item.value}
-                                id={i}
-                              />
-                            );
-                          })}
+                    + Email Address
+                  </button>
+                </div>
+              </form>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                className="btn-primary m-auto px-5"
+                disabled={
+                  emailInput[0].value.includes("@") &&
+                  emailInput[0].value.includes(".")
+                    ? false
+                    : true
+                }
+                color="primary"
+                type="button"
+                onClick={() => {
+                  setIsRespondModal(false);
+                  resetEmailInput();
+                  sendInformation(emailInput);
+                }}
+              >
+                Send Information
+              </Button>
 
-                          <button
-                            onClick={addEmailInput}
-                            className="btn btn-secondary text-center mt-2"
-                            onSubmit={null}
-                          >
-                            + Email Address
-                          </button>
-                        </div>
-                      </form>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button
-                          className="btn-primary m-auto px-5"
-                          disabled={emailInput[0].value.includes("@") &&
-                          emailInput[0].value.includes(".") ? false : true}
-                          color="primary"
-                          type="button"
-                          onClick={() => {
-                            setIsRespondModal(false);
-                            resetEmailInput();
-                            sendInformation(emailInput);
-                          }}
-                        >
-                          Send Information
-                        </Button>
+              <Button
+                className="btn-light m-auto px-5"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsRespondModal(false);
+                  resetEmailInput();
+                }}
+              >
+                Back
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </>
+      )}
 
-                      <Button
-                        className="btn-light m-auto px-5"
-                        color="secondary"
-                        type="button"
-                        onClick={() => {
-                          setIsRespondModal(false);
-                          resetEmailInput();
-                        }}
-                      >
-                        Back
-                      </Button>
-                    </ModalFooter>
-                  </Modal>
-                </>
-              )}
+      {isArchiveModal && (
+        <>
+          <Modal
+            toggle={() => setIsArchiveModal(!isArchiveModal)}
+            isOpen={isArchiveModal}
+          >
+            <div className="modal-header">
+              <h5
+                className="modal-title text-center m-auto fw-bold text-uppercase"
+                id="viewModal"
+              >
+                ARE YOU SURE YOU WANT TO ARCHIVE THIS REPORT?
+              </h5>
+            </div>
+            <ModalBody>
+              <p className="text-center">
+                You can always unarchive this report anytime.
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                className="btn-danger text-white m-auto px-5 fw-semibold"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsArchiveModal(false);
+                  updateStatus("archive");
+                }}
+              >
+                Proceed Archiving
+              </Button>
+              <Button
+                className="btn-light m-auto px-5 fw-semibold"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsArchiveModal(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </>
+      )}
+
+      {isUnarchiveModal && (
+        <>
+          <Modal
+            toggle={() => setIsArchiveModal(!isUnarchiveModal)}
+            isOpen={isUnarchiveModal}
+          >
+            <div className="modal-header">
+              <h5
+                className="modal-title text-center m-auto fw-bold text-uppercase"
+                id="viewModal"
+              >
+                ARE YOU SURE YOU WANT TO UNARCHIVE THIS REPORT?
+              </h5>
+            </div>
+            <ModalBody>
+              <p className="text-center">
+                You can always archive this report anytime.
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                className="btn-danger text-white m-auto px-5 fw-semibold"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsUnarchiveModal(false);
+                  updateStatus("responded");
+                }}
+              >
+                Proceed Unarchiving
+              </Button>
+              <Button
+                className="btn-light m-auto px-5 fw-semibold"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsUnarchiveModal(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </>
+      )}
+
+      {isMarkResponded && (
+        <>
+          <Modal
+            toggle={() => setIsMarkResponded(!isMarkResponded)}
+            isOpen={isMarkResponded}
+          >
+            <div className="modal-header">
+              <h5
+                className="modal-title text-center m-auto fw-bold text-uppercase"
+                id="viewModal"
+              >
+                ARE YOU SURE YOU WANT TO MARK THIS REPORT AS RESPONDED?
+              </h5>
+            </div>
+            <ModalBody>
+              <p className="text-center">
+                You can always mark this report as "not responded" anytime.
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                className="btn-danger text-white m-auto px-5 fw-semibold"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsMarkResponded(false);
+                  updateStatus("responded");
+                }}
+              >
+                Proceed
+              </Button>
+              <Button
+                className="btn-light m-auto px-5 fw-semibold"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsMarkResponded(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </>
+      )}
+
+      {isMarkNotResponded && (
+        <>
+          <Modal
+            toggle={() => setIsMarkNotResponded(!isMarkNotResponded)}
+            isOpen={isMarkNotResponded}
+          >
+            <div className="modal-header">
+              <h5
+                className="modal-title text-center m-auto fw-bold text-uppercase"
+                id="viewModal"
+              >
+                ARE YOU SURE YOU WANT TO MARK THIS REPORT AS NOT RESPONDED?
+              </h5>
+            </div>
+            <ModalBody>
+              <p className="text-center">
+                You can always mark this report as "responded" anytime.
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                className="btn-danger text-white m-auto px-5 fw-semibold"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsMarkNotResponded(false);
+                  updateStatus("no_response");
+                }}
+              >
+                Proceed
+              </Button>
+              <Button
+                className="btn-light m-auto px-5 fw-semibold"
+                color="secondary"
+                type="button"
+                onClick={() => {
+                  setIsMarkNotResponded(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </>
+      )}
     </>
   ) : (
     <div className="mapLoader">
+      <div className="text-center">
+        <h1>Map Loading...</h1>
+      </div>
       <div className="loader m-auto"></div>
     </div>
   );
