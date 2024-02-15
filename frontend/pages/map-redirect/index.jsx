@@ -4,11 +4,12 @@ import React from "react";
 export default function index() {
   const router = useRouter();
 
-  const propVal = router.query.filterValue;;
-
   router.push({
     pathname: "/map",
-    query: {filterValue: propVal}
+    query: {
+      filterValue: router.query.filterValue,
+      dataId: router.query.dataId
+    }
   });
 
   return (

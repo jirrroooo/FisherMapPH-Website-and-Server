@@ -51,6 +51,10 @@ export default function FisherMap() {
           router.push("/login");
         }
       });
+
+      if(router.query.dataId){
+        setSelectedData(router.query.dataId);
+      }
   }, []);
 
   function getUserId(token) {
@@ -92,7 +96,6 @@ export default function FisherMap() {
   }
 
   async function getFisherfolkLogs() {
-    console.log("at getFisherfolkLogs");
     await fetch(`${useApiStore.getState().apiUrl}logs/fisherfolkLogs`, {
       headers: {
         Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -253,11 +256,7 @@ export default function FisherMap() {
   }
 
   async function getMapData(filter) {
-    console.log("at getMapData");
-
     let linkString = "";
-
-    console.log(filter);
 
     if (filter == "alerts") {
       linkString = "alerts?map=true";
@@ -280,9 +279,6 @@ export default function FisherMap() {
   }
 
   const handleNextPage = () => {
-    console.log(searchBy);
-    console.log(search);
-
     setSelectedData(null);
 
     if (searchBy != "Search by") {

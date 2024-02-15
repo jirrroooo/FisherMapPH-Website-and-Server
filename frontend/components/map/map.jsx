@@ -128,7 +128,6 @@ export default function Map({ markerData, selectedData, data, filter }) {
         return calculateCenter(navigatedData.location);
       }
     } else if (filter == "reports" && navigatedData !== null) {
-      console.log(navigatedData);
       return [
         navigatedData.positionInfo.latitude,
         navigatedData.positionInfo.longitude,
@@ -308,7 +307,6 @@ export default function Map({ markerData, selectedData, data, filter }) {
     })
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
         updateStatus("forwarded");
       });
   }
@@ -329,11 +327,12 @@ export default function Map({ markerData, selectedData, data, filter }) {
     )
       .then((response) => response.json())
       .then((body) => {
-        console.log(body);
-
         router.push({
           pathname: "/map-redirect",
-          query: { filterValue: "reports" },
+          query: {
+            filterValue: "reports",
+            dataId: selectedUser.report._id
+         },
         });
       });
   }
@@ -374,7 +373,8 @@ export default function Map({ markerData, selectedData, data, filter }) {
         router.push({
           pathname: "/map-redirect",
           query: {
-            filterValue: "alerts"
+            filterValue: "alerts",
+            dataId: selectedUser._id
           }
         })
       });
@@ -441,7 +441,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
           </Popup>
         </Polygon>
 
-        <Marker
+        {/* <Marker
           key={9999}
           position={calculateCenter(highlightRegionCoords)}
           icon={reportMarker}
@@ -459,7 +459,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
               </div>
             </div>
           </Popup>
-        </Marker>
+        </Marker> */}
 
         {filter == "alerts" &&
           data.map((alert) => (
@@ -671,7 +671,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
                     <tr>
                       <th>Status:</th>
                       <td className="fw-bold text-uppercase text-danger">
-                        {report.report.status}
+                        {report.report.status == "no_response" ? "no response" : report.report.status}
                       </td>
                     </tr>
                     <tr>
