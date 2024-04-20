@@ -40,6 +40,7 @@ export default function Homepage() {
       body: JSON.stringify({
         first_name: document.getElementById("fname").value,
         last_name: document.getElementById("lname").value,
+        sex: document.getElementById("sex").value,
         email_address: document.getElementById("email").value,
         password: document.getElementById("password").value,
         profile_picture: null,
@@ -57,6 +58,7 @@ export default function Homepage() {
           alert("Signup Successful! Your account will be reviewed for approval.");
           document.getElementById("fname").value = '';
           document.getElementById("lname").value = '';
+          document.getElementById("sex").value = '';
           document.getElementById("email").value = '';
           document.getElementById("bday").value = '';
           document.getElementById("contact").value = '';
@@ -121,6 +123,13 @@ export default function Homepage() {
                       placeholder="Last Name"
                       required
                     />
+                    <label htmlFor="sex" className="label mb-2 fst-italic pb-2 px-3">
+                      Sex Assigned at Birth
+                    </label>
+                    <select id="sex" name="sex" className="px-5 py-2 border-1">
+                      <option value="male" className="text-center" >Male</option>
+                      <option value="female" className="text-center" >Female</option>
+                    </select>
                     <input
                       type="email"
                       className="form-control"

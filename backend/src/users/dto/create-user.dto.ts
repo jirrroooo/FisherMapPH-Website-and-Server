@@ -12,6 +12,10 @@ export class CreateUserDto {
     last_name: string;
 
     @IsNotEmpty()
+    @IsString()
+    sex: string;
+
+    @IsNotEmpty()
     @IsEmail({}, {message: "Please enter correct email"})
     email_address: string;
 

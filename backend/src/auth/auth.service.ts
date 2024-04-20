@@ -21,6 +21,7 @@ export class AuthService {
     const {
       first_name,
       last_name,
+      sex,
       email_address,
       password,
       contact_number,
@@ -40,6 +41,7 @@ export class AuthService {
       const user = await this.userModel.create({
         first_name,
         last_name,
+        sex,
         email_address,
         password: hashedPassword,
         contact_number,
@@ -73,13 +75,13 @@ export class AuthService {
     const user = await this.userModel.findOne({ email_address });
 
     if (!user) {
-      throw new UnauthorizedException('No Account Found!');
+      throw new UnauthorizedException(['No Account Found!']);
     }
 
     const isPasswordMatched = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatched) {
-      throw new UnauthorizedException('Wrong Password!');
+      throw new UnauthorizedException(['Wrong Password!']);
     }
 
     const token = this.jwtService.sign({ id: user._id });

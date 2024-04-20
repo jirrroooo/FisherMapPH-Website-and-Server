@@ -11,6 +11,9 @@ export class User{
     @Prop()
     last_name: string;
 
+    @Prop()
+    gender: string;
+
     @Prop({unique: [true, "Duplicate email entered"]})
     email_address: string;
 
