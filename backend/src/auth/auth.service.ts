@@ -69,6 +69,7 @@ export class AuthService {
   async login(loginDto: LogInDto): Promise<{
     token: string;
     isAuthenticated: boolean;
+    userType: string;
   }> {
     const { email_address, password } = loginDto;
 
@@ -88,7 +89,8 @@ export class AuthService {
 
     return {
       token: token,
-      isAuthenticated: user.isAuthenticated
+      isAuthenticated: user.isAuthenticated,
+      userType: user.user_type,
     };
   }
 

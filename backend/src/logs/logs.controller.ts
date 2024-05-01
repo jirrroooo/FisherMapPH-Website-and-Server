@@ -53,10 +53,16 @@ export class LogsController {
     return this.logsService.usersLogCorrection();
   }
 
-  @Get(':id')
+  @Get('alert/:id')
   @UseGuards(AuthGuard())
-  async getLog(@Param('id') id: ObjectId) {
-    return this.logsService.getLog(id);
+  async getAlertLogs(@Param('id') id: ObjectId) {
+    return this.logsService.getAlertLogs(id);
+  }
+
+  @Get('location/:id')
+  @UseGuards(AuthGuard())
+  async getLocationLog(@Param('id') id: ObjectId) {
+    return this.logsService.getLocationLogs(id);
   }
 
   @Patch(':id')

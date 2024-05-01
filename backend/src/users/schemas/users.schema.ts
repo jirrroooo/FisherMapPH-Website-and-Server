@@ -12,7 +12,7 @@ export class User{
     last_name: string;
 
     @Prop()
-    gender: string;
+    sex: string;
 
     @Prop({unique: [true, "Duplicate email entered"]})
     email_address: string;

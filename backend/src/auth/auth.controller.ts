@@ -42,7 +42,8 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ): Promise<{
     token: string;
-    isAuthenticated: boolean
+    isAuthenticated: boolean;
+    userType: string;
   }> {
     return this.authService.login(logInDto);
   }

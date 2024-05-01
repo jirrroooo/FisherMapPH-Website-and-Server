@@ -13,11 +13,15 @@ import { Query } from 'express-serve-static-core';
 import { CreateLogDto } from './dto/create-log.dto';
 import { User } from 'src/users/schemas/users.schema';
 import { Position } from 'src/positions/schemas/positions.schema';
+import { Alert } from 'src/alerts/schemas/alerts.schema';
 @Injectable()
 export class LogsService {
   constructor(
     @InjectModel(Log.name)
     private logModel: mongoose.Model<Log>,
+
+    @InjectModel(Alert.name)
+    private alertModel: mongoose.Model<Alert>,
 
     @InjectModel(User.name)
     private userModel: mongoose.Model<User>,
@@ -146,6 +150,71 @@ export class LogsService {
 
     return log;
   }
+
+  async getAlertLogs(id: ObjectId) {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if (!isValidId) {
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
+    const log = await this.logModel.findOne({user_id: id});
+
+    if (!log) {
+      throw new NotFoundException('log Not Found!');
+    }
+
+    const serializedData = JSON.stringify(log);
+    const objectData = JSON.parse(serializedData);
+
+    const alert_logs = [];
+
+
+    for (const alert of objectData.alert_log) {
+      const alertLog = await this.alertModel.findOne({_id: alert});
+      if (alertLog) {
+        alert_logs.push(alertLog);
+      } else {
+        console.error(`Alert log not found for ID ${alert}`);
+      }
+      console.log("test");
+    }
+
+    return alert_logs;
+  }
+
+  async getLocationLogs(id: ObjectId) {
+    const isValidId = mongoose.isValidObjectId(id);
+
+    if (!isValidId) {
+      throw new BadRequestException('Please enter valid ID.');
+    }
+
+    const log = await this.logModel.findOne({user_id: id});
+
+    if (!log) {
+      throw new NotFoundException('log Not Found!');
+    }
+
+    const serializedData = JSON.stringify(log);
+    const objectData = JSON.parse(serializedData);
+
+    const location_logs = [];
+
+
+    for (const location of objectData.location_log) {
+      const locationLog = await this.positionModel.findOne({_id: location});
+      if (locationLog) {
+        location_logs.push(locationLog);
+      } else {
+        console.error(`Alert log not found for ID ${location}`);
+      }
+      console.log("test");
+    }
+
+    return location_logs;
+  }
+  
 
   async updateLog(id: ObjectId, updateLogDto: UpdateLogDto) {
     const isValidId = mongoose.isValidObjectId(id);
