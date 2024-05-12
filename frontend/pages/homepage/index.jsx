@@ -8,6 +8,11 @@ import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
 import { useUserDataStore } from "../../store/userDataStore";
 import { useApiStore } from "../../store/apiStore";
+import LoadingPage from "../../components/loading_page";
+import { MapContainer, TileLayer } from "react-leaflet";
+import { LatLng } from "leaflet";
+import Map from "../../components/map/map";
+import MapHome from "../../components/map_home";
 
 export default function Homepage() {
   const router = useRouter();
@@ -20,6 +25,7 @@ export default function Homepage() {
   const [totalAdminPendingUsers, setTotalAdminPendingUsers] = useState(0);
   const [totalAlerts, setTotalAlerts] = useState(0);
   const [totalReports, setTotalReports] = useState(0);
+  const [markerData, setMarkerData] = useState(0);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -133,6 +139,23 @@ export default function Homepage() {
         setTotalReports(data);
       });
 
+      getFisherfolkLogs();
+  }
+
+  async function getFisherfolkLogs() {
+    await fetch(`${useApiStore.getState().apiUrl}logs/fisherfolkLogs`, {
+      headers: {
+        Authorization: `Bearer ${useLoginStore.getState().token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        if (body) {
+          setMarkerData(body);
+          // getMapData(filter);
+        }
+      });
+
     getData();
   }
 
@@ -144,12 +167,9 @@ export default function Homepage() {
           <div className="container mt-4 text-center">
             <h2 className="text-uppercase">WELCOME {name}!</h2>
             <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Modi
-              voluptas, dolore, similique velit rerum neque minima delectus illo
-              consequatur sequi id ad laborum error nesciunt dicta quasi
-              molestiae aspernatur incidunt!
+            Our goal is to provide an organized platform that increases the security and broaden the linkages among the fisherfolk in the Philippines.
             </p>
-            <div className="row mt-4">
+            <div className="row mt-5">
               <div className="col-6 container-fluid">
                 <div className="row mt-2">
                   <div className="col-6">
@@ -230,17 +250,15 @@ export default function Homepage() {
               </div>
 
               <div className="col-6 container">
-                <div className="row mt-1">
-                  <div className="col-6">
-                    <Image
-                      src="/images/1.jpg"
-                      width={550}
-                      height={350}
-                      alt="..."
-                    />
-                  </div>
+                <div className="mt-0 p-0">
+                <MapHome
+                    className="home_map"
+                    markerData={markerData}
+                    selectedData={markerData[0]}
+                    filter={'fisherfolk'}
+                  />
                 </div>
-                <div className="mt-3">
+                <div className="row-4 mt-3">
                   <button
                     className="btn btn-secondary px-4 py-2 fw-bold"
                     onClick={() => {
@@ -255,14 +273,7 @@ export default function Homepage() {
           </div>
         </>
       ) : (
-        <>
-          <div className="m-auto mt-5">
-            <h1 className="text-center" style={{ marginTop: "150px" }}>
-              FisherMap PH
-            </h1>
-          </div>
-          <div className="loader m-auto mt-5"></div>
-        </>
+        <LoadingPage />
       )}
     </>
   );

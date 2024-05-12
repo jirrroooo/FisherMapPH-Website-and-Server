@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { useApiStore } from "../../store/apiStore";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 import FormattedDate from "../../components/formatted-date";
+import LoadingPage from "../../components/loading_page";
 
 export default function FisherfolkRejectedApplications() {
   const router = useRouter();
@@ -164,7 +165,6 @@ export default function FisherfolkRejectedApplications() {
         setData(body);
         setIsLoading(false);
       });
-
   }
 
   function getFilteredDataByPageNumber(pageNumber) {
@@ -686,7 +686,6 @@ export default function FisherfolkRejectedApplications() {
                   }
                 </li>
               </ul>
-
             </div>
 
             <div className="row">
@@ -716,14 +715,7 @@ export default function FisherfolkRejectedApplications() {
           </div>
         </>
       ) : (
-        <>
-        <div className="m-auto mt-5">
-          <h1 className="text-center" style={{ marginTop: "150px" }}>
-            FisherMap PH
-          </h1>
-        </div>
-        <div className="loader m-auto mt-5"></div>
-      </>
+        <LoadingPage />
       )}
     </>
   );

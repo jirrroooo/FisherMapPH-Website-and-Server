@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import Navbar from "../../components/navbar";
 import Image from "next/image";
 import "./style.css";
+import LoadingPage from "../../components/loading_page";
 
 export default function FisherMap() {
   const router = useRouter();
@@ -52,9 +53,9 @@ export default function FisherMap() {
         }
       });
 
-      if(router.query.dataId){
-        setSelectedData(router.query.dataId);
-      }
+    if (router.query.dataId) {
+      setSelectedData(router.query.dataId);
+    }
   }, []);
 
   function getUserId(token) {
@@ -674,14 +675,7 @@ export default function FisherMap() {
           </div>
         </>
       ) : (
-        <>
-          <div className="m-auto mt-5">
-            <h1 className="text-center" style={{ marginTop: "150px" }}>
-              FisherMap PH
-            </h1>
-          </div>
-          <div className="loader m-auto mt-5"></div>
-        </>
+        <LoadingPage />
       )}
     </>
   );

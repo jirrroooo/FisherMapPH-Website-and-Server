@@ -11,6 +11,7 @@ import FormattedDate, {
   FormattedDateTime,
 } from "../../components/formatted-date";
 import { useUserDataStore } from "../../store/userDataStore";
+import LoadingPage from "../../components/loading_page";
 
 export default function ManageDistressCalls() {
   const router = useRouter();
@@ -916,20 +917,24 @@ export default function ManageDistressCalls() {
                       </form>
                     </ModalBody>
                     <ModalFooter>
-                        <Button
-                          className="btn-primary m-auto px-5"
-                          disabled={emailInput[0].value.includes("@") &&
-                          emailInput[0].value.includes(".") ? false : true}
-                          color="primary"
-                          type="button"
-                          onClick={() => {
-                            setIsRespondModal(false);
-                            resetEmailInput();
-                            sendInformation(emailInput);
-                          }}
-                        >
-                          Send Information
-                        </Button>
+                      <Button
+                        className="btn-primary m-auto px-5"
+                        disabled={
+                          emailInput[0].value.includes("@") &&
+                          emailInput[0].value.includes(".")
+                            ? false
+                            : true
+                        }
+                        color="primary"
+                        type="button"
+                        onClick={() => {
+                          setIsRespondModal(false);
+                          resetEmailInput();
+                          sendInformation(emailInput);
+                        }}
+                      >
+                        Send Information
+                      </Button>
 
                       <Button
                         className="btn-light m-auto px-5"
@@ -1112,14 +1117,7 @@ export default function ManageDistressCalls() {
           </div>
         </>
       ) : (
-        <>
-          <div className="m-auto mt-5">
-            <h1 className="text-center" style={{ marginTop: "150px" }}>
-              FisherMap PH
-            </h1>
-          </div>
-          <div className="loader m-auto mt-5"></div>
-        </>
+        <LoadingPage />
       )}
     </>
   );

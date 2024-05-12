@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { useApiStore } from "../../store/apiStore";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 import FormattedDate from "../../components/formatted-date";
+import LoadingPage from "../../components/loading_page";
 
 export default function AdminRejectedApplications() {
   const router = useRouter();
@@ -61,18 +62,21 @@ export default function AdminRejectedApplications() {
       });
   }
 
-  async function getUserType(token){
-    fetch(`${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+  async function getUserType(token) {
+    fetch(
+      `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data) {
-          if(data.user_type == "admin"){
+          if (data.user_type == "admin") {
             router.push("/homepage");
-          }else{
+          } else {
             getData();
           }
         }
@@ -188,7 +192,6 @@ export default function AdminRejectedApplications() {
         setData(body);
         setIsLoading(false);
       });
-
   }
 
   function getFilteredDataByPageNumber(pageNumber) {
@@ -716,7 +719,6 @@ export default function AdminRejectedApplications() {
                   }
                 </li>
               </ul>
-              
             </div>
 
             <div className="row">
@@ -746,14 +748,7 @@ export default function AdminRejectedApplications() {
           </div>
         </>
       ) : (
-        <>
-        <div className="m-auto mt-5">
-          <h1 className="text-center" style={{ marginTop: "150px" }}>
-            FisherMap PH
-          </h1>
-        </div>
-        <div className="loader m-auto mt-5"></div>
-      </>
+        <LoadingPage />
       )}
     </>
   );

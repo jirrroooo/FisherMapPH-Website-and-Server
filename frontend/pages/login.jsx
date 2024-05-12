@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useLoginStore } from "../store/loginStore";
 import { useApiStore } from "../store/apiStore";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [isVerified, setIsVerified] = useState(true);
@@ -29,13 +30,16 @@ export default function LoginPage() {
       .then((body) => {
         if (body.status == "success") {
           setIsVerified(true);
-          useLoginStore.setState({ isLoggedIn: true, token: body.token, id: body.id });
+          useLoginStore.setState({
+            isLoggedIn: true,
+            token: body.token,
+            id: body.id,
+          });
           router.push("/homepage");
         } else {
           setIsVerified(false);
         }
       });
-
   }, []);
 
   // Set cookie for token
@@ -47,7 +51,7 @@ export default function LoginPage() {
       },
       body: JSON.stringify({
         tk: useLoginStore.getState().token,
-        id: useLoginStore.getState().id
+        id: useLoginStore.getState().id,
       }),
     })
       .then((response) => response.json())
@@ -75,18 +79,30 @@ export default function LoginPage() {
     })
       .then((response) => response.json())
       .then((body) => {
-        if (body.token != "" && body.userType != "user" && body.isAuthenticated) {
-          useLoginStore.setState({token: body.token, isLoggedIn: true});
+        if (
+          body.token != "" &&
+          body.userType != "user" &&
+          body.isAuthenticated
+        ) {
+          useLoginStore.setState({ token: body.token, isLoggedIn: true });
           setCookie();
           setIsLoggedIn(true);
           router.push("/homepage");
-        } else if(body.token == "" && body.userType != "user" && body.isAuthenticated){
+        } else if (
+          body.token == "" &&
+          body.userType != "user" &&
+          body.isAuthenticated
+        ) {
           alert("Unsuccessful Login Try Again.");
-        } else if(body.userType == "user"){
-          alert("You are only allowed to signin on FisherMap PH mobile application!")
-        } else if(!body.isAuthenticated){
-          alert("Pending Account Approval. You cannot login as of this moment.");
-        }else{
+        } else if (body.userType == "user") {
+          alert(
+            "You are only allowed to signin on FisherMap PH mobile application!"
+          );
+        } else if (!body.isAuthenticated) {
+          alert(
+            "Pending Account Approval. You cannot login as of this moment."
+          );
+        } else {
           console.log(body);
           alert(body.message);
         }
@@ -102,13 +118,13 @@ export default function LoginPage() {
           <Navbar />
           <div className="container mt-4">
             <div className="row">
-              <div className="col-sm-4">
+              <div className="col-sm-6">
                 <div className="text-center loginForm">
-                  <h5>Login to your Administrator Account</h5>
+                  <h5 className="mb-4">Login to your Administrator Account</h5>
                   <form action="" id="signupForm">
                     <input
                       type="email"
-                      className="form-control"
+                      className="form-control auth_field"
                       id="email"
                       name="email"
                       placeholder="Enter Address"
@@ -116,7 +132,7 @@ export default function LoginPage() {
                     />
                     <input
                       type="password"
-                      className="form-control"
+                      className="form-control auth_field"
                       id="password"
                       name="password"
                       placeholder="Password"
@@ -125,7 +141,7 @@ export default function LoginPage() {
 
                     <button
                       type="submit"
-                      className="btn btn-primary"
+                      className="btn btn-primary auth_button"
                       id="submitBtn"
                       onClick={logIn}
                     >
@@ -137,8 +153,13 @@ export default function LoginPage() {
                   </p>
                 </div>
               </div>
-              <div className="col-sm-8">
-                <AdminCarousel />
+              <div className="col-sm-6 text-center ">
+                <Image
+                  src="/images/splash.png"
+                  width={500}
+                  height={500}
+                  alt="Picture of the author"
+                />
               </div>
             </div>
           </div>

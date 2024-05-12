@@ -4,6 +4,7 @@ import "../../styles/custom.scss";
 import { useLoginStore } from "../../store/loginStore";
 import { useRouter } from "next/router";
 import { useApiStore } from "../../store/apiStore";
+import LoadingPage from "../../components/loading_page";
 
 export default function ManageAccounts() {
   const router = useRouter();
@@ -36,8 +37,7 @@ export default function ManageAccounts() {
       });
   }, []);
 
-  
-  function getUserId(token){
+  function getUserId(token) {
     fetch(`${useApiStore.getState().apiUrl}auth/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -45,16 +45,16 @@ export default function ManageAccounts() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if(data){
+        if (data) {
           useLoginStore.setState({
-            id: data.id
+            id: data.id,
           });
           getData();
         }
       });
   }
 
-  function getData(){
+  function getData() {
     fetch(`${useApiStore.getState().apiUrl}users/admin-rejected-users`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
     })
@@ -72,14 +72,7 @@ export default function ManageAccounts() {
           <div>Hello World!</div>
         </>
       ) : (
-        <>
-        <div className="m-auto mt-5">
-          <h1 className="text-center" style={{ marginTop: "150px" }}>
-            FisherMap PH
-          </h1>
-        </div>
-        <div className="loader m-auto mt-5"></div>
-      </>
+        <LoadingPage />
       )}
     </>
   );

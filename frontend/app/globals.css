@@ -1,5 +1,9 @@
 @import "bootstrap/dist/css/bootstrap.css";
 
+p,h1,h2,h3,h4,h5, input, button, .dropdown, th, td{
+  font-family: 'Readex Pro', 'Inter' !important;
+}
+
 .pg-active{
     background-color: #2b5497 !important;
     border: #2b5497 !important;

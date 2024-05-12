@@ -1,1 +1,6 @@
 @import "../../app/globals.css";
+
+.home_map{
+    height:1rem !important;
+}
+

@@ -95,8 +95,9 @@ export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-sm bg-dark navbar-dark" style={{width:"100%"}}>
       <div className="container-fluid">
-        <Link className="text-decoration-none text-white" href="/homepage">
-          <h4>FisherMap PH</h4>
+      <Link className="text-decoration-none text-white" href="/homepage">
+          {router.pathname != "/login" && router.pathname != "/signup" ?
+            <h4>FisherMap PH</h4> : <h4 className="text-dark">FisherMap PH</h4>}
         </Link>
 
         {router.pathname != "/login" && router.pathname != "/signup" && (

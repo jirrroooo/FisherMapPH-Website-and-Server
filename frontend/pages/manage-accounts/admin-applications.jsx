@@ -11,6 +11,7 @@ import { useApiStore } from "../../store/apiStore";
 import FormattedDate from "../../components/formatted-date";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 import { useUserDataStore } from "../../store/userDataStore";
+import LoadingPage from "../../components/loading_page";
 
 export default function AdminApplications() {
   const router = useRouter();
@@ -74,18 +75,21 @@ export default function AdminApplications() {
       });
   }
 
-  async function getUserType(token){
-    fetch(`${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+  async function getUserType(token) {
+    fetch(
+      `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data) {
-          if(data.user_type == "admin"){
+          if (data.user_type == "admin") {
             router.push("/homepage");
-          }else{
+          } else {
             getData();
           }
         }
@@ -111,8 +115,6 @@ export default function AdminApplications() {
 
     console.log("page " + page);
   }
-
-
 
   function getFilteredData() {
     const search = document.getElementById("search").value;
@@ -214,7 +216,6 @@ export default function AdminApplications() {
         setData(body);
         setIsLoading(false);
       });
-
   }
 
   function getFilteredDataByPageNumber(pageNumber) {
@@ -265,7 +266,7 @@ export default function AdminApplications() {
     if (searchBy != "Search by") {
       getFilteredDataByPageNumber(page + 1);
     } else {
-      getDataByPage(page +1);
+      getDataByPage(page + 1);
     }
   };
 
@@ -442,61 +443,60 @@ export default function AdminApplications() {
               <br />
 
               {data.map((info) => {
-
-                  return (
-                    <div className="row student-data" key={info._id}>
-                      <div className="col-2">
-                        <p>
-                          {info.first_name} {info.last_name}
-                        </p>
-                      </div>
-                      <div className="col-3">
-                        <p>{info.email_address}</p>
-                      </div>
-                      <div className="col-2">
-                        <FormattedDate date={info.createdAt} />
-                      </div>
-                      <div className="col-2">
-                        <button
-                          className="btn btn-light px-4 rounded-5 fw-semibold text-black"
-                          onClick={() => {
-                            setSelectedUser(info);
-                            setIsViewModal(true);
-                          }}
-                        >
-                          View
-                        </button>
-                      </div>
-                      <div className="col-3">
-                        <div className="row">
-                          <div className="col">
-                            <button
-                              className="btn btn-success px-3 rounded-5 fw-semibold text-white"
-                              onClick={() => {
-                                setSelectedUser(info);
-                                setAction("approve");
-                                setIsApprovedRejectModal(true);
-                              }}
-                            >
-                              Accept
-                            </button>
-                          </div>
-                          <div className="col">
-                            <button
-                              className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
-                              onClick={() => {
-                                setSelectedUser(info);
-                                setAction("reject");
-                                setIsApprovedRejectModal(true);
-                              }}
-                            >
-                              Reject
-                            </button>
-                          </div>
+                return (
+                  <div className="row student-data" key={info._id}>
+                    <div className="col-2">
+                      <p>
+                        {info.first_name} {info.last_name}
+                      </p>
+                    </div>
+                    <div className="col-3">
+                      <p>{info.email_address}</p>
+                    </div>
+                    <div className="col-2">
+                      <FormattedDate date={info.createdAt} />
+                    </div>
+                    <div className="col-2">
+                      <button
+                        className="btn btn-light px-4 rounded-5 fw-semibold text-black"
+                        onClick={() => {
+                          setSelectedUser(info);
+                          setIsViewModal(true);
+                        }}
+                      >
+                        View
+                      </button>
+                    </div>
+                    <div className="col-3">
+                      <div className="row">
+                        <div className="col">
+                          <button
+                            className="btn btn-success px-3 rounded-5 fw-semibold text-white"
+                            onClick={() => {
+                              setSelectedUser(info);
+                              setAction("approve");
+                              setIsApprovedRejectModal(true);
+                            }}
+                          >
+                            Accept
+                          </button>
+                        </div>
+                        <div className="col">
+                          <button
+                            className="btn btn-danger px-4 text-white rounded-5 fw-semibold "
+                            onClick={() => {
+                              setSelectedUser(info);
+                              setAction("reject");
+                              setIsApprovedRejectModal(true);
+                            }}
+                          >
+                            Reject
+                          </button>
                         </div>
                       </div>
                     </div>
-                  );
+                  </div>
+                );
               })}
 
               {isApprovedRejectModal && (
@@ -702,7 +702,6 @@ export default function AdminApplications() {
                   }
                 </li>
               </ul>
-
             </div>
 
             <div className="row">
@@ -732,14 +731,7 @@ export default function AdminApplications() {
           </div>
         </>
       ) : (
-        <>
-        <div className="m-auto mt-5">
-          <h1 className="text-center" style={{ marginTop: "150px" }}>
-            FisherMap PH
-          </h1>
-        </div>
-        <div className="loader m-auto mt-5"></div>
-      </>
+        <LoadingPage />
       )}
     </>
   );

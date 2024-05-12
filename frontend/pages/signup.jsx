@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useLoginStore } from "../store/loginStore";
 import { useRouter } from "next/router";
 import { useApiStore } from "../store/apiStore";
+import Image from "next/image";
 
 export default function Homepage() {
   const [isVerified, setIsVerified] = useState(true);
@@ -53,18 +54,19 @@ export default function Homepage() {
     })
       .then((response) => response.json())
       .then((body) => {
-
         if (body.status == "success") {
-          alert("Signup Successful! Your account will be reviewed for approval.");
-          document.getElementById("fname").value = '';
-          document.getElementById("lname").value = '';
-          document.getElementById("sex").value = '';
-          document.getElementById("email").value = '';
-          document.getElementById("bday").value = '';
-          document.getElementById("contact").value = '';
-          document.getElementById("address").value = '';
-          document.getElementById("civilStatus").value = 'Please Select';
-          document.getElementById("password").value = '';
+          alert(
+            "Signup Successful! Your account will be reviewed for approval."
+          );
+          document.getElementById("fname").value = "";
+          document.getElementById("lname").value = "";
+          document.getElementById("sex").value = "";
+          document.getElementById("email").value = "";
+          document.getElementById("bday").value = "";
+          document.getElementById("contact").value = "";
+          document.getElementById("address").value = "";
+          document.getElementById("civilStatus").value = "Please Select";
+          document.getElementById("password").value = "";
 
           createLog(body.id);
         } else {
@@ -86,9 +88,9 @@ export default function Homepage() {
     })
       .then((response) => response.json())
       .then((body) => {
-        if(body.status){
+        if (body.status) {
           router.push("/login");
-        }else{
+        } else {
           alert("User Log is not properly created!");
         }
       });
@@ -103,13 +105,13 @@ export default function Homepage() {
           <Navbar />
           <div className="container mt-4 ">
             <div className="row">
-              <div className="col-sm-4">
+              <div className="col-sm-6">
                 <div className="text-center">
                   <h5>Register an Administrator Account</h5>
                   <form id="signupForm">
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control auth_field"
                       id="fname"
                       name="fname"
                       placeholder="First Name"
@@ -117,22 +119,29 @@ export default function Homepage() {
                     />
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control auth_field"
                       id="lname"
                       name="lname"
                       placeholder="Last Name"
                       required
                     />
-                    <label htmlFor="sex" className="label mb-2 fst-italic pb-2 px-3">
+                    <label
+                      htmlFor="sex"
+                      className="label mb-2 fst-italic pb-2 px-3"
+                    >
                       Sex Assigned at Birth
                     </label>
                     <select id="sex" name="sex" className="px-5 py-2 border-1">
-                      <option value="male" className="text-center" >Male</option>
-                      <option value="female" className="text-center" >Female</option>
+                      <option value="male" className="text-center">
+                        Male
+                      </option>
+                      <option value="female" className="text-center">
+                        Female
+                      </option>
                     </select>
                     <input
                       type="email"
-                      className="form-control"
+                      className="form-control auth_field"
                       id="email"
                       name="email"
                       placeholder="Enter Email Address"
@@ -143,7 +152,7 @@ export default function Homepage() {
                     </label>
                     <input
                       type="date"
-                      className="form-control"
+                      className="form-control auth_field"
                       id="bday"
                       name="bday"
                       placeholder="Birthday"
@@ -151,7 +160,7 @@ export default function Homepage() {
                     />
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control auth_field"
                       id="contact"
                       name="contact"
                       placeholder="Contact Number"
@@ -159,26 +168,39 @@ export default function Homepage() {
                     />
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control auth_field"
                       id="address"
                       name="address"
                       placeholder="Complete Address"
                       required
                     />
-                    <label htmlFor="civilStatus" className="label mb-2 fst-italic pb-2 px-3">
+                    <label
+                      htmlFor="civilStatus"
+                      className="label mb-2 fst-italic pb-2 px-3"
+                    >
                       Civil Status
                     </label>
-                    <select id="civilStatus" name="civilStatus" className="px-5 py-2 border-1">
+                    <select
+                      id="civilStatus"
+                      name="civilStatus"
+                      className="px-5 py-2 border-1"
+                    >
                       <option value="single" className="text-center" selected>
                         Single
                       </option>
-                      <option value="married" className="text-center" >Married</option>
-                      <option value="widowed" className="text-center" >Widowed</option>
-                      <option value="separated" className="text-center" >Legally Separated</option>
+                      <option value="married" className="text-center">
+                        Married
+                      </option>
+                      <option value="widowed" className="text-center">
+                        Widowed
+                      </option>
+                      <option value="separated" className="text-center">
+                        Legally Separated
+                      </option>
                     </select>
                     <input
                       type="password"
-                      className="form-control"
+                      className="form-control auth_field"
                       id="password"
                       name="password"
                       placeholder="Password"
@@ -186,8 +208,7 @@ export default function Homepage() {
                     />
 
                     <button
-                      // type="submit"
-                      className="btn btn-primary"
+                      className="btn btn-primary auth_button"
                       id="submitBtn"
                       onClick={signup}
                     >
@@ -200,8 +221,13 @@ export default function Homepage() {
                   </p>
                 </div>
               </div>
-              <div className="col-sm-8">
-                <AdminCarousel />
+              <div className="col-sm-6 text-center">
+                <Image
+                  src="/images/splash.png"
+                  width={500}
+                  height={500}
+                  alt="Picture of the author"
+                />
               </div>
             </div>
           </div>

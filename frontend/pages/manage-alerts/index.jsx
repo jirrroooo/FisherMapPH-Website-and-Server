@@ -9,6 +9,7 @@ import { useApiStore } from "../../store/apiStore";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 import FormattedDate from "../../components/formatted-date";
 import ListFormat from "../../components/list";
+import LoadingPage from "../../components/loading_page";
 
 export default function ManageAlerts() {
   const router = useRouter();
@@ -129,11 +130,11 @@ export default function ManageAlerts() {
     const isSpecific = document.getElementById("yes").checked ? true : false;
 
     let locationList = [];
-    
+
     latLongInput.map((loc) => {
       let str = loc.value.trim();
-      str = str.split(',').map(parseFloat);
-      locationList.push(str)
+      str = str.split(",").map(parseFloat);
+      locationList.push(str);
     });
 
     fetch(`${useApiStore.getState().apiUrl}alerts`, {
@@ -184,8 +185,8 @@ export default function ManageAlerts() {
 
     latLongInput.map((loc) => {
       let str = loc.value.trim();
-      str = str.split(',').map(parseFloat);
-      locationList.push(str)
+      str = str.split(",").map(parseFloat);
+      locationList.push(str);
     });
 
     const isSpecific = document.getElementById("yes").checked ? true : false;
@@ -564,15 +565,15 @@ export default function ManageAlerts() {
                             onClick={() => {
                               setSelectedUser(info);
                               setIsEditModal(true);
-                              
+
                               let locationInfo = [];
 
-                              info.location.map((loc, index)=>{
+                              info.location.map((loc, index) => {
                                 locationInfo.push({
                                   id: index,
-                                  value: `${loc[0]}, ${loc[1]}`
+                                  value: `${loc[0]}, ${loc[1]}`,
                                 });
-                              })
+                              });
 
                               setLatLongInput(locationInfo);
                             }}
@@ -775,7 +776,7 @@ export default function ManageAlerts() {
                               Enter Radius
                             </label>
                             <input
-                              disabled={latLongInput.length == 1 ? false: true}
+                              disabled={latLongInput.length == 1 ? false : true}
                               type="number"
                               id="c_radius"
                               className="form-control"
@@ -1041,7 +1042,7 @@ export default function ManageAlerts() {
                               Enter Radius
                             </label>
                             <input
-                              disabled={latLongInput.length == 1 ? false: true}
+                              disabled={latLongInput.length == 1 ? false : true}
                               type="number"
                               id="c_radius"
                               className="form-control"
@@ -1332,14 +1333,7 @@ export default function ManageAlerts() {
           </div>
         </>
       ) : (
-        <>
-          <div className="m-auto mt-5">
-            <h1 className="text-center" style={{ marginTop: "150px" }}>
-              FisherMap PH
-            </h1>
-          </div>
-          <div className="loader m-auto mt-5"></div>
-        </>
+        <LoadingPage />
       )}
     </>
   );

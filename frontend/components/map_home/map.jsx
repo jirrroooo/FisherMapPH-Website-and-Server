@@ -386,7 +386,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
   return !isMapLoading ? (
     <>
       <MapContainer
-        className="map"
+        className="map2"
         center={centerLatLong()}
         zoom={navigatedData == null ? 6 : 10}
         scrollWheelZoom={true}
