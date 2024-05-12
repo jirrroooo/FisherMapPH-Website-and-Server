@@ -4,6 +4,9 @@ import { ContactService } from './contact.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
+import { ContactSchema } from './schemas/contacts.schema';
+import { MongooseModule } from '@nestjs/mongoose';
+import { UserSchema } from 'src/users/schemas/users.schema';
 
 @Module({
     imports: [
@@ -20,7 +23,9 @@ import { AuthModule } from 'src/auth/auth.module';
                 }
             }
         }),
-        AuthModule
+        AuthModule,
+        MongooseModule.forFeature([{ name: 'Contact', schema: ContactSchema}]),
+        MongooseModule.forFeature([{ name: 'User', schema: UserSchema}]),
     ],
   controllers: [ContactController],
   providers: [ContactService]

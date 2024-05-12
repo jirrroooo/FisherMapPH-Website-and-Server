@@ -4,17 +4,41 @@ import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { ObjectId } from 'mongoose';
 import { Position } from './schemas/positions.schema';
 import { Query } from 'express-serve-static-core';
+import { Log } from 'src/logs/schemas/logs.schema';
 
 @Injectable()
 export class PositionsService {
   constructor(
     @InjectModel(Position.name)
-    private positionModel: mongoose.Model<Position>
+    private positionModel: mongoose.Model<Position>,
+
+    @InjectModel(Log.name)
+    private logModel: mongoose.Model<Log>
   ){}
 
   async newPosition(position: Position): Promise<Position>{
-    const res = await this.positionModel.create(position);
-    return res;
+    const positionResponse = await this.positionModel.create(position);
+
+    const logResponse = await this.logModel.findOne({user_id: position.user_id});
+
+    var positionId = new mongoose.Types.ObjectId(positionResponse._id.toString());
+
+    var new_location_log: any = [];
+
+    new_location_log.push(positionId);
+
+    logResponse.location_log.forEach((log) => {
+      new_location_log.push(log);
+    });
+
+    logResponse.location_log = new_location_log;
+
+    const res = await this.logModel.findByIdAndUpdate(logResponse._id, logResponse, {
+      new: true,
+      runValidators: true,
+    });
+
+    return positionResponse;
   }
 
   async getPositions(query: Query): Promise<Position[]> {

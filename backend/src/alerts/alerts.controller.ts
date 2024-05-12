@@ -24,6 +24,13 @@ export class AlertsController {
     return this.alertsService.getAlerts(query);
   }
 
+  @Get('map')
+  @UseGuards(AuthGuard())
+  async getUserMapAlerts(@Query() query: ExpressQuery) {
+    return this.alertsService.getUserMapAlerts(query);
+  }
+
+
   @Get('total')
   @UseGuards(AuthGuard())
   async getTotalAlerts() {

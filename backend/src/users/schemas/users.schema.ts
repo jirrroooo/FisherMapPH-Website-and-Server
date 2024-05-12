@@ -42,7 +42,7 @@ export class User{
     membership_date: Date;
 
     @Prop()
-    person_to_notify: string;
+    person_to_notify: Array<object>;
 
     @Prop()
     fishing_vessel_type: string;

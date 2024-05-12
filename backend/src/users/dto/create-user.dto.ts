@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, } from "class-validator";
+import { IsArray, IsBoolean, IsDate, IsEmail, IsNotEmpty, IsObject, IsOptional, IsString, MinLength, } from "class-validator";
 
 export class CreateUserDto {
 
@@ -54,8 +54,8 @@ export class CreateUserDto {
     membership_date = null;
 
     @IsOptional()
-    @IsString()
-    person_to_notify = "";
+    @Type(() => Array<Object>)
+    person_to_notify = [];
 
     @IsOptional()
     @IsString()

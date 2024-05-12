@@ -16,40 +16,4 @@ export class DistressCallInfo {
     @IsString()
     html_message: string;
 
-    // @IsDate()
-    // date_time: Date;
-
-    // @IsString()
-    // type: string;
-
-    // @IsString()
-    // message: string;
-
-    // @IsString()
-    // status: string;
-
-    // @IsNumber()
-    // latitude: number;
-
-    // @IsNumber()
-    // longitude: number;
-
-    // @IsString()
-    // fishing_vessel_type: string;
-
-    // @IsNumber()
-    // sea_depth: number;
-
-    // @IsString()
-    // fisherfolk_name: string;
-
-    // @IsString()
-    // contact_number: string;
-
-    // @IsString()
-    // person_to_notify: string;
-
-    // @IsString()
-    // address: string;
-
 }

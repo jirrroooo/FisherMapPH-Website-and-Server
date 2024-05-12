@@ -238,12 +238,6 @@ export default function Map({ markerData, selectedData, data, filter }) {
           </td>
         </tr>
         <tr>
-          <th>Sea Depth</th>
-          <td> ${parseFloat(
-            selectedUser.positionInfo.sea_depth.toFixed(4)
-          )} meters</td>
-        </tr>
-        <tr>
           <th>Fisherfolk Name</th>
           <td>${selectedUser.userInfo.first_name} ${
       selectedUser.userInfo.last_name
@@ -421,45 +415,6 @@ export default function Map({ markerData, selectedData, data, filter }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <Polygon
-          positions={highlightRegionCoords}
-          color="blue"
-          weight={2}
-          fillOpacity={0.4}
-        >
-          <Popup>
-            <div className="text-center">
-              <h5>Santo Domingo Municipal Water</h5>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-                sunt eius eum ipsum magnam doloribus, iusto porro corporis iure
-                tempora? Aliquid sint voluptatum amet, laboriosam expedita aut
-                officiis sapiente ut.
-              </p>
-              <button className="btn btn-secondary">View Information</button>
-            </div>
-          </Popup>
-        </Polygon>
-
-        {/* <Marker
-          key={9999}
-          position={calculateCenter(highlightRegionCoords)}
-          icon={reportMarker}
-        >
-          <Popup>
-            <div>
-              <h5 className="text-center fw-bold text-uppercase  py-1">
-                TEST CENTER
-              </h5>
-
-              <div className="text-center py-2">
-                <button className="btn btn-danger text-white fw-bold">
-                  Send Alert
-                </button>
-              </div>
-            </div>
-          </Popup>
-        </Marker> */}
 
         {filter == "alerts" &&
           data.map((alert) => (
@@ -603,10 +558,6 @@ export default function Map({ markerData, selectedData, data, filter }) {
                     </td>
                   </tr>
                   <tr>
-                    <th>Sea Depth:</th>
-                    <td>{marker.position.sea_depth.toFixed(4)}</td>
-                  </tr>
-                  <tr>
                     <th>Fishing Vessel Type:</th>
                     <td>
                       {marker.user.fishing_vessel_type.charAt(0).toUpperCase()}
@@ -689,10 +640,6 @@ export default function Map({ markerData, selectedData, data, filter }) {
                           date={report.positionInfo.timestamp}
                         />
                       </td>
-                    </tr>
-                    <tr>
-                      <th>Sea Depth:</th>
-                      <td>{report.positionInfo.sea_depth.toFixed(4)}</td>
                     </tr>
                     <tr>
                       <th>Fishing Vessel Type:</th>

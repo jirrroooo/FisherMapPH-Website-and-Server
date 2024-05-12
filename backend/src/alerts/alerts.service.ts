@@ -10,6 +10,8 @@ import * as mongoose from 'mongoose';
 import { ObjectId } from 'mongoose';
 
 import { Query } from 'express-serve-static-core';
+import { Coordinates, DataPoint, MapFunction } from 'functions/map_functions';
+import { filter } from 'rxjs';
 
 @Injectable()
 export class AlertsService {
@@ -105,6 +107,29 @@ export class AlertsService {
     }
 
     return alerts;
+  }
+
+  async getUserMapAlerts(query: Query){
+    const alerts = await this.alertModel.find();
+
+    var active_alerts = [];
+
+    alerts.forEach((alert) => {
+      if(new Date() >= alert.effective && new Date() < alert.expires){
+        active_alerts.push(alert);
+      }
+    });
+
+    const mapFunction = new MapFunction();
+
+    const coordinate: Coordinates = {
+      longitude: parseFloat(query.longitude.toString()),
+      latitude: parseFloat(query.latitude.toString())
+    }
+
+    const filteredDataPoints = mapFunction.filterDataByRadius(active_alerts, coordinate, parseFloat(query.radius.toString()));
+
+    return filteredDataPoints;
   }
 
   async getTotalAlerts() {

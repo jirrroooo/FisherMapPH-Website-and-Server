@@ -117,6 +117,24 @@ export class UsersController {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
+  // @Patch('contact/:id')
+  // @UseGuards(AuthGuard())
+  // async updateContact(
+  //   @Param('id') id: ObjectId,
+  //   @Body() contactObject: any,
+  // ): Promise<User> {
+  //   return this.usersService.updateContact(id, contactObject);
+  // }
+
+  // @Delete('contact/:id')
+  // @UseGuards(AuthGuard())
+  // async deleteContact(
+  //   @Param('id') id: ObjectId,
+  //   @Body() contactObject: any,
+  // ): Promise<User> {
+  //   return this.usersService.deleteContact(id, contactObject);
+  // }
+
   @Delete(':id')
   @UseGuards(AuthGuard())
   async removeUser(@Param('id') id: ObjectId): Promise<User> {

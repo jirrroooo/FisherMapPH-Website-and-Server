@@ -719,6 +719,35 @@ export class UsersService {
     return user;
   }
 
+
+  // async updateContact(id: ObjectId, contactObject: any): Promise<User> {
+  //   const isValidId = mongoose.isValidObjectId(id);
+
+  //   if (!isValidId) {
+  //     throw new BadRequestException('Please enter valid ID.');
+  //   }
+
+  //   const user = await this.userModel.findOne(id);
+
+  //   const newContact = (user.person_to_notify);
+
+  //   return await this.userModel.findOne(id, {person_to_notify: newContact});
+  // }
+
+  // async deleteContact(id: ObjectId, contactObject: any): Promise<User> {
+  //   const isValidId = mongoose.isValidObjectId(id);
+
+  //   if (!isValidId) {
+  //     throw new BadRequestException('Please enter valid ID.');
+  //   }
+
+  //   const user = await this.userModel.findOne(id);
+
+  //   const newContact = (user.person_to_notify).pop(contactObject);
+
+  //   return await this.userModel.findOne(id, {person_to_notify: newContact});
+  // }
+
   async updateUser(id: ObjectId, updateUserDto: UpdateUserDto): Promise<User> {
     const isValidId = mongoose.isValidObjectId(id);
 

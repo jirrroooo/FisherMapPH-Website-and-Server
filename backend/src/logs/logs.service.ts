@@ -175,9 +175,8 @@ export class LogsService {
       if (alertLog) {
         alert_logs.push(alertLog);
       } else {
-        console.error(`Alert log not found for ID ${alert}`);
+        // console.error(`Alert log not found for ID ${alert}`);
       }
-      console.log("test");
     }
 
     return alert_logs;
@@ -207,9 +206,8 @@ export class LogsService {
       if (locationLog) {
         location_logs.push(locationLog);
       } else {
-        console.error(`Alert log not found for ID ${location}`);
+        // console.error(`Alert log not found for ID ${location}`);
       }
-      console.log("test");
     }
 
     return location_logs;

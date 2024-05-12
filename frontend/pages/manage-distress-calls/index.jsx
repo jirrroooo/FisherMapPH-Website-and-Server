@@ -213,7 +213,7 @@ export default function ManageDistressCalls() {
     </head>
     <body>
       <p>Dear Ma'am/Sir:</p>
-      <p>Please be informed that there is an emergency situation for a fisherfolk that needs your attention. Below are the details of the distres call alert.</p>
+      <p>Please be informed that there is an emergency situation for a fisherfolk that needs your attention. Below are the details of the distress call alert.</p>
       
       <p style="font-weight: bold; margin-top: 30px">Message from the Administrator:</p>
       <p>${document.getElementById("emailContent").value}</p>
@@ -248,12 +248,6 @@ export default function ManageDistressCalls() {
           <th>Fishing Vessel Type</th>
           <td>${selectedUser.userInfo.fishing_vessel_type}
           </td>
-        </tr>
-        <tr>
-          <th>Sea Depth</th>
-          <td> ${parseFloat(
-            selectedUser.positionInfo.sea_depth.toFixed(4)
-          )} meters</td>
         </tr>
         <tr>
           <th>Fisherfolk Name</th>
@@ -796,16 +790,6 @@ export default function ManageDistressCalls() {
                             <td className="fw-bold">Fishing Vessel Type:</td>
                             <td className="text-capitalize">
                               {selectedUser.userInfo.fishing_vessel_type}
-                            </td>
-                          </tr>
-
-                          <tr>
-                            <td className="fw-bold">Sea Depth:</td>
-                            <td>
-                              {parseFloat(
-                                selectedUser.positionInfo.sea_depth.toFixed(4)
-                              )}{" "}
-                              meters
                             </td>
                           </tr>
 

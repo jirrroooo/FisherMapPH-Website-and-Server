@@ -27,7 +27,7 @@ export function computeCircleAlertBounds(centerLng, centerLat, distance) {
   let circumference = [];
 
   for (let i = 0; i < 360; i++) {
-    if (i % 24 == 0) {
+    if (i % 6 == 0) {
       circumference.push(calculateDestination(centerLng, centerLat, i));
     }
   }

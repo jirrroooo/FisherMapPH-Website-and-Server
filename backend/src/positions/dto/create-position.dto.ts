@@ -7,17 +7,11 @@ export class CreatePositionDto {
     @IsNotEmpty()
     user_id: ObjectId;
 
-    @IsNotEmpty()
-    weather_id: ObjectId;
+    @IsNumber()
+    longitude: number;
 
-    @IsBoolean()
-    isSailing: boolean;
-
-    @IsString()
-    longitude: string;
-
-    @IsString()
-    latitude: string;
+    @IsNumber()
+    latitude: number;
 
     @IsDate()
     @Type(() => Date)
@@ -29,15 +23,12 @@ export class CreatePositionDto {
     @IsNumber()
     altitude: number;
 
-    @IsString()
-    heading: string;
+    @IsNumber()
+    heading: number;
 
     @IsNumber()
     speed: number;
 
     @IsNumber()
     speed_accuracy: number;
-
-    @IsNumber()
-    sea_depth: number;
 }

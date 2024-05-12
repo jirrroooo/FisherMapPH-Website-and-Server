@@ -30,6 +30,12 @@ export class ReportsController {
     return this.reportsService.getTotalReports();
   }
 
+  @Get('user/:id')
+  @UseGuards(AuthGuard())
+  async getUserReports(@Param('id') id: ObjectId) {
+    return this.reportsService.getUserReports(id);
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard())
   async getReport(@Param('id') id: ObjectId): Promise<Report> {

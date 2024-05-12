@@ -23,11 +23,17 @@ export function FormattedDateTime({ date }) {
   let hrs = today.getHours();
   let min = today.getMinutes();
   let sec = today.getSeconds();
+  let am_pm = 'AM';
+
+  if(hrs > 12){
+    hrs = hrs - 12;
+    am_pm = 'PM';
+  }
 
   if (dd < 10) dd = "0" + dd;
   if (mm < 10) mm = "0" + mm;
 
-  const formattedToday = mm + "/" + dd + "/" + yyyy + ", " + hrs + ":" + min + ":" + sec;
+  const formattedToday = mm + "/" + dd + "/" + yyyy + ", " + hrs + ":" + min + ":" + sec + ' ' + am_pm;
 
   return <p>{formattedToday}</p>;
 }

@@ -4,29 +4,23 @@ import mongoose, { AnyArray, ObjectId } from "mongoose";
 @Schema({
     timestamps: true
 })
-export class Log{
+export class Contact{
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     user_id: ObjectId;
 
     @Prop()
-    manage_user: [ObjectId];
+    full_name: string;
 
     @Prop()
-    manage_alert: [ObjectId];
+    email_address: string;
 
     @Prop()
-    location_log: [ObjectId];
+    contact_number: string;
 
     @Prop()
-    alert_log: [ObjectId];
-
-    @Prop()
-    permission: [string];
-
-    @Prop()
-    report_log: [ObjectId];
+    address: string;
 
 }
 
-export const LogSchema = SchemaFactory.createForClass(Log);
+export const ContactSchema = SchemaFactory.createForClass(Contact);
