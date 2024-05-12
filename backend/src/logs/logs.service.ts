@@ -8,12 +8,14 @@ import { Log } from './schemas/logs.schema';
 import * as mongoose from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 // import { ObjectId } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { ObjectId } from 'mongoose';
 import { Query } from 'express-serve-static-core';
 import { CreateLogDto } from './dto/create-log.dto';
 import { User } from 'src/users/schemas/users.schema';
 import { Position } from 'src/positions/schemas/positions.schema';
 import { Alert } from 'src/alerts/schemas/alerts.schema';
+import { AlertLogDto } from 'src/logs/dto/alert-log.dto';
+
 @Injectable()
 export class LogsService {
   constructor(
@@ -63,25 +65,35 @@ export class LogsService {
     return logs;
   }
 
-  async getFisherfolkLogs() {  
+  async getFisherfolkLogs() {
     const logs = await this.logModel.find().sort({ createdAt: -1 });
 
-    const serializedData = logs.map(doc => JSON.stringify(doc));
-    const objectData = serializedData.map(doc => JSON.parse(doc));
-    
+    const serializedData = logs.map((doc) => JSON.stringify(doc));
+    const objectData = serializedData.map((doc) => JSON.parse(doc));
+
     let fisherfolkLogs = [];
     let position: any;
     let user: any;
-  
+
     for (const log of objectData) {
-      user = await this.userModel.findOne({ _id: log.user_id }).select('-password');
-  
-      if(log.location_log != undefined){
-        position = await this.positionModel.findOne({ _id: log.location_log[0] });
+      user = await this.userModel
+        .findOne({ _id: log.user_id })
+        .select('-password');
+
+      if (log.location_log != undefined) {
+        position = await this.positionModel.findOne({
+          _id: log.location_log[0],
+        });
       }
-  
-      if (user && user.user_type == 'user' && user.isAuthenticated == true && position != null && position != undefined) {
-        fisherfolkLogs.push({ log: log, user: user, position: position});
+
+      if (
+        user &&
+        user.user_type == 'user' &&
+        user.isAuthenticated == true &&
+        position != null &&
+        position != undefined
+      ) {
+        fisherfolkLogs.push({ log: log, user: user, position: position });
       }
     }
     return fisherfolkLogs;
@@ -158,7 +170,7 @@ export class LogsService {
       throw new BadRequestException('Please enter valid ID.');
     }
 
-    const log = await this.logModel.findOne({user_id: id});
+    const log = await this.logModel.findOne({ user_id: id });
 
     if (!log) {
       throw new NotFoundException('log Not Found!');
@@ -169,9 +181,8 @@ export class LogsService {
 
     const alert_logs = [];
 
-
     for (const alert of objectData.alert_log) {
-      const alertLog = await this.alertModel.findOne({_id: alert});
+      const alertLog = await this.alertModel.findOne({ _id: alert });
       if (alertLog) {
         alert_logs.push(alertLog);
       } else {
@@ -189,7 +200,7 @@ export class LogsService {
       throw new BadRequestException('Please enter valid ID.');
     }
 
-    const log = await this.logModel.findOne({user_id: id});
+    const log = await this.logModel.findOne({ user_id: id });
 
     if (!log) {
       throw new NotFoundException('log Not Found!');
@@ -200,9 +211,8 @@ export class LogsService {
 
     const location_logs = [];
 
-
     for (const location of objectData.location_log) {
-      const locationLog = await this.positionModel.findOne({_id: location});
+      const locationLog = await this.positionModel.findOne({ _id: location });
       if (locationLog) {
         location_logs.push(locationLog);
       } else {
@@ -212,7 +222,41 @@ export class LogsService {
 
     return location_logs;
   }
-  
+
+  async addAlertToLog(alertLogDto: AlertLogDto) {
+    const user_id = new mongoose.Types.ObjectId(alertLogDto.user_id.toString());
+    const alert_id = new mongoose.Types.ObjectId(alertLogDto.alert_id.toString());
+
+
+    const log = await this.logModel.findOne({ user_id: user_id });
+
+    if (!log) {
+      throw new NotFoundException('User log not found');
+    }
+
+    var new_report_log: any = [];
+
+    var new_log: any = [];
+
+    new_log.push(alert_id);
+
+    log.alert_log.forEach((alert) => {
+      new_log.push(alert);
+    });
+
+    log.alert_log = new_log;
+
+    const updatedLog = await this.logModel.findByIdAndUpdate(log._id, log, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedLog) {
+      return { status: 'failed' };
+    }
+
+    return { status: 'success' };
+  }
 
   async updateLog(id: ObjectId, updateLogDto: UpdateLogDto) {
     const isValidId = mongoose.isValidObjectId(id);
@@ -237,14 +281,14 @@ export class LogsService {
     return await this.logModel.findByIdAndRemove(id);
   }
 
-  async usersLogCorrection(): Promise<{success: string}>{
+  async usersLogCorrection(): Promise<{ success: string }> {
     const users = await this.userModel.find().select('-password');
     let result: any;
 
-    users.forEach( async(user) => {
-      result = await this.logModel.find({user_id: user._id});
+    users.forEach(async (user) => {
+      result = await this.logModel.find({ user_id: user._id });
 
-      if(result.length == 0){
+      if (result.length == 0) {
         const newLog: CreateLogDto = {
           user_id: user.id,
           manage_user: null,
@@ -253,21 +297,20 @@ export class LogsService {
           alert_log: null,
           permission: null,
           report_log: null,
-        }
+        };
 
         this.newLog(newLog);
       }
     });
 
-    users.forEach( async(user) => {
-      result = await this.logModel.find({user_id: user._id});
+    users.forEach(async (user) => {
+      result = await this.logModel.find({ user_id: user._id });
 
-      if(result.length == 0){
-        return {success: "false"};
+      if (result.length == 0) {
+        return { success: 'false' };
       }
     });
 
-    return {success: "true"};
-
+    return { success: 'true' };
   }
 }

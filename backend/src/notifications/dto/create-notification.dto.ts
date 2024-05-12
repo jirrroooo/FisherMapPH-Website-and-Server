@@ -1,10 +1,11 @@
 import { Prop } from "@nestjs/mongoose";
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
+;
 import { ObjectId } from "typeorm";
 
 
 export class CreateNotificationDto {
-    @Prop()
+    @IsOptional()
     user_id: ObjectId;
 
     @Prop()

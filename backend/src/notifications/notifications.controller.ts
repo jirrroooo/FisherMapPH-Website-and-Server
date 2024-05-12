@@ -15,6 +15,7 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { ObjectId } from 'mongoose';
+import { Notification } from './schemas/notifications.schema';
 
 @Controller('notifications')
 export class NotificationsController {

@@ -3,10 +3,11 @@ import { LogsService } from './logs.service';
 import { CreateLogDto } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
 // import { ObjectId } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { ObjectId } from 'mongoose';
 import { Log } from './schemas/logs.schema';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { AuthGuard } from '@nestjs/passport';
+import { AlertLogDto } from 'src/logs/dto/alert-log.dto';
 
 @Controller('logs')
 export class LogsController {
@@ -63,6 +64,12 @@ export class LogsController {
   @UseGuards(AuthGuard())
   async getLocationLog(@Param('id') id: ObjectId) {
     return this.logsService.getLocationLogs(id);
+  }
+
+  @Post('add-alert-log')
+  @UseGuards(AuthGuard())
+  async addAlertToLog(@Body() alertLogDto : AlertLogDto){
+    return this.logsService.addAlertToLog(alertLogDto);
   }
 
   @Patch(':id')

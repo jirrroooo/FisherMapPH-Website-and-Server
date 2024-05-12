@@ -8,6 +8,7 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import mongoose, { ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Query } from 'express-serve-static-core';
+import { Notification } from './schemas/notifications.schema';
 
 @Injectable()
 export class NotificationsService {

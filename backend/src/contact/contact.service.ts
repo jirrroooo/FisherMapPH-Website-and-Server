@@ -40,7 +40,7 @@ export class ContactService {
   async newContact(contact: CreateContactDto): Promise<{ status: string }> {
     const res = await this.contactModel.create(contact);
 
-    if (res._id) {
+    if (res) {
       const id = new mongoose.Types.ObjectId(contact.user_id.toString());
 
       const user = await this.userModel.findOne({ _id: contact.user_id });
