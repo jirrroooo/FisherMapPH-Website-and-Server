@@ -1,3 +1,4 @@
+import { Prop } from "@nestjs/mongoose";
 import { Type } from "class-transformer";
 import { IsBoolean, IsDate, IsEmpty, IsNotEmpty, IsNumber } from "class-validator";
 import { ObjectId } from "mongoose";
@@ -5,17 +6,23 @@ import { ObjectId } from "mongoose";
 export class CreateLogDto {
 
     @IsNotEmpty()
-    user_id: ObjectId
+    user_id: ObjectId;
 
-    manage_user: [string];
+    @Prop()
+    manage_user: [ObjectId];
 
-    manage_alert: [string];
+    @Prop()
+    manage_alert: [ObjectId];
 
-    location_log: [string];
+    @Prop()
+    location_log: [ObjectId];
 
-    alert_log: [string];
+    @Prop()
+    alert_log: [ObjectId];
 
+    @Prop()
     permission: [string];
 
-    report_log: [string];
+    @Prop()
+    report_log: [ObjectId];
 }

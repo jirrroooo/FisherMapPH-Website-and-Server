@@ -11,6 +11,9 @@ export class User{
     @Prop()
     last_name: string;
 
+    @Prop()
+    sex: string;
+
     @Prop({unique: [true, "Duplicate email entered"]})
     email_address: string;
 
@@ -22,6 +25,9 @@ export class User{
 
     @Prop()
     address: string;
+
+    @Prop()
+    region: string;
 
     @Prop()
     birthday: Date;
@@ -39,7 +45,7 @@ export class User{
     membership_date: Date;
 
     @Prop()
-    person_to_notify: string;
+    person_to_notify: Array<object>;
 
     @Prop()
     fishing_vessel_type: string;

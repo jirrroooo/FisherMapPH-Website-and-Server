@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsEmpty, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsEmpty, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { ObjectId } from "mongoose";
 
 export class CreateAlertDto {
@@ -13,8 +13,11 @@ export class CreateAlertDto {
     description: string;
 
     @IsNotEmpty()
-    @IsString()
-    location: string;
+    location: [];
+
+    @IsNotEmpty()
+    @IsNumber()
+    radius: number;
 
     @IsString()
     level: string;
@@ -34,7 +37,6 @@ export class CreateAlertDto {
     @Type(() => Date)
     expires: Date;
 
-    @IsDate()
-    @Type(() => Date)
-    instruction: Date;
+    @IsString()
+    instruction: string;
 }

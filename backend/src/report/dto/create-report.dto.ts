@@ -1,3 +1,4 @@
+import { Prop } from "@nestjs/mongoose";
 import { Type } from "class-transformer";
 import { IsBoolean, IsDate, IsEmpty, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { ObjectId } from "mongoose";
@@ -15,4 +16,7 @@ export class CreateReportDto {
 
     @IsString()
     content: string;
+
+    @IsString()
+    status: string;
 }

@@ -9,11 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/cookie": "^0.5.3",
+    "cookie": "^0.5.0",
+    "cookies": "^0.8.0",
+    "cookies-next": "^4.0.0",
+    "leaflet": "^1.9.4",
     "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1",
+    "reactstrap": "^9.2.0"
   },
   "devDependencies": {
+    "@types/node": "20.8.7",
+    "@types/react": "18.2.29",
     "eslint": "latest",
     "eslint-config-next": "latest",
     "sass": "^1.68.0"

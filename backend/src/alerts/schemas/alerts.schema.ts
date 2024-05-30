@@ -12,7 +12,10 @@ export class Alert{
     description: string;
 
     @Prop()
-    location: string;
+    location: [];
+
+    @Prop()
+    radius: number;
 
     @Prop()
     level: string;
@@ -33,7 +36,7 @@ export class Alert{
     expires: Date;
 
     @Prop()
-    instruction: Date;
+    instruction: string;
 
 }
 

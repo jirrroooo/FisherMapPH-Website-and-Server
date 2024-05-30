@@ -1,24 +1,19 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
+import mongoose, { ObjectId } from "mongoose";
 
 @Schema({
     timestamps: true
 })
 export class Position{
 
-    // @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
-    // user_id: User;
-
-    // @Prop()
-    // weather_id: Weather;
+    @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
+    user_id: ObjectId;
 
     @Prop()
-    isSailing: boolean;
+    longitude: number;
 
     @Prop()
-    longitude: string;
-
-    @Prop()
-    latitude: string;
+    latitude: number;
 
     @Prop()
     timestamp: Date;
@@ -30,17 +25,13 @@ export class Position{
     altitude: number;
 
     @Prop()
-    heading: string;
+    heading: number;
 
     @Prop()
     speed: number;
 
     @Prop()
     speed_accuracy: number;
-
-    @Prop()
-    sea_depth: number;
-
 }
 
 export const PositionSchema = SchemaFactory.createForClass(Position);

@@ -12,6 +12,10 @@ export class SignUpDto {
     last_name: string;
 
     @IsNotEmpty()
+    @IsString()
+    sex: string;
+
+    @IsNotEmpty()
     @IsEmail({}, {message: "Please enter correct email"})
     email_address: string;
 
@@ -27,6 +31,11 @@ export class SignUpDto {
     @IsNotEmpty()
     @IsString()
     address: string;
+
+    
+    @IsNotEmpty()
+    @IsString()
+    region: string;
 
     @IsDate()
     @Type(() => Date)
