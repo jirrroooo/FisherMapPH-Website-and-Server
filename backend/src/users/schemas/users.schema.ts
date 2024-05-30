@@ -27,6 +27,9 @@ export class User{
     address: string;
 
     @Prop()
+    region: string;
+
+    @Prop()
     birthday: Date;
 
     @Prop()

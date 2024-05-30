@@ -208,7 +208,7 @@ export default function Homepage() {
                           <p>Fisherfolk Active Accounts</p>
                           <Link
                             className="btn btn-warning admin-btn"
-                            href="/manage-accounts/fisherfolk-applications"
+                            href="/manage-accounts/fisherfolk-accounts"
                           >
                             Manage
                           </Link>

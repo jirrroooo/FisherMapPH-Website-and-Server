@@ -32,6 +32,11 @@ export class SignUpDto {
     @IsString()
     address: string;
 
+    
+    @IsNotEmpty()
+    @IsString()
+    region: string;
+
     @IsDate()
     @Type(() => Date)
     birthday: Date;

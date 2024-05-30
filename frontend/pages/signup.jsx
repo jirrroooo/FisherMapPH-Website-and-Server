@@ -47,6 +47,7 @@ export default function Homepage() {
         contact_number: document.getElementById("contact").value,
         address: document.getElementById("address").value,
         birthday: document.getElementById("bday").value,
+        region: document.getElementById("region").value,
         civil_status: document.getElementById("civilStatus").value,
         user_type: "admin",
       }),
@@ -174,8 +175,89 @@ export default function Homepage() {
                       required
                     />
                     <label
-                      htmlFor="civilStatus"
+                      htmlFor="region"
                       className="label mb-2 fst-italic pb-2 px-3"
+                    >
+                      Select Region
+                    </label>
+
+                    <select
+                      id="region"
+                      name="region"
+                      className="px-5 py-2 border-1"
+                    >
+                      <option
+                        value="Ilocos Region"
+                        className="text-center"
+                        selected
+                      >
+                        Ilocos Region
+                      </option>
+                      <option value="Cagayan Valley" className="text-center">
+                        Cagayan Valley
+                      </option>
+                      <option value="Central Luzon" className="text-center">
+                        Central Luzon
+                      </option>
+                      <option value="CALABARZON" className="text-center">
+                        CALABARZON
+                      </option>
+                      <option value="MIMAROPA" className="text-center">
+                        MIMAROPA
+                      </option>
+                      <option value="Bicol Region" className="text-center">
+                        Bicol Region
+                      </option>
+                      <option value="Western Visayas" className="text-center">
+                        Western Visayas
+                      </option>
+                      <option value="Central Visayas" className="text-center">
+                        Central Visayas
+                      </option>
+                      <option value="Eastern Visayas" className="text-center">
+                        Eastern Visayas
+                      </option>
+                      <option
+                        value="Zamboanga Peninsula"
+                        className="text-center"
+                      >
+                        Zamboanga Peninsula
+                      </option>
+                      <option value="Northern Mindanao" className="text-center">
+                        Northern Mindanao
+                      </option>
+                      <option value="Davao Region" className="text-center">
+                        Davao Region
+                      </option>
+                      <option value="SOCCSKSARGEN" className="text-center">
+                        SOCCSKSARGEN
+                      </option>
+                      <option value="Caraga" className="text-center">
+                        Caraga
+                      </option>
+                      <option
+                        value="BARMM"
+                        className="text-center"
+                      >
+                        BARMM
+                      </option>
+                      <option
+                        value="National Capital Region"
+                        className="text-center"
+                      >
+                        National Capital Region
+                      </option>
+                      <option
+                        value="Cordillera Administrative Region"
+                        className="text-center"
+                      >
+                        Cordillera Administrative Region
+                      </option>
+                    </select>
+
+                    <label
+                      htmlFor="civilStatus"
+                      className="label mb-2 fst-italic pb-2 px-5"
                     >
                       Civil Status
                     </label>

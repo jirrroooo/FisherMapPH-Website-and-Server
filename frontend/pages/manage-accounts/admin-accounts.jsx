@@ -28,7 +28,7 @@ export default function AdminAccounts() {
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
-      fetch("/api/verify")
+    fetch("/api/verify")
       .then((response) => response.json())
       .then((body) => {
         if (body.status == "success") {
@@ -63,18 +63,21 @@ export default function AdminAccounts() {
       });
   }
 
-  async function getUserType(token){
-    fetch(`${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+  async function getUserType(token) {
+    fetch(
+      `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data) {
-          if(data.user_type == "admin"){
+          if (data.user_type == "admin") {
             router.push("/homepage");
-          }else{
+          } else {
             getData();
           }
         }
@@ -82,15 +85,14 @@ export default function AdminAccounts() {
   }
 
   async function getData() {
-
     await fetch(`${useApiStore.getState().apiUrl}users/admin-users`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
     })
       .then((response) => response.json())
       .then((body) => {
-        if(useUserDataStore.getState().userData.user_type == "admin"){
+        if (useUserDataStore.getState().userData.user_type == "admin") {
           setData(null);
-        }else{
+        } else {
           setData(body);
         }
         setIsLoading(false);
@@ -168,6 +170,7 @@ export default function AdminAccounts() {
         email_address: document.getElementById("email_address").value,
         contact_number: document.getElementById("contact_number").value,
         address: document.getElementById("address").value,
+        region: document.getElementById("region").value,
         birthday: document.getElementById("birthday").value,
         civil_status: document.getElementById("civil_status").value,
         user_type: document.getElementById("user_type").value,
@@ -241,7 +244,6 @@ export default function AdminAccounts() {
         setData(body);
         setIsLoading(false);
       });
-
   }
 
   function getFilteredDataByPageNumber(pageNumber) {
@@ -312,9 +314,10 @@ export default function AdminAccounts() {
           <div className="container mt-4 text-center">
             <h2>Administrator Accounts</h2>
             <p>
-              The list of administrators is shown below. As the super administrator, you need to ensure that the administrators
-              are following the guidelines and protocols. You can suspend an administrator account if any of the policy
-              is not followed.
+              The list of administrators is shown below. As the super
+              administrator, you need to ensure that the administrators are
+              following the guidelines and protocols. You can suspend an
+              administrator account if any of the policy is not followed.
             </p>
 
             <form className="my-4">
@@ -484,13 +487,37 @@ export default function AdminAccounts() {
                         )}
                       </div>
                       <div className="col-3">
-                        <p className={info._id == useLoginStore.getState().id ? "fw-bold " : ""}>{info.email_address}</p>
+                        <p
+                          className={
+                            info._id == useLoginStore.getState().id
+                              ? "fw-bold "
+                              : ""
+                          }
+                        >
+                          {info.email_address}
+                        </p>
                       </div>
                       <div className="col-2">
                         {info.user_type == "superadmin" ? (
-                          <p className={info._id == useLoginStore.getState().id ? "fw-bold " : ""}>Super Administrator</p>
+                          <p
+                            className={
+                              info._id == useLoginStore.getState().id
+                                ? "fw-bold "
+                                : ""
+                            }
+                          >
+                            Super Administrator
+                          </p>
                         ) : (
-                          <p className={info._id == useLoginStore.getState().id ? "fw-bold " : ""}>Administrator</p>
+                          <p
+                            className={
+                              info._id == useLoginStore.getState().id
+                                ? "fw-bold "
+                                : ""
+                            }
+                          >
+                            Administrator
+                          </p>
                         )}
                       </div>
                       <div className="col-2">
@@ -570,6 +597,10 @@ export default function AdminAccounts() {
                           <tr>
                             <td className="fw-bold">Address:</td>
                             <td>{selectedUser.address}</td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Region:</td>
+                            <td>{selectedUser.region}</td>
                           </tr>
                           <tr>
                             <td className="fw-bold">Birthday:</td>
@@ -716,6 +747,55 @@ export default function AdminAccounts() {
                               defaultValue={fetchDate(selectedUser.birthday)}
                               name="birthday"
                             />
+                          </div>
+                          <div className="mb-3">
+                            <label htmlFor="region" className="label">
+                              Region
+                            </label>
+                            <br />
+                            <select
+                              id="region"
+                              name="region"
+                              defaultValue={selectedUser.region}
+                            >
+                              <option value="Ilocos Region">
+                                Ilocos Region
+                              </option>
+                              <option value="Cagayan Valley">
+                                Cagayan Valley
+                              </option>
+                              <option value="Central Luzon">
+                                Central Luzon
+                              </option>
+                              <option value="CALABARZON">CALABARZON</option>
+                              <option value="MIMAROPA">MIMAROPA</option>
+                              <option value="Bicol Region">Bicol Region</option>
+                              <option value="Western Visayas">
+                                Western Visayas
+                              </option>
+                              <option value="Central Visayas">
+                                Central Visayas
+                              </option>
+                              <option value="Eastern Visayas">
+                                Eastern Visayas
+                              </option>
+                              <option value="Zamboanga Peninsula">
+                                Zamboanga Peninsula
+                              </option>
+                              <option value="Northern Mindanao">
+                                Northern Mindanao
+                              </option>
+                              <option value="Davao Region">Davao Region</option>
+                              <option value="SOCCSKSARGEN">SOCCSKSARGEN</option>
+                              <option value="Caraga">Caraga</option>
+                              <option value="BARMM">BARMM</option>
+                              <option value="National Capital Region">
+                                National Capital Region
+                              </option>
+                              <option value="Cordillera Administrative Region">
+                                Cordillera Administrative Region
+                              </option>
+                            </select>
                           </div>
                           <div className="mb-3">
                             <label htmlFor="civil_status" className="label">
@@ -1090,7 +1170,6 @@ export default function AdminAccounts() {
                   }
                 </li>
               </ul>
-              
             </div>
 
             <div className="row">

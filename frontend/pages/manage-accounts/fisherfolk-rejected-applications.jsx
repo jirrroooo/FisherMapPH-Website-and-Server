@@ -480,6 +480,10 @@ export default function FisherfolkRejectedApplications() {
                             <td>{selectedUser.address}</td>
                           </tr>
                           <tr>
+                            <td className="fw-bold">Region:</td>
+                            <td>{selectedUser.region}</td>
+                          </tr>
+                          <tr>
                             <td className="fw-bold">Birthday:</td>
                             <td>
                               <FormattedDate date={selectedUser.birthday} />

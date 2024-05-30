@@ -557,6 +557,10 @@ export default function Map({ markerData, selectedData, data, filter }) {
                     <th>Address:</th>
                     <td>{marker.user.address}</td>
                   </tr>
+                  <tr>
+                    <th>Region:</th>
+                    <td>{marker.user.region}</td>
+                  </tr>
                 </table>
 
                 <hr />

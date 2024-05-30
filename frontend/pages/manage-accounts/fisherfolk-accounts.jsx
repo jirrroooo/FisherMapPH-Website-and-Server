@@ -143,8 +143,10 @@ export default function FisherfolkAccount() {
         email_address: document.getElementById("email_address").value,
         contact_number: document.getElementById("contact_number").value,
         address: document.getElementById("address").value,
+        region: document.getElementById("region").value,
         birthday: document.getElementById("birthday").value,
         civil_status: document.getElementById("civil_status").value,
+        region: document.getElementById("region").value,
         user_type: "user",
         fishing_vessel_type: document.getElementById("fishing_vessel_type")
           .value,
@@ -547,6 +549,13 @@ export default function FisherfolkAccount() {
                             </td>
                           </tr>
                           <tr>
+                            <td className="fw-bold">Region:</td>
+                            <td>
+                              {selectedUser.region}
+                            </td>
+                          </tr>
+
+                          <tr>
                             <td className="fw-bold">Civil Status:</td>
                             {selectedUser.civil_status == "single" ? (
                               <td>Single</td>
@@ -683,6 +692,55 @@ export default function FisherfolkAccount() {
                               defaultValue={fetchDate(selectedUser.birthday)}
                               name="birthday"
                             />
+                          </div>
+                          <div className="mb-3">
+                            <label htmlFor="region" className="label">
+                              Region
+                            </label>
+                            <br />
+                            <select
+                              id="region"
+                              name="region"
+                              defaultValue={selectedUser.region}
+                            >
+                              <option value="Ilocos Region">
+                                Ilocos Region
+                              </option>
+                              <option value="Cagayan Valley">
+                                Cagayan Valley
+                              </option>
+                              <option value="Central Luzon">
+                                Central Luzon
+                              </option>
+                              <option value="CALABARZON">CALABARZON</option>
+                              <option value="MIMAROPA">MIMAROPA</option>
+                              <option value="Bicol Region">Bicol Region</option>
+                              <option value="Western Visayas">
+                                Western Visayas
+                              </option>
+                              <option value="Central Visayas">
+                                Central Visayas
+                              </option>
+                              <option value="Eastern Visayas">
+                                Eastern Visayas
+                              </option>
+                              <option value="Zamboanga Peninsula">
+                                Zamboanga Peninsula
+                              </option>
+                              <option value="Northern Mindanao">
+                                Northern Mindanao
+                              </option>
+                              <option value="Davao Region">Davao Region</option>
+                              <option value="SOCCSKSARGEN">SOCCSKSARGEN</option>
+                              <option value="Caraga">Caraga</option>
+                              <option value="BARMM">BARMM</option>
+                              <option value="National Capital Region">
+                                National Capital Region
+                              </option>
+                              <option value="Cordillera Administrative Region">
+                                Cordillera Administrative Region
+                              </option>
+                            </select>
                           </div>
                           <div className="mb-3">
                             <label htmlFor="civil_status" className="label">

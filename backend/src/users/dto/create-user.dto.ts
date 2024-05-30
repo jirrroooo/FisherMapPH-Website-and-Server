@@ -32,6 +32,10 @@ export class CreateUserDto {
     @IsString()
     address: string;
 
+    @IsNotEmpty()
+    @IsString()
+    region: string;
+
     @IsDate()
     @Type(() => Date)
     birthday: Date;
