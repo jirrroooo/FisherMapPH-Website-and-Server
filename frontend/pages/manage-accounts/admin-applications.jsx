@@ -286,10 +286,9 @@ export default function AdminApplications() {
           <div className="container mt-4 text-center">
             <h2>Administrator Account Applications</h2>
             <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eaque
-              iusto ipsam maxime nostrum commodi dolorum quisquam ex nam
-              repudiandae tenetur quia, minima vero odio totam at sint
-              assumenda, excepturi consequatur.
+              The list of administrator account applications for your approval is shown below. Remember to verify the information
+              provided in the application. Note that you can always reverse the approval or disapproval in the dedicated pages
+              for administrator accounts.
             </p>
 
             <form className="my-4">

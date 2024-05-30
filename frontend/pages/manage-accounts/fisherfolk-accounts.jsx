@@ -293,10 +293,9 @@ export default function FisherfolkAccount() {
           <div className="container mt-4 text-center">
             <h2>Fisherfolk Accounts</h2>
             <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eaque
-              iusto ipsam maxime nostrum commodi dolorum quisquam ex nam
-              repudiandae tenetur quia, minima vero odio totam at sint
-              assumenda, excepturi consequatur.
+              The list of verified fisherfolk accounts is shown below. Make sure to send them a notification whenever
+               they need to update their information. Noted that creating a user account will not automatically make 
+               the account verified.
             </p>
 
             <form className="my-4">

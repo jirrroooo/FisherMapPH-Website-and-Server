@@ -11,6 +11,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { ContactModule } from './contact/contact.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { BoundariesModule } from './boundaries/boundaries.module';
+import { EmergencyContactsModule } from './emergency-contacts/emergency-contacts.module';
 
 
 @Module({
@@ -24,7 +26,9 @@ import { NotificationsModule } from './notifications/notifications.module';
   MongooseModule.forRoot(process.env.DB_URI),
   AuthModule,
   ContactModule,
-  NotificationsModule],
+  NotificationsModule,
+  BoundariesModule,
+  EmergencyContactsModule],
   controllers: [AppController],
   providers: [AppService],
 })

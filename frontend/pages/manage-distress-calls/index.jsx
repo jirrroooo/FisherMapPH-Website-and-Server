@@ -422,10 +422,7 @@ export default function ManageDistressCalls() {
           <div className="container mt-4 text-center">
             <h2>Manage Distress Call Logs</h2>
             <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eaque
-              iusto ipsam maxime nostrum commodi dolorum quisquam ex nam
-              repudiandae tenetur quia, minima vero odio totam at sint
-              assumenda, excepturi consequatur.
+              The list of distress call logs is shown below. Remember to send the data to concerned authorities as soon as possible.
             </p>
 
             <form className="my-4">

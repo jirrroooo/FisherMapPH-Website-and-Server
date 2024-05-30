@@ -13,6 +13,7 @@ import { MapContainer, TileLayer } from "react-leaflet";
 import { LatLng } from "leaflet";
 import Map from "../../components/map/map";
 import MapHome from "../../components/map_home";
+import Sidebar from "../../components/side-navigation";
 
 export default function Homepage() {
   const router = useRouter();

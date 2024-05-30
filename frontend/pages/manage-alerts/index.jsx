@@ -352,10 +352,8 @@ export default function ManageAlerts() {
           <div className="container mt-4 text-center">
             <h2>Manage Alerts</h2>
             <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eaque
-              iusto ipsam maxime nostrum commodi dolorum quisquam ex nam
-              repudiandae tenetur quia, minima vero odio totam at sint
-              assumenda, excepturi consequatur.
+              The list of alerts is shown below. You can view, configure, and delete an alert.
+              Alerts can also be edited in the map feature of the website.
             </p>
 
             <form className="my-4">
@@ -658,14 +656,6 @@ export default function ManageAlerts() {
                             <td>{selectedUser.isSpecific}</td>
                           </tr>
                           <tr>
-                            <td className="fw-bold">Target Users:</td>
-                            <td>Feature to be followed</td>
-                          </tr>
-                          <tr>
-                            <td className="fw-bold">Notified Users:</td>
-                            <td>Feature to be followed</td>
-                          </tr>
-                          <tr>
                             <td className="fw-bold">Effectivity Date:</td>
                             <td>
                               <FormattedDate date={selectedUser.effective} />
@@ -822,35 +812,7 @@ export default function ManageAlerts() {
                               </div>
                             </div>
                             <br />
-                          </div>
-
-                          <div className="mb-3 mt-3">
-                            <label htmlFor="" className="label">
-                              Specified Users
-                            </label>
-                            <input
-                              type="text"
-                              id="c_specified_users"
-                              className="form-control"
-                              placeholder="Specified User - Feature Not Working"
-                              name="c_specified_users"
-                              readOnly
-                            />
-                          </div>
-
-                          <div className="mb-3 mt-3">
-                            <label htmlFor="c_notified_users" className="label">
-                              Notified Users
-                            </label>
-                            <input
-                              type="text"
-                              id="c_notified_users"
-                              className="form-control"
-                              placeholder="Notified User - Feature Not Working"
-                              name="c_notified_users"
-                              readOnly
-                            />
-                          </div>
+                          </div>                        
 
                           <div className="mb-3">
                             <label htmlFor="c_effective" className="label">
@@ -1147,34 +1109,6 @@ export default function ManageAlerts() {
                             )}
 
                             <br />
-                          </div>
-
-                          <div className="mb-3 mt-3">
-                            <label htmlFor="" className="label">
-                              Specified Users
-                            </label>
-                            <input
-                              type="text"
-                              id="specified_users"
-                              className="form-control"
-                              placeholder="Specified User - Feature Not Working"
-                              name="specified_users"
-                              readOnly
-                            />
-                          </div>
-
-                          <div className="mb-3 mt-3">
-                            <label htmlFor="notified_users" className="label">
-                              Notified Users
-                            </label>
-                            <input
-                              type="text"
-                              id="notified_users"
-                              className="form-control"
-                              placeholder="Notified User - Feature Not Working"
-                              name="notified_users"
-                              readOnly
-                            />
                           </div>
 
                           <div className="mb-3">

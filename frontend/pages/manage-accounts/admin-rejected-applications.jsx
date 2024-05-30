@@ -262,10 +262,8 @@ export default function AdminRejectedApplications() {
           <div className="container mt-4 text-center">
             <h2>Rejected Administrator Account Applications</h2>
             <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eaque
-              iusto ipsam maxime nostrum commodi dolorum quisquam ex nam
-              repudiandae tenetur quia, minima vero odio totam at sint
-              assumenda, excepturi consequatur.
+            The list of disapproved applications is shown below. Remember to recheck the information submitted and email
+            the user for any discrepancies you find in applicant's information.
             </p>
 
             <form className="my-4">

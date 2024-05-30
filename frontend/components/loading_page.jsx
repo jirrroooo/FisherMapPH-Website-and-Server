@@ -14,5 +14,5 @@ export default function LoadingPage() {
       FisherMap Loading...
     </h3>
   </div>
-  )
+  );
 }

@@ -1,0 +1,50 @@
+@import "../app/globals.css";
+
+.sidebar {
+    height: 100%;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    background-color: #2F3340;
+    transition: 0.3s;
+    padding-top: 20px;
+    z-index: 1000;
+  }
+  
+  .sidebar.open {
+    left: 0;
+    margin: 0px;
+  }
+  
+  .sidebar .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    margin: 0px;
+    padding: 0px;
+  }
+  
+  .sidebar-nav {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .link {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none !important;
+    font-size: 14px;
+    color: white;
+    display: block;
+    transition: 0.3s;
+  }
+  
+  .link:hover {
+    font-weight: 700;
+    color: #F0CD92;
+  }
+
+  .horizontal-line{
+    border: white solid 2px;
+  }
+  

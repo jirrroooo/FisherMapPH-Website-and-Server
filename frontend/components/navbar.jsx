@@ -4,10 +4,14 @@ import Link from "next/link";
 import { useLoginStore } from "../store/loginStore";
 import { useApiStore } from "../store/apiStore";
 import { useUserDataStore } from "../store/userDataStore";
+import Image from "next/image";
+import Sidebar from "./side-navigation";
+import "./style.css";
 
 export default function Navbar() {
   const [userType, setUserType] = useState();
   const [isVerified, setIsVerified] = useState();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -92,40 +96,45 @@ export default function Navbar() {
 
   }
 
-  return (
-    <nav className="navbar navbar-expand-sm bg-dark navbar-dark" style={{width:"100%"}}>
-      <div className="container-fluid">
-      <Link className="text-decoration-none text-white" href="/homepage">
-          {router.pathname != "/login" && router.pathname != "/signup" ?
-            <h4>FisherMap PH</h4> : <h4 className="text-dark">FisherMap PH</h4>}
-        </Link>
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
-        {router.pathname != "/login" && router.pathname != "/signup" && (
+
+  return (
+    <>
+    <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar}  userType={userType}/>
+     <nav className="navbar navbar-expand-sm bg-dark navbar-dark" style={{width:"100%"}}>
+      <div className="container-fluid d-flex justify-content-between align-items-center">
+        <div className="d-flex align-items-center">
+
+          {
+            router.pathname !== "/login" && router.pathname !== "/signup" &&
+            <Image src="/images/sidenav-icon.png" width={15} height={15} alt="Sidebar Navigation" className="mb-1 mx-3" onClick={toggleSidebar} />
+          }
+
+          <Link className="text-decoration-none text-white ms-2" href="/homepage">
+            {router.pathname !== "/login" && router.pathname !== "/signup" ? (
+              <h4>FisherMap PH</h4>
+            ) : (
+              <h4 className="text-dark">FisherMap PH</h4>
+            )}
+          </Link>
+        </div>
+        {router.pathname !== "/login" && router.pathname !== "/signup" && (
           <ul className="navbar-nav">
             <li className="nav-item dropdown">
-              {(userType  == "superadmin") ? (
-                <a
-                  className="nav-link dropdown-toggle"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                >
-                  Super Administrator
-                </a>
-              ) : (userType  == "admin") ? (
-                <a
-                  className="nav-link dropdown-toggle"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                >
-                  Administrator
-                </a>
-              ) : <a 
-              className="nav-link dropdown-toggle"
-              role="button"
-              data-bs-toggle="dropdown"
-              >Menu</a>
-            }
-
+              <a
+                className="nav-link dropdown-toggle"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                {userType === "superadmin"
+                  ? "Super Administrator"
+                  : userType === "admin"
+                  ? "Administrator"
+                  : "Menu"}
+              </a>
               <ul className="dropdown-menu">
                 <li>
                   <a className="dropdown-item" id="profile" href="#">
@@ -140,7 +149,6 @@ export default function Navbar() {
                   >
                     Log Out
                   </a>
-                  {/* <Link className="text-decoration-none text-black px-3 " href="/signup">Log Out</Link> */}
                 </li>
               </ul>
             </li>
@@ -148,5 +156,8 @@ export default function Navbar() {
         )}
       </div>
     </nav>
+    </>
+    
+   
   );
 }

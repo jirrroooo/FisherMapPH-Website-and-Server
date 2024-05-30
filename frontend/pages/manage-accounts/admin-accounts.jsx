@@ -312,10 +312,9 @@ export default function AdminAccounts() {
           <div className="container mt-4 text-center">
             <h2>Administrator Accounts</h2>
             <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eaque
-              iusto ipsam maxime nostrum commodi dolorum quisquam ex nam
-              repudiandae tenetur quia, minima vero odio totam at sint
-              assumenda, excepturi consequatur.
+              The list of administrators is shown below. As the super administrator, you need to ensure that the administrators
+              are following the guidelines and protocols. You can suspend an administrator account if any of the policy
+              is not followed.
             </p>
 
             <form className="my-4">

@@ -8,7 +8,8 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
   imports: [
     AuthModule,
-    MongooseModule.forFeature([{name: 'Alert', schema: AlertSchema}])],
+    MongooseModule.forFeature([{name: 'Alert', schema: AlertSchema}])
+  ],
   controllers: [AlertsController],
   providers: [AlertsService],
 })

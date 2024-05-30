@@ -3,7 +3,6 @@ import Navbar from "../components/navbar";
 import "./style.css";
 import "../styles/custom.scss";
 import { useEffect, useState } from "react";
-import AdminCarousel from "../components/admin-carousel";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useLoginStore } from "../store/loginStore";

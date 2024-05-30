@@ -29,6 +29,7 @@ export default function ManageAccounts() {
             token: body.token,
           });
           getUserId(body.id);
+          router.push("/homepage");
         } else {
           setIsVerified(false);
           useLoginStore.setState({ isVerifiedCookie: false });
@@ -49,31 +50,9 @@ export default function ManageAccounts() {
           useLoginStore.setState({
             id: data.id,
           });
-          getData();
         }
       });
   }
 
-  function getData() {
-    fetch(`${useApiStore.getState().apiUrl}users/admin-rejected-users`, {
-      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
-    })
-      .then((response) => response.json())
-      .then((body) => {
-        setData(body);
-        setIsLoading(false);
-      });
-  }
-
-  return (
-    <>
-      {isVerified ? (
-        <>
-          <div>Hello World!</div>
-        </>
-      ) : (
-        <LoadingPage />
-      )}
-    </>
-  );
+  return <LoadingPage />;
 }
