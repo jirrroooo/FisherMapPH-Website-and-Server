@@ -24,6 +24,8 @@ export default function FisherfolkAccount() {
   const [page, setPage] = useState(1);
   const [searchBy, setSearchBy] = useState("Search by");
   const [sortBy, setSortBy] = useState("Sort by");
+  const [adminRegion, setAdminRegion] = useState(null);
+  const [userType, setUserType] = useState(null);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -58,13 +60,32 @@ export default function FisherfolkAccount() {
           useLoginStore.setState({
             id: data.id,
           });
-          getData();
+          getAdminRegionAndUserType(token);
         }
       });
   }
 
-  function getData() {
-    fetch(`${useApiStore.getState().apiUrl}users/fisherfolk-users`, {
+  async function getAdminRegionAndUserType(token) {
+    fetch(
+      `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          setAdminRegion(data.region);
+          setUserType(data.user_type);
+          getData(data.user_type, data.region);
+        }
+      });
+  }
+
+  function getData(type, reg) {
+    fetch(`${useApiStore.getState().apiUrl}users/fisherfolk-users?userType=${type}&adminRegion=${reg}`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
     })
       .then((response) => response.json())
@@ -81,7 +102,7 @@ export default function FisherfolkAccount() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }users/fisherfolk-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}`,
+        }users/fisherfolk-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}&userType=${userType}&adminRegion=${adminRegion}`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -98,7 +119,7 @@ export default function FisherfolkAccount() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }users/fisherfolk-users?searchBy=${searchBy}&search=${search}&page=${page}`,
+        }users/fisherfolk-users?searchBy=${searchBy}&search=${search}&page=${page}&userType=${userType}&adminRegion=${adminRegion}`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -140,11 +161,13 @@ export default function FisherfolkAccount() {
       body: JSON.stringify({
         first_name: document.getElementById("first_name").value,
         last_name: document.getElementById("last_name").value,
+        sex: document.getElementById("sex").value,
         email_address: document.getElementById("email_address").value,
         contact_number: document.getElementById("contact_number").value,
         address: document.getElementById("address").value,
         region: document.getElementById("region").value,
         birthday: document.getElementById("birthday").value,
+        region: document.getElementById("region").value,
         civil_status: document.getElementById("civil_status").value,
         region: document.getElementById("region").value,
         user_type: "user",
@@ -170,11 +193,13 @@ export default function FisherfolkAccount() {
       body: JSON.stringify({
         first_name: document.getElementById("c_first_name").value,
         last_name: document.getElementById("c_last_name").value,
+        sex: document.getElementById("c_sex").value,
         email_address: document.getElementById("c_email_address").value,
         contact_number: document.getElementById("c_contact_number").value,
         address: document.getElementById("c_address").value,
         birthday: document.getElementById("c_birthday").value,
         password: document.getElementById("c_password").value,
+        region: document.getElementById("c_region").value,
         civil_status: document.getElementById("c_civil_status").value,
         user_type: "user",
         fishing_vessel_type: document.getElementById("c_fishing_vessel_type")
@@ -215,7 +240,7 @@ export default function FisherfolkAccount() {
     fetch(
       `${
         useApiStore.getState().apiUrl
-      }users/fisherfolk-users?page=${pageNumber}`,
+      }users/fisherfolk-users?page=${pageNumber}&userType=${userType}&adminRegion=${adminRegion}`,
       {
         headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
       }
@@ -236,7 +261,7 @@ export default function FisherfolkAccount() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }users/fisherfolk-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        }users/fisherfolk-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}&userType=${userType}&adminRegion=${adminRegion}`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -253,7 +278,7 @@ export default function FisherfolkAccount() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }users/fisherfolk-users?searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        }users/fisherfolk-users?searchBy=${searchBy}&search=${search}&page=${pageNumber}&userType=${userType}&adminRegion=${adminRegion}`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -295,9 +320,10 @@ export default function FisherfolkAccount() {
           <div className="container mt-4 text-center">
             <h2>Fisherfolk Accounts</h2>
             <p>
-              The list of verified fisherfolk accounts is shown below. Make sure to send them a notification whenever
-               they need to update their information. Noted that creating a user account will not automatically make 
-               the account verified.
+              The list of verified fisherfolk accounts is shown below. Make sure
+              to send them a notification whenever they need to update their
+              information. Noted that creating a user account will not
+              automatically make the account verified.
             </p>
 
             <form className="my-4">
@@ -531,6 +557,12 @@ export default function FisherfolkAccount() {
                             </td>
                           </tr>
                           <tr>
+                            <td className="fw-bold">Sex:</td>
+                            <td>
+                              {selectedUser.sex[0].toUpperCase()}{selectedUser.sex.substring(1)}
+                            </td>
+                          </tr>
+                          <tr>
                             <td className="fw-bold">Email Address:</td>
                             <td>{selectedUser.email_address}</td>
                           </tr>
@@ -550,9 +582,7 @@ export default function FisherfolkAccount() {
                           </tr>
                           <tr>
                             <td className="fw-bold">Region:</td>
-                            <td>
-                              {selectedUser.region}
-                            </td>
+                            <td>{selectedUser.region}</td>
                           </tr>
 
                           <tr>
@@ -641,6 +671,24 @@ export default function FisherfolkAccount() {
                               name="first_name"
                             />
                           </div>
+                          <div className="mb-3">
+                            <label htmlFor="region" className="label">
+                              Sex Assigned at Birth:
+                            </label>
+                            <br />
+                            <select
+                              id="sex"
+                              name="sex"
+                              defaultValue={selectedUser.sex}
+                            >
+                              <option value="male">
+                                Male
+                              </option>
+                              <option value="female">
+                                Female
+                              </option>
+                              </select>
+                              </div>
                           <div className="mb-3 mt-3">
                             <label htmlFor="email_address" className="label">
                               Email Address:
@@ -955,6 +1003,23 @@ export default function FisherfolkAccount() {
                               name="c_first_name"
                             />
                           </div>
+                          <div className="mb-3">
+                            <label htmlFor="region" className="label">
+                              Sex Assigned at Birth:
+                            </label>
+                            <br />
+                            <select
+                              id="c_sex"
+                              name="c_sex"
+                            >
+                              <option value="male">
+                                Male
+                              </option>
+                              <option value="female">
+                                Female
+                              </option>
+                              </select>
+                              </div>
                           <div className="mb-3 mt-3">
                             <label htmlFor="c_email_address" className="label">
                               Email Address:
@@ -1013,6 +1078,54 @@ export default function FisherfolkAccount() {
                               placeholder="Password"
                               name="c_password"
                             />
+                          </div>
+                          <div className="mb-3">
+                            <label htmlFor="c_region" className="label">
+                              Region
+                            </label>
+                            <br />
+                            <select
+                              id="c_region"
+                              name="c_region"
+                            >
+                              <option value="Ilocos Region">
+                                Ilocos Region
+                              </option>
+                              <option value="Cagayan Valley">
+                                Cagayan Valley
+                              </option>
+                              <option value="Central Luzon">
+                                Central Luzon
+                              </option>
+                              <option value="CALABARZON">CALABARZON</option>
+                              <option value="MIMAROPA">MIMAROPA</option>
+                              <option value="Bicol Region">Bicol Region</option>
+                              <option value="Western Visayas">
+                                Western Visayas
+                              </option>
+                              <option value="Central Visayas">
+                                Central Visayas
+                              </option>
+                              <option value="Eastern Visayas">
+                                Eastern Visayas
+                              </option>
+                              <option value="Zamboanga Peninsula">
+                                Zamboanga Peninsula
+                              </option>
+                              <option value="Northern Mindanao">
+                                Northern Mindanao
+                              </option>
+                              <option value="Davao Region">Davao Region</option>
+                              <option value="SOCCSKSARGEN">SOCCSKSARGEN</option>
+                              <option value="Caraga">Caraga</option>
+                              <option value="BARMM">BARMM</option>
+                              <option value="National Capital Region">
+                                National Capital Region
+                              </option>
+                              <option value="Cordillera Administrative Region">
+                                Cordillera Administrative Region
+                              </option>
+                            </select>
                           </div>
                           <div className="mb-3">
                             <label htmlFor="c_civil_status" className="label">
@@ -1132,7 +1245,7 @@ export default function FisherfolkAccount() {
               </ul>
             </div>
 
-            <div className="row">
+            <div className="row mb-5">
               <div className="col-3"></div>
               <div className="col-3">
                 <button

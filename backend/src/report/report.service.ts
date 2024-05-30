@@ -29,14 +29,16 @@ export class ReportsService {
     private logModel: mongoose.Model<Log>,
   ) {}
 
-  async getTotalReports(){
+  async getTotalReports() {
     return (await this.reportModel.find()).length;
   }
 
   async newReport(report: Report): Promise<Report> {
     const reportResponse = await this.reportModel.create(report);
 
-    const logResponse = await this.logModel.findOne({user_id: report.user_id});
+    const logResponse = await this.logModel.findOne({
+      user_id: report.user_id,
+    });
 
     var reportId = new mongoose.Types.ObjectId(reportResponse._id.toString());
 
@@ -50,10 +52,14 @@ export class ReportsService {
 
     logResponse.report_log = new_report_log;
 
-    const res = await this.logModel.findByIdAndUpdate(logResponse._id, logResponse, {
-      new: true,
-      runValidators: true,
-    });
+    const res = await this.logModel.findByIdAndUpdate(
+      logResponse._id,
+      logResponse,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
     return reportResponse;
   }
@@ -67,76 +73,96 @@ export class ReportsService {
     let userInfo = {};
     let positionInfo = {};
 
-
-    if (query.search) {
-      if (query.searchBy != 'status') {
-        if (query.sort) {
-          reports = await this.reportModel
-            .find(
-              query.searchBy == 'alert_type'
-                ? {
-                    type: new RegExp(`${query.search}`, 'i'),
-                  }
-                : {
-                    content: new RegExp(`${query.search}`, 'i'),
-                  },
-            )
-            .sort(
-              query.sort == 'alphabetical' && query.searchBy == 'alert_type'
-                ? { type: 1 }
-                : query.sort != 'alphabetical' && query.searchBy == 'alert_type'
-                ? { type: -1 }
-                : query.sort == 'alphabetical' && query.searchBy == 'message'
-                ? { type: 1 }
-                : { type: -1 },
-            )
-            .collation({ locale: 'en', caseLevel: true })
-            .limit(responsePerPage)
-            .skip(skip);            
-          
-        } else if (!query.sort) {
-          reports = await this.reportModel
-            .find(
-              query.searchBy == 'alert_type'
-                ? {
-                    type: new RegExp(`${query.search}`, 'i'),
-                  }
-                : {
-                    content: new RegExp(`${query.search}`, 'i'),
-                  },
-            )
-            .collation({ locale: 'en', caseLevel: true })
-            .limit(responsePerPage)
-            .skip(skip);
-
-        }
-      } else if (query.searchBy == 'status') {
-        if (query.sort) {
-          reports = await this.reportModel
-            .find({
-              status: new RegExp(`${query.search}`, 'i'),
-            })
-            .sort({ status: query.sort == 'alphabetical' ? 1 : -1 })
-            .collation({ locale: 'en', caseLevel: true })
-            .limit(responsePerPage)
-            .skip(skip);
-
-        }else if(!query.sort){
-          reports = await this.reportModel.find({
-            status: new RegExp(`${query.search}`, 'i'),
-          });
-  
-        }
+    if (query.search && query.status) {
+      if (query.sort) {
+        reports = await this.reportModel
+          .find(
+            query.searchBy == 'alert_type'
+              ? {
+                  type: new RegExp(`${query.search}`, 'i'),
+                  status: query.status
+                }
+              : {
+                  content: new RegExp(`${query.search}`, 'i'),
+                  status: query.status
+                },
+          )
+          .sort(
+            query.sort == 'alphabetical' && query.searchBy == 'alert_type'
+              ? { type: 1 }
+              : query.sort != 'alphabetical' && query.searchBy == 'alert_type'
+              ? { type: -1 }
+              : query.sort == 'alphabetical' && query.searchBy == 'message'
+              ? { type: 1 }
+              : { type: -1 },
+          )
+          .collation({ locale: 'en', caseLevel: true })
+          .limit(responsePerPage)
+          .skip(skip);
+      } else if (!query.sort) {
+        reports = await this.reportModel
+          .find(
+            query.searchBy == 'alert_type'
+              ? {
+                  type: new RegExp(`${query.search}`, 'i'),
+                  status: query.status
+                }
+              : {
+                  content: new RegExp(`${query.search}`, 'i'),
+                  status: query.status
+                },
+          )
+          .collation({ locale: 'en', caseLevel: true })
+          .limit(responsePerPage)
+          .skip(skip);
       }
-    } else if (!query.search && !query.map) {
-
+    } else if (query.search && !query.status) {
+      if (query.sort) {
+        reports = await this.reportModel
+          .find(
+            query.searchBy == 'alert_type'
+              ? {
+                  type: new RegExp(`${query.search}`, 'i'),
+                }
+              : {
+                  content: new RegExp(`${query.search}`, 'i'),
+                },
+          )
+          .sort(
+            query.sort == 'alphabetical' && query.searchBy == 'alert_type'
+              ? { type: 1 }
+              : query.sort != 'alphabetical' && query.searchBy == 'alert_type'
+              ? { type: -1 }
+              : query.sort == 'alphabetical' && query.searchBy == 'message'
+              ? { type: 1 }
+              : { type: -1 },
+          )
+          .collation({ locale: 'en', caseLevel: true })
+          .limit(responsePerPage)
+          .skip(skip);
+      } else if (!query.sort) {
+        reports = await this.reportModel
+          .find(
+            query.searchBy == 'alert_type'
+              ? {
+                  type: new RegExp(`${query.search}`, 'i'),
+                }
+              : {
+                  content: new RegExp(`${query.search}`, 'i'),
+                },
+          )
+          .collation({ locale: 'en', caseLevel: true })
+          .limit(responsePerPage)
+          .skip(skip);
+      }
+    } else if (!query.search && !query.map && !query.status) {
       reports = await this.reportModel
         .find()
         .sort({ createdAt: -1 })
         .limit(responsePerPage)
         .skip(skip);
-    }else if(query.map){
-      reports = await this.reportModel.find().sort({ createdAt: -1 })
+    } else if (query.map) {
+      reports = await this.reportModel.find().sort({ createdAt: -1 });
     }
 
     reports = await reports.reduce(
@@ -144,17 +170,13 @@ export class ReportsService {
         promise.then(async (result) =>
           result.concat({
             userInfo: await this.userModel.findOne(report.user_id),
-            positionInfo: await this.positionModel.findOne(
-              report.position_id,
-            ),
+            positionInfo: await this.positionModel.findOne(report.position_id),
             report: await { ...userInfo, ...positionInfo[0], ...report._doc },
           }),
         ),
       Promise.resolve([]),
     );
-
     return reports;
-    
   }
 
   async getUserReports(id: ObjectId) {
@@ -163,9 +185,11 @@ export class ReportsService {
     if (!isValidId) {
       throw new BadRequestException('Please enter valid ID.');
     }
-    
+
     let positionInfo = {};
-    var reports = await this.reportModel.find({user_id: id}).sort({ createdAt: -1 });
+    var reports = await this.reportModel
+      .find({ user_id: id })
+      .sort({ createdAt: -1 });
 
     if (!reports) {
       throw new NotFoundException('log Not Found!');
@@ -175,10 +199,8 @@ export class ReportsService {
       (promise: any, report: any) =>
         promise.then(async (result) =>
           result.concat({
-            positionInfo: await this.positionModel.findOne(
-              report.position_id,
-            ),
-            report: await {...positionInfo[0], ...report._doc },
+            positionInfo: await this.positionModel.findOne(report.position_id),
+            report: await { ...positionInfo[0], ...report._doc },
           }),
         ),
       Promise.resolve([]),

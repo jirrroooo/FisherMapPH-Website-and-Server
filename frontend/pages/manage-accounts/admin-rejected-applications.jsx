@@ -499,6 +499,12 @@ export default function AdminRejectedApplications() {
                             </td>
                           </tr>
                           <tr>
+                            <td className="fw-bold">Sex:</td>
+                            <td>
+                              {selectedUser.sex[0]}{selectedUser.sex.substring(1)}
+                            </td>
+                          </tr>
+                          <tr>
                             <td className="fw-bold">Email Address:</td>
                             <td>{selectedUser.email_address}</td>
                           </tr>
@@ -723,7 +729,7 @@ export default function AdminRejectedApplications() {
               </ul>
             </div>
 
-            <div className="row">
+            <div className="row mb-5">
               <div className="col-3"></div>
               <div className="col-3">
                 <Link

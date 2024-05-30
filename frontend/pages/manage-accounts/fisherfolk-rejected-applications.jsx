@@ -23,6 +23,8 @@ export default function FisherfolkRejectedApplications() {
   const [page, setPage] = useState(1);
   const [searchBy, setSearchBy] = useState("Search by");
   const [sortBy, setSortBy] = useState("Sort by");
+  const [adminRegion, setAdminRegion] = useState(null);
+  const [userType, setUserType] = useState(null);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -57,13 +59,32 @@ export default function FisherfolkRejectedApplications() {
           useLoginStore.setState({
             id: data.id,
           });
-          getData();
+          getAdminRegionAndUserType(token);
         }
       });
   }
 
-  function getData() {
-    fetch(`${useApiStore.getState().apiUrl}users/fisherfolk-rejected-users`, {
+  async function getAdminRegionAndUserType(token) {
+    fetch(
+      `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          setAdminRegion(data.region);
+          setUserType(data.user_type);
+          getData(data.user_type, data.region);
+        }
+      });
+  }
+
+  function getData(type, reg) {
+    fetch(`${useApiStore.getState().apiUrl}users/fisherfolk-rejected-users?userType=${type}&adminRegion=${reg}`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
     })
       .then((response) => response.json())
@@ -80,7 +101,7 @@ export default function FisherfolkRejectedApplications() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }users/fisherfolk-rejected-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}`,
+        }users/fisherfolk-rejected-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}&userType=${userType}&adminRegion=${adminRegion}`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -97,7 +118,7 @@ export default function FisherfolkRejectedApplications() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }users/fisherfolk-rejected-users?searchBy=${searchBy}&search=${search}&page=${page}`,
+        }users/fisherfolk-rejected-users?searchBy=${searchBy}&search=${search}&page=${page}&userType=${userType}&adminRegion=${adminRegion}`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -155,7 +176,7 @@ export default function FisherfolkRejectedApplications() {
     fetch(
       `${
         useApiStore.getState().apiUrl
-      }users/fisherfolk-rejected-users?page=${pageNumber}`,
+      }users/fisherfolk-rejected-users?page=${pageNumber}&userType=${userType}&adminRegion=${adminRegion}`,
       {
         headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
       }
@@ -176,7 +197,7 @@ export default function FisherfolkRejectedApplications() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }users/fisherfolk-rejected-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        }users/fisherfolk-rejected-users?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}&userType=${userType}&adminRegion=${adminRegion}`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -193,7 +214,7 @@ export default function FisherfolkRejectedApplications() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }users/fisherfolk-rejected-users?searchBy=${searchBy}&search=${search}&page=${pageNumber}`,
+        }users/fisherfolk-rejected-users?searchBy=${searchBy}&search=${search}&page=${pageNumber}&userType=${userType}&adminRegion=${adminRegion}`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -465,6 +486,12 @@ export default function FisherfolkRejectedApplications() {
                             <td className="fw-bold">Name:</td>
                             <td>
                               {selectedUser.first_name} {selectedUser.last_name}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="fw-bold">Sex:</td>
+                            <td>
+                              {selectedUser.sex[0].toUpperCase()}{selectedUser.sex.substring(1)}
                             </td>
                           </tr>
                           <tr>

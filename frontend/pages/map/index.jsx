@@ -7,6 +7,7 @@ import Navbar from "../../components/navbar";
 import Image from "next/image";
 import "./style.css";
 import LoadingPage from "../../components/loading_page";
+import { useUserDataStore } from "../../store/userDataStore";
 
 export default function FisherMap() {
   const router = useRouter();
@@ -31,6 +32,8 @@ export default function FisherMap() {
   const [search, setSearch] = useState("");
   const [markerData, setMarkerData] = useState();
   const [selectedData, setSelectedData] = useState(null);
+  const [adminRegion, setAdminRegion] = useState(null);
+  const [userType, setUserType] = useState(null);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -70,12 +73,31 @@ export default function FisherMap() {
           useLoginStore.setState({
             id: data.id,
           });
-          getData();
+          getAdminRegionAndUserType(token);
         }
       });
   }
 
-  async function getData() {
+  async function getAdminRegionAndUserType(token) {
+    fetch(
+      `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          setUserType(data.user_type);
+          setAdminRegion(data.region);
+          getData(data.user_type, data.region);
+        }
+      });
+  }
+
+  async function getData(type, reg) {
     let linkString = "";
 
     if (filter == "fisherfolk") {
@@ -86,22 +108,45 @@ export default function FisherMap() {
       linkString = "reports";
     }
 
-    await fetch(`${useApiStore.getState().apiUrl}${linkString}`, {
-      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
-    })
-      .then((response) => response.json())
-      .then((body) => {
-        setData(body);
-        getFisherfolkLogs();
-      });
+    if (filter == "fisherfolk") {
+      await fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }${linkString}?userType=${type}&adminRegion=${reg}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setData(body);
+          getFisherfolkLogs(type, reg);
+        });
+    } else {
+      await fetch(`${useApiStore.getState().apiUrl}${linkString}`, {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      })
+        .then((response) => response.json())
+        .then((body) => {
+          setData(body);
+          getFisherfolkLogs(type, reg);
+        });
+    }
   }
 
-  async function getFisherfolkLogs() {
-    await fetch(`${useApiStore.getState().apiUrl}logs/fisherfolkLogs`, {
-      headers: {
-        Authorization: `Bearer ${useLoginStore.getState().token}`,
-      },
-    })
+  async function getFisherfolkLogs(type, reg) {
+    await fetch(
+      `${
+        useApiStore.getState().apiUrl
+      }logs/fisherfolkLogs?userType=${type}&adminRegion=${reg}`,
+      {
+        headers: {
+          Authorization: `Bearer ${useLoginStore.getState().token}`,
+        },
+      }
+    )
       .then((response) => response.json())
       .then((body) => {
         if (body) {
@@ -122,15 +167,34 @@ export default function FisherMap() {
       linkString = "reports";
     }
 
-    await fetch(`${useApiStore.getState().apiUrl}${linkString}`, {
-      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
-    })
-      .then((response) => response.json())
-      .then((body) => {
-        setData(body);
-        setIsLoading(false);
-        setIsSearchInterfaceLoading(false);
-      });
+    if (x == "fisherfolk") {
+      await fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }${linkString}?userType=${userType}&adminRegion=${adminRegion}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setData(body);
+          setIsLoading(false);
+          setIsSearchInterfaceLoading(false);
+        });
+    } else {
+      await fetch(`${useApiStore.getState().apiUrl}${linkString}`, {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      })
+        .then((response) => response.json())
+        .then((body) => {
+          setData(body);
+          setIsLoading(false);
+          setIsSearchInterfaceLoading(false);
+        });
+    }
   }
 
   async function getSearchedData(input) {
@@ -139,7 +203,7 @@ export default function FisherMap() {
     let linkString = "";
 
     if (filter == "fisherfolk") {
-      linkString = "users/fisherfolk-users";
+      linkString = `users/fisherfolk-users`;
       setSearchBy("first_name");
     } else if (filter == "alerts") {
       linkString = "alerts";
@@ -153,7 +217,23 @@ export default function FisherMap() {
       setSearchBy("Search by");
     }
 
-    if (searchBy != "Search by") {
+    if (searchBy != "Search by" && filter == "fisherfolk") {
+      await fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }${linkString}?searchBy=${searchBy}&search=${input}&page=${page}&userType=${userType}&adminRegion=${adminRegion}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy != "Search by" && filter != "fisherfolk") {
       await fetch(
         `${
           useApiStore.getState().apiUrl
@@ -188,14 +268,37 @@ export default function FisherMap() {
     setPage(pageNumber);
     setIsLoading(true);
 
-    fetch(`${useApiStore.getState().apiUrl}${linkString}?page=${pageNumber}`, {
-      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
-    })
-      .then((response) => response.json())
-      .then((body) => {
-        setData(body);
-        setIsLoading(false);
-      });
+    if (filter == "fisherfolk") {
+      fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }${linkString}?page=${pageNumber}&userType=${userType}&adminRegion=${adminRegion}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setData(body);
+          setIsLoading(false);
+        });
+    } else {
+      fetch(
+        `${useApiStore.getState().apiUrl}${linkString}?page=${pageNumber}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setData(body);
+          setIsLoading(false);
+        });
+    }
   }
 
   async function getSearchedDataByPageNumber(pageNumber, input) {
@@ -216,7 +319,23 @@ export default function FisherMap() {
 
     setPage(pageNumber);
 
-    if (searchBy != "Search by") {
+    if (searchBy != "Search by" && filter == "fisherfolk") {
+      await fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }${linkString}?searchBy=${searchBy}&search=${input}&page=${pageNumber}&userType=${userType}&adminRegion=${adminRegion}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setData(body);
+          setIsLoading(false);
+        });
+    } else if (searchBy != "Search by" && filter != "fisherfolk") {
       await fetch(
         `${
           useApiStore.getState().apiUrl
@@ -239,7 +358,6 @@ export default function FisherMap() {
 
   async function handleDataChange(filter) {
     setIsSearchInterfaceLoading(true);
-
     setIsMapLoading(true);
     setSelectedData(null);
 
@@ -257,22 +375,40 @@ export default function FisherMap() {
   }
 
   async function getMapData(filter) {
+    console.log("type: " + userType + " reg: " + adminRegion);
     let linkString = "";
 
-    if (filter == "alerts") {
-      linkString = "alerts?map=true";
+    if (filter == "fisherfolk") {
+      await fetch(
+        `${
+          useApiStore.getState().apiUrl
+        }users/fisherfolk-users?userType=${userType}&adminRegion=${adminRegion}`,
+        {
+          headers: {
+            Authorization: `Bearer ${useLoginStore.getState().token}`,
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((body) => {
+          setMapData(body);
+          setIsLoading(false);
+        });
     } else {
-      linkString = "reports?map=true";
+      if (filter == "alerts") {
+        linkString = "alerts?map=true";
+      } else {
+        linkString = "reports?map=true";
+      }
+      await fetch(`${useApiStore.getState().apiUrl}${linkString}`, {
+        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+      })
+        .then((response) => response.json())
+        .then((body) => {
+          setMapData(body);
+          setIsLoading(false);
+        });
     }
-
-    await fetch(`${useApiStore.getState().apiUrl}${linkString}`, {
-      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
-    })
-      .then((response) => response.json())
-      .then((body) => {
-        setMapData(body);
-        setIsLoading(false);
-      });
   }
 
   function handleSearch() {
@@ -354,7 +490,7 @@ export default function FisherMap() {
             <div className="col-5 container mt-0 ">
               {!isSearchInterfaceLoading ? (
                 <>
-                  <form className="mt-4" onSubmit={handleSubmit}>
+                  {/* <form className="mt-4" onSubmit={handleSubmit}>
                     <div className="row mx-2">
                       <div className="col-10">
                         <input
@@ -458,7 +594,81 @@ export default function FisherMap() {
                         </button>
                       </div>
                     </div>
-                  </form>
+                  </form> */}
+
+                  <div className="row mx-2 my-2 mt-5">
+                    <div className="col-3 my-1">
+                      <p className="fw-bold">Options:</p>
+                    </div>
+
+                    <div
+                      className="col-3 d-flex btn p-0 my-1 text-center "
+                      onClick={() => {
+                        handleDataChange("fisherfolk");
+                      }}
+                    >
+                      <Image
+                        src="/images/fishing.png"
+                        width={20}
+                        height={20}
+                        alt=""
+                      />
+                      <p
+                        className={
+                          filter == "fisherfolk"
+                            ? "mx-2 p-0 text-center fw-bold"
+                            : "mx-2 p-0 text-center"
+                        }
+                      >
+                        Fisherfolk
+                      </p>
+                    </div>
+
+                    <div
+                      className="col-2 d-flex btn p-0 my-1 text-center"
+                      onClick={() => {
+                        handleDataChange("alerts");
+                      }}
+                    >
+                      <Image
+                        src="/images/alert-sign.png"
+                        width={20}
+                        height={20}
+                        alt=""
+                      />
+                      <p
+                        className={
+                          filter == "alerts"
+                            ? "mx-2 p-0 text-center fw-bold"
+                            : "mx-2 p-0 text-center"
+                        }
+                      >
+                        Alerts
+                      </p>
+                    </div>
+                    <div
+                      className="col-3 d-flex btn p-0 my-1 text-center mx-2"
+                      onClick={() => {
+                        handleDataChange("reports");
+                      }}
+                    >
+                      <Image
+                        src="/images/urgent.png"
+                        width={20}
+                        height={20}
+                        alt=""
+                      />
+                      <p
+                        className={
+                          filter == "reports"
+                            ? "mx-2 p-0 text-center fw-bold"
+                            : "mx-2 p-0 text-center"
+                        }
+                      >
+                        Reports
+                      </p>
+                    </div>
+                  </div>
 
                   <div className="card mt-3 p-2 mx-4">
                     <div className="row text-center my-1">

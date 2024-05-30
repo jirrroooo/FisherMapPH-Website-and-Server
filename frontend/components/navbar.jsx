@@ -10,6 +10,7 @@ import "./style.css";
 
 export default function Navbar() {
   const [userType, setUserType] = useState();
+  const [region, setRegion] = useState();
   const [isVerified, setIsVerified] = useState();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -35,7 +36,7 @@ export default function Navbar() {
     // Fetch User Data
   }, []);
 
-  function getUserId(token){
+  function getUserId(token) {
     fetch(`${useApiStore.getState().apiUrl}auth/profile/${token}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -44,14 +45,13 @@ export default function Navbar() {
       .then((response) => response.json())
       .then((data) => {
         useLoginStore.setState({
-          id: data.id
+          id: data.id,
         });
         getData();
       });
-
   }
 
-  function getData(){
+  function getData() {
     fetch(
       `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
       {
@@ -64,6 +64,7 @@ export default function Navbar() {
           const { password, ...user } = data;
           useUserDataStore.setState({ userData: user });
           setUserType(user.user_type);
+          setRegion(user.region);
         }
       });
   }
@@ -85,79 +86,72 @@ export default function Navbar() {
     })
       .then((response) => response.json())
       .then((body) => {
-
         if (body.status == "success") {
-          useLoginStore.setState({  isLoggedIn: false, isVerifiedCookie: false, token: "", id: ""})
+          useLoginStore.setState({
+            isLoggedIn: false,
+            isVerifiedCookie: false,
+            token: "",
+            id: "",
+          });
           router.push("/login");
         } else {
-          alert("Error Logging Out!")
+          alert("Error Logging Out!");
         }
       });
-
   }
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-
   return (
     <>
-    <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar}  userType={userType}/>
-     <nav className="navbar navbar-expand-sm bg-dark navbar-dark" style={{width:"100%"}}>
-      <div className="container-fluid d-flex justify-content-between align-items-center">
-        <div className="d-flex align-items-center">
-
-          {
-            router.pathname !== "/login" && router.pathname !== "/signup" &&
-            <Image src="/images/sidenav-icon.png" width={15} height={15} alt="Sidebar Navigation" className="mb-1 mx-3" onClick={toggleSidebar} />
-          }
-
-          <Link className="text-decoration-none text-white ms-2" href="/homepage">
-            {router.pathname !== "/login" && router.pathname !== "/signup" ? (
-              <h4>FisherMap PH</h4>
-            ) : (
-              <h4 className="text-dark">FisherMap PH</h4>
+      <Sidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        userType={userType}
+      />
+      <nav
+        className="navbar navbar-expand-sm bg-dark navbar-dark"
+        style={{ width: "100%" }}
+      >
+        <div className="container-fluid d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center">
+            {router.pathname !== "/login" && router.pathname !== "/signup" && (
+              <Image
+                src="/images/sidenav-icon.png"
+                width={15}
+                height={15}
+                alt="Sidebar Navigation"
+                className="mb-1 mx-3"
+                onClick={toggleSidebar}
+              />
             )}
-          </Link>
-        </div>
-        {router.pathname !== "/login" && router.pathname !== "/signup" && (
-          <ul className="navbar-nav">
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
+
+            <Link
+              className="text-decoration-none text-white ms-2"
+              href="/homepage"
+            >
+              {router.pathname !== "/login" && router.pathname !== "/signup" ? (
+                <h4>FisherMap PH</h4>
+              ) : (
+                <h4 className="text-dark">FisherMap PH</h4>
+              )}
+            </Link>
+          </div>
+          {router.pathname !== "/login" && router.pathname !== "/signup" && (
+            <div className="d-flex align-items-center">
+              <p className="mb-0 me-3 text-white">
                 {userType === "superadmin"
-                  ? "Super Administrator"
+                  ? "Super Administrator | " + region
                   : userType === "admin"
-                  ? "Administrator"
+                  ? "Administrator | " + region
                   : "Menu"}
-              </a>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" id="profile" href="#">
-                    Profile
-                  </a>
-                </li>
-                <li>
-                  <a
-                    id="logout"
-                    className="text-decoration-none text-black px-3"
-                    onClick={logOut}
-                  >
-                    Log Out
-                  </a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        )}
-      </div>
-    </nav>
+              </p>
+            </div>
+          )}
+        </div>
+      </nav>
     </>
-    
-   
   );
 }

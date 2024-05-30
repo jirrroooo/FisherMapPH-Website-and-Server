@@ -65,7 +65,9 @@ export class LogsService {
     return logs;
   }
 
-  async getFisherfolkLogs() {
+  async getFisherfolkLogs(query: Query) {
+    console.log("type: " + query.userType + " reg: " + query.adminRegion);
+    
     const logs = await this.logModel.find().sort({ createdAt: -1 });
 
     const serializedData = logs.map((doc) => JSON.stringify(doc));
@@ -75,27 +77,53 @@ export class LogsService {
     let position: any;
     let user: any;
 
-    for (const log of objectData) {
-      user = await this.userModel
-        .findOne({ _id: log.user_id })
-        .select('-password');
-
-      if (log.location_log != undefined) {
-        position = await this.positionModel.findOne({
-          _id: log.location_log[0],
-        });
+    if(query.userType == 'superadmin'){
+      for (const log of objectData) {
+        user = await this.userModel
+          .findOne({ _id: log.user_id })
+          .select('-password');
+  
+        if (log.location_log != undefined) {
+          position = await this.positionModel.findOne({
+            _id: log.location_log[0],
+          });
+        }
+  
+        if (
+          user &&
+          user.user_type == 'user' &&
+          user.isAuthenticated == true &&
+          position != null &&
+          position != undefined
+        ) {
+          fisherfolkLogs.push({ log: log, user: user, position: position });
+        }
       }
-
-      if (
-        user &&
-        user.user_type == 'user' &&
-        user.isAuthenticated == true &&
-        position != null &&
-        position != undefined
-      ) {
-        fisherfolkLogs.push({ log: log, user: user, position: position });
+    }else{
+      for (const log of objectData) {
+        user = await this.userModel
+          .findOne({ _id: log.user_id, region: query.adminRegion })
+          .select('-password');
+  
+        if (log.location_log != undefined) {
+          position = await this.positionModel.findOne({
+            _id: log.location_log[0],
+          });
+        }
+  
+        if (
+          user &&
+          user.user_type == 'user' &&
+          user.isAuthenticated == true &&
+          position != null &&
+          position != undefined
+        ) {
+          fisherfolkLogs.push({ log: log, user: user, position: position });
+        }
       }
     }
+    
+
     return fisherfolkLogs;
   }
 

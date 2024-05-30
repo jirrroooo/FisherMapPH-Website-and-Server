@@ -26,8 +26,8 @@ export class LogsController {
 
   @Get('fisherfolkLogs')
   @UseGuards(AuthGuard())
-  async getFisherfolkLogs() {
-    return this.logsService.getFisherfolkLogs();
+  async getFisherfolkLogs(@Query() query: ExpressQuery) {
+    return this.logsService.getFisherfolkLogs(query);
   }
 
   @Get('totalFisherfolkLogs')

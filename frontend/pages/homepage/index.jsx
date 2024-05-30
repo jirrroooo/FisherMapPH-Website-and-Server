@@ -27,6 +27,8 @@ export default function Homepage() {
   const [totalAlerts, setTotalAlerts] = useState(0);
   const [totalReports, setTotalReports] = useState(0);
   const [markerData, setMarkerData] = useState(0);
+  const [adminRegion, setAdminRegion] = useState(null);
+  const [userType, setUserType] = useState(null);
 
   useEffect(() => {
     import("bootstrap/dist/js/bootstrap");
@@ -62,7 +64,26 @@ export default function Homepage() {
           useLoginStore.setState({
             id: data.id,
           });
-          getStatistics();
+          getAdminRegionAndUserType(token);
+        }
+      });
+  }
+
+  async function getAdminRegionAndUserType(token) {
+    fetch(
+      `${useApiStore.getState().apiUrl}users/${useLoginStore.getState().id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          setAdminRegion(data.region);
+          setUserType(data.user_type);
+          getStatistics(data.user_type, data.region);
         }
       });
   }
@@ -85,10 +106,10 @@ export default function Homepage() {
       });
   }
 
-  async function getStatistics() {
+  async function getStatistics(type, reg) {
     // Total Fisherfolk Pending Users
     await fetch(
-      `${useApiStore.getState().apiUrl}users/total-fisherfolk-pending-users`,
+      `${useApiStore.getState().apiUrl}users/total-fisherfolk-pending-users?userType=${type}&adminRegion=${reg}`,
       {
         headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
       }
@@ -100,7 +121,7 @@ export default function Homepage() {
 
     // Total Fisherfolk Users
     await fetch(
-      `${useApiStore.getState().apiUrl}users/total-fisherfolk-users`,
+      `${useApiStore.getState().apiUrl}users/total-fisherfolk-users?userType=${type}&adminRegion=${reg}`,
       {
         headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
       }
@@ -140,11 +161,11 @@ export default function Homepage() {
         setTotalReports(data);
       });
 
-      getFisherfolkLogs();
+      getFisherfolkLogs(type, reg);
   }
 
-  async function getFisherfolkLogs() {
-    await fetch(`${useApiStore.getState().apiUrl}logs/fisherfolkLogs`, {
+  async function getFisherfolkLogs(type, reg) {
+    await fetch(`${useApiStore.getState().apiUrl}logs/fisherfolkLogs?userType=${type}&adminRegion=${reg}`, {
       headers: {
         Authorization: `Bearer ${useLoginStore.getState().token}`,
       },
@@ -153,7 +174,7 @@ export default function Homepage() {
       .then((body) => {
         if (body) {
           setMarkerData(body);
-          // getMapData(filter);
+          console.log("marker data ======> " + body);
         }
       });
 

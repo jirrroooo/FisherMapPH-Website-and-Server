@@ -22,16 +22,34 @@ export class UsersService {
     return res;
   }
 
-  async getTotalFisherfolkPendingUsers(){
-    return (await this.userModel.find({user_type: "user", isAuthenticated: false})).length;
+  async getTotalFisherfolkPendingUsers(query: Query) {
+    if(query.userType == "admin"){
+      return (
+        await this.userModel.find({ user_type: 'user', isAuthenticated: false, region: query.adminRegion })
+      ).length;
+    }
+
+    return (
+      await this.userModel.find({ user_type: 'user', isAuthenticated: false})
+    ).length;
   }
 
-  async getTotalFisherfolkUsers(){
-    return (await this.userModel.find({user_type: "user", isAuthenticated: true})).length;
+  async getTotalFisherfolkUsers(query: Query) {
+    if(query.userType == "admin"){
+      return (
+        await this.userModel.find({ user_type: 'user', isAuthenticated: true, region: query.adminRegion })
+      ).length;
+    }
+
+    return (
+      await this.userModel.find({ user_type: 'user', isAuthenticated: true })
+    ).length;
   }
 
-  async getTotalAdminPendingUsers(){
-    return (await this.userModel.find({user_type: "admin", isAuthenticated: false})).length;
+  async getTotalAdminPendingUsers() {
+    return (
+      await this.userModel.find({ user_type: 'admin', isAuthenticated: false })
+    ).length;
   }
 
   async getAdminUsers(query: Query): Promise<User[]> {
@@ -144,8 +162,6 @@ export class UsersService {
     return users;
   }
 
-
-
   async getAdminPendingUsers(query: Query): Promise<User[]> {
     const responsePerPage = 5;
     const currentPage = Number(query.page) || 1;
@@ -256,7 +272,6 @@ export class UsersService {
     return users;
   }
 
-
   async getAdminRejectedUsers(query: Query): Promise<User[]> {
     const responsePerPage = 5;
     const currentPage = Number(query.page) || 1;
@@ -271,12 +286,16 @@ export class UsersService {
                 ? {
                     first_name: new RegExp(`${query.search}`, 'i'),
                     isAuthenticated: false,
-                    user_type: { $in: ['admin-rejected', 'superadmin-rejected'] },
+                    user_type: {
+                      $in: ['admin-rejected', 'superadmin-rejected'],
+                    },
                   }
                 : {
                     last_name: new RegExp(`${query.search}`, 'i'),
                     isAuthenticated: false,
-                    user_type: { $in: ['admin-rejected', 'superadmin-rejected'] },
+                    user_type: {
+                      $in: ['admin-rejected', 'superadmin-rejected'],
+                    },
                   },
             )
             .sort(
@@ -367,13 +386,15 @@ export class UsersService {
     return users;
   }
 
-
   async getFisherfolkUsers(query: Query): Promise<User[]> {
+    console.log("type: " + query.userType + " reg: " + query.adminRegion);
+    
+
     const responsePerPage = 5;
     const currentPage = Number(query.page) || 1;
     const skip = responsePerPage * (currentPage - 1);
 
-    if (query.search) {
+    if (query.search && query.userType == 'superadmin') {
       if (query.searchBy != 'email') {
         if (query.sort) {
           const alphabetical = this.userModel
@@ -444,7 +465,7 @@ export class UsersService {
         const searchByEmail = await this.userModel.find({
           email_address: new RegExp(`${query.email}`, 'i'),
           isAuthenticated: true,
-          user_type:'user',
+          user_type: 'user',
         });
         return searchByEmail;
       }
@@ -464,6 +485,119 @@ export class UsersService {
       );
 
       return searchByName;
+    } else if (query.search && query.userType == 'admin') {
+      if (query.searchBy != 'email') {
+        if (query.sort) {
+          const alphabetical = this.userModel
+            .find(
+              query.searchBy == 'first_name'
+                ? {
+                    first_name: new RegExp(`${query.search}`, 'i'),
+                    isAuthenticated: true,
+                    user_type: 'user',
+                    region: query.adminRegion,
+                  }
+                : {
+                    last_name: new RegExp(`${query.search}`, 'i'),
+                    isAuthenticated: true,
+                    user_type: 'user',
+                    region: query.adminRegion,
+                  },
+            )
+            .sort(
+              query.sort == 'alphabetical' && query.searchBy == 'first_name'
+                ? { first_name: 1 }
+                : query.sort != 'alphabetical' && query.searchBy == 'first_name'
+                ? { first_name: -1 }
+                : query.sort == 'alphabetical' && query.searchBy == 'last_name'
+                ? { last_name: 1 }
+                : { last_name: -1 },
+            )
+            .collation({ locale: 'en', caseLevel: true })
+            .limit(responsePerPage)
+            .skip(skip);
+
+          return alphabetical;
+        }
+
+        const alphabetical = this.userModel
+          .find(
+            query.searchBy == 'first_name'
+              ? {
+                  first_name: new RegExp(`${query.search}`, 'i'),
+                  isAuthenticated: true,
+                  user_type: 'user',
+                  region: query.adminRegion,
+                }
+              : {
+                  last_name: new RegExp(`${query.search}`, 'i'),
+                  isAuthenticated: true,
+                  user_type: 'user',
+                  region: query.adminRegion,
+                },
+          )
+          .collation({ locale: 'en', caseLevel: true })
+          .limit(responsePerPage)
+          .skip(skip);
+
+        return alphabetical;
+      } else if (query.searchBy == 'email') {
+        if (query.sort) {
+          const alphabetical = this.userModel
+            .find({
+              email_address: new RegExp(`${query.search}`, 'i'),
+              isAuthenticated: true,
+              user_type: 'user',
+              region: query.adminRegion,
+            })
+            .sort({ email_address: query.sort == 'alphabetical' ? 1 : -1 })
+            .collation({ locale: 'en', caseLevel: true })
+            .limit(responsePerPage)
+            .skip(skip);
+
+          return alphabetical;
+        }
+
+        const searchByEmail = await this.userModel.find({
+          email_address: new RegExp(`${query.email}`, 'i'),
+          isAuthenticated: true,
+          user_type: 'user',
+          region: query.adminRegion,
+        });
+        return searchByEmail;
+      }
+
+      const searchByName = await this.userModel.find(
+        query.searchBy == 'first_name'
+          ? {
+              first_name: new RegExp(`${query.search}`, 'i'),
+              isAuthenticated: true,
+              user_type: 'user',
+              region: query.adminRegion,
+            }
+          : {
+              last_name: new RegExp(`${query.search}`, 'i'),
+              isAuthenticated: true,
+              user_type: 'user',
+              region: query.adminRegion,
+            },
+      );
+
+      return searchByName;
+    }
+
+    if (query.userType == 'admin') {
+      const users = await this.userModel
+        .find({
+          isAuthenticated: true,
+          user_type: 'user',
+          region: query.adminRegion,
+        })
+        .sort({ createdAt: -1 })
+        .limit(responsePerPage)
+        .skip(skip);
+
+      return users;
     }
 
     const users = await this.userModel
@@ -478,13 +612,12 @@ export class UsersService {
     return users;
   }
 
-
   async getFisherfolkPendingUsers(query: Query): Promise<User[]> {
     const responsePerPage = 5;
     const currentPage = Number(query.page) || 1;
     const skip = responsePerPage * (currentPage - 1);
 
-    if (query.search) {
+    if (query.search && query.userType == 'superadmin') {
       if (query.searchBy != 'email') {
         if (query.sort) {
           const alphabetical = this.userModel
@@ -555,7 +688,7 @@ export class UsersService {
         const searchByEmail = await this.userModel.find({
           email_address: new RegExp(`${query.email}`, 'i'),
           isAuthenticated: false,
-          user_type:'user',
+          user_type: 'user',
         });
         return searchByEmail;
       }
@@ -575,6 +708,101 @@ export class UsersService {
       );
 
       return searchByName;
+    } else if (query.search && query.userType == 'admin') {
+      if (query.searchBy != 'email') {
+        if (query.sort) {
+          const alphabetical = this.userModel
+            .find(
+              query.searchBy == 'first_name'
+                ? {
+                    first_name: new RegExp(`${query.search}`, 'i'),
+                    isAuthenticated: false,
+                    user_type: 'user',
+                    region: query.adminRegion,
+                  }
+                : {
+                    last_name: new RegExp(`${query.search}`, 'i'),
+                    isAuthenticated: false,
+                    user_type: 'user',
+                    region: query.adminRegion,
+                  },
+            )
+            .sort(
+              query.sort == 'alphabetical' && query.searchBy == 'first_name'
+                ? { first_name: 1 }
+                : query.sort != 'alphabetical' && query.searchBy == 'first_name'
+                ? { first_name: -1 }
+                : query.sort == 'alphabetical' && query.searchBy == 'last_name'
+                ? { last_name: 1 }
+                : { last_name: -1 },
+            )
+            .collation({ locale: 'en', caseLevel: true })
+            .limit(responsePerPage)
+            .skip(skip);
+
+          return alphabetical;
+        }
+
+        const alphabetical = this.userModel
+          .find(
+            query.searchBy == 'first_name'
+              ? {
+                  first_name: new RegExp(`${query.search}`, 'i'),
+                  isAuthenticated: false,
+                  user_type: 'user',
+                  region: query.adminRegion,
+                }
+              : {
+                  last_name: new RegExp(`${query.search}`, 'i'),
+                  isAuthenticated: false,
+                  user_type: 'user',
+                  region: query.adminRegion,
+                },
+          )
+          .collation({ locale: 'en', caseLevel: true })
+          .limit(responsePerPage)
+          .skip(skip);
+
+        return alphabetical;
+      } else if (query.searchBy == 'email') {
+        if (query.sort) {
+          const alphabetical = this.userModel
+            .find({
+              email_address: new RegExp(`${query.search}`, 'i'),
+              isAuthenticated: false,
+              user_type: 'user',
+              region: query.adminRegion,
+            })
+            .sort({ email_address: query.sort == 'alphabetical' ? 1 : -1 })
+            .collation({ locale: 'en', caseLevel: true })
+            .limit(responsePerPage)
+            .skip(skip);
+
+          return alphabetical;
+        }
+
+        const searchByEmail = await this.userModel.find({
+          email_address: new RegExp(`${query.email}`, 'i'),
+          isAuthenticated: false,
+          user_type: 'user',
+          region: query.adminRegion,
+        });
+        return searchByEmail;
+      }
+    }
+
+    if (query.userType == 'admin') {
+      const users = await this.userModel
+        .find({
+          isAuthenticated: false,
+          user_type: 'user',
+          region: query.adminRegion,
+        })
+        .sort({ createdAt: -1 })
+        .limit(responsePerPage)
+        .skip(skip);
+
+      return users;
     }
 
     const users = await this.userModel
@@ -589,13 +817,12 @@ export class UsersService {
     return users;
   }
 
-
   async getFisherfolkRejectedUsers(query: Query): Promise<User[]> {
     const responsePerPage = 5;
     const currentPage = Number(query.page) || 1;
     const skip = responsePerPage * (currentPage - 1);
 
-    if (query.search) {
+    if (query.search && query.userType == 'superadmin') {
       if (query.searchBy != 'email') {
         if (query.sort) {
           const alphabetical = this.userModel
@@ -666,7 +893,7 @@ export class UsersService {
         const searchByEmail = await this.userModel.find({
           email_address: new RegExp(`${query.email}`, 'i'),
           isAuthenticated: false,
-          user_type:'user-rejected',
+          user_type: 'user-rejected',
         });
         return searchByEmail;
       }
@@ -686,6 +913,119 @@ export class UsersService {
       );
 
       return searchByName;
+    } else if (query.search && query.userType == 'admin') {
+      if (query.searchBy != 'email') {
+        if (query.sort) {
+          const alphabetical = this.userModel
+            .find(
+              query.searchBy == 'first_name'
+                ? {
+                    first_name: new RegExp(`${query.search}`, 'i'),
+                    isAuthenticated: false,
+                    user_type: 'user-rejected',
+                    region: query.adminRegion
+                  }
+                : {
+                    last_name: new RegExp(`${query.search}`, 'i'),
+                    isAuthenticated: false,
+                    user_type: 'user-rejected',
+                    region: query.adminRegion
+                  },
+            )
+            .sort(
+              query.sort == 'alphabetical' && query.searchBy == 'first_name'
+                ? { first_name: 1 }
+                : query.sort != 'alphabetical' && query.searchBy == 'first_name'
+                ? { first_name: -1 }
+                : query.sort == 'alphabetical' && query.searchBy == 'last_name'
+                ? { last_name: 1 }
+                : { last_name: -1 },
+            )
+            .collation({ locale: 'en', caseLevel: true })
+            .limit(responsePerPage)
+            .skip(skip);
+
+          return alphabetical;
+        }
+
+        const alphabetical = this.userModel
+          .find(
+            query.searchBy == 'first_name'
+              ? {
+                  first_name: new RegExp(`${query.search}`, 'i'),
+                  isAuthenticated: false,
+                  user_type: 'user-rejected',
+                  region: query.adminRegion
+                }
+              : {
+                  last_name: new RegExp(`${query.search}`, 'i'),
+                  isAuthenticated: false,
+                  user_type: 'user-rejected',
+                  region: query.adminRegion
+                },
+          )
+          .collation({ locale: 'en', caseLevel: true })
+          .limit(responsePerPage)
+          .skip(skip);
+
+        return alphabetical;
+      } else if (query.searchBy == 'email') {
+        if (query.sort) {
+          const alphabetical = this.userModel
+            .find({
+              email_address: new RegExp(`${query.search}`, 'i'),
+              isAuthenticated: false,
+              user_type: 'user-rejected',
+              region: query.adminRegion
+            })
+            .sort({ email_address: query.sort == 'alphabetical' ? 1 : -1 })
+            .collation({ locale: 'en', caseLevel: true })
+            .limit(responsePerPage)
+            .skip(skip);
+
+          return alphabetical;
+        }
+
+        const searchByEmail = await this.userModel.find({
+          email_address: new RegExp(`${query.email}`, 'i'),
+          isAuthenticated: false,
+          user_type: 'user-rejected',
+          region: query.adminRegion
+        });
+        return searchByEmail;
+      }
+
+      const searchByName = await this.userModel.find(
+        query.searchBy == 'first_name'
+          ? {
+              first_name: new RegExp(`${query.search}`, 'i'),
+              isAuthenticated: false,
+              user_type: 'user-rejected',
+              region: query.adminRegion
+            }
+          : {
+              last_name: new RegExp(`${query.search}`, 'i'),
+              isAuthenticated: false,
+              user_type: 'user-rejected',
+              region: query.adminRegion
+            },
+      );
+
+      return searchByName;
+    }
+
+    if(query.userType == 'admin'){
+      const users = await this.userModel
+      .find({
+        isAuthenticated: false,
+        user_type: 'user-rejected',
+        region: query.adminRegion
+      })
+      .sort({ createdAt: -1 })
+      .limit(responsePerPage)
+      .skip(skip);
+
+    return users;
     }
 
     const users = await this.userModel
@@ -699,7 +1039,6 @@ export class UsersService {
 
     return users;
   }
-
 
   async getUser(id: ObjectId): Promise<User> {
     const isValidId = mongoose.isValidObjectId(id);
@@ -718,7 +1057,6 @@ export class UsersService {
 
     return user;
   }
-
 
   // async updateContact(id: ObjectId, contactObject: any): Promise<User> {
   //   const isValidId = mongoose.isValidObjectId(id);

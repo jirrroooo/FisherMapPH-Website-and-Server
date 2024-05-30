@@ -97,7 +97,7 @@ export default function ManageDistressCalls() {
   }
 
   function getData() {
-    fetch(`${useApiStore.getState().apiUrl}reports?status=no_response`, {
+    fetch(`${useApiStore.getState().apiUrl}reports?status=forwarded`, {
       headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
     })
       .then((response) => response.json())
@@ -115,7 +115,7 @@ export default function ManageDistressCalls() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }reports?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}&status=no_response`,
+        }reports?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${page}&status=forwarded`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -132,7 +132,7 @@ export default function ManageDistressCalls() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }reports?searchBy=${searchBy}&search=${search}&page=${page}&status=no_response`,
+        }reports?searchBy=${searchBy}&search=${search}&page=${page}&status=forwarded`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -344,14 +344,9 @@ export default function ManageDistressCalls() {
     setPage(pageNumber);
     setIsLoading(true);
 
-    fetch(
-      `${
-        useApiStore.getState().apiUrl
-      }reports?page=${pageNumber}&status=no_response`,
-      {
-        headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
-      }
-    )
+    fetch(`${useApiStore.getState().apiUrl}reports?page=${pageNumber}&status=forwarded`, {
+      headers: { Authorization: `Bearer ${useLoginStore.getState().token}` },
+    })
       .then((response) => response.json())
       .then((body) => {
         setData(body);
@@ -368,7 +363,7 @@ export default function ManageDistressCalls() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }reports?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}&status=no_response`,
+        }reports?sort=${sortBy}&searchBy=${searchBy}&search=${search}&page=${pageNumber}&status=forwarded`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -385,7 +380,7 @@ export default function ManageDistressCalls() {
       fetch(
         `${
           useApiStore.getState().apiUrl
-        }reports?searchBy=${searchBy}&search=${search}&page=${pageNumber}&status=no_response`,
+        }reports?searchBy=${searchBy}&search=${search}&page=${pageNumber}&status=forwarded`,
         {
           headers: {
             Authorization: `Bearer ${useLoginStore.getState().token}`,
@@ -425,10 +420,9 @@ export default function ManageDistressCalls() {
         <>
           <Navbar />
           <div className="container mt-4 text-center">
-            <h2>URGENT | Distress Call Logs</h2>
+            <h2>Forwarded | Distress Calls Logs</h2>
             <p>
-              The list of distress call logs is shown below. Remember to send
-              the data to concerned authorities as soon as possible.
+              The list of distress call logs is shown below. Remember to send the data to concerned authorities as soon as possible.
             </p>
 
             <form className="my-4">
@@ -1037,7 +1031,7 @@ export default function ManageDistressCalls() {
                 </>
               )}
 
-              <ul className="pagination m-auto mt-2">
+              <ul className="pagination m-auto mt-5">
                 <li className="page-item">
                   {page != 1 ? (
                     <button
@@ -1103,9 +1097,9 @@ export default function ManageDistressCalls() {
                   type="button"
                   className="btn btn-primary"
                   onClick={null}
-                  href="/manage-distress-calls/forwarded"
+                  href="/manage-distress-calls"
                 >
-                  View Forwarded Distress Calls
+                  View Urgent Distress Calls
                 </Link>
               </div>
 

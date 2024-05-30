@@ -82,8 +82,15 @@ export default function Map({ markerData, selectedData, data, filter }) {
   });
 
   const reportMarker = leaflet.icon({
-    iconUrl: "/images/alert-sign.png",
-    iconSize: [35, 33],
+    iconUrl: "/images/alert.png",
+    iconSize: [45, 43],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
+
+  const reportMarker2 = leaflet.icon({
+    iconUrl: "/images/alert.svg",
+    iconSize: [45, 43],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
   });
@@ -97,7 +104,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
 
 
   function centerLatLong() {
-    if (filter == "fisherfolk" && navigatedData !== null) {
+    if (filter == "fisherfolk" && navigatedData !== null && navigatedData !== undefined) {
       return [
         Number(navigatedData.position.latitude),
         Number(navigatedData.position.longitude),
@@ -321,7 +328,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
       locationList.push(str);
     });
 
-    const isSpecific = document.getElementById("yes").checked ? true : false;
+    // const isSpecific = document.getElementById("yes").checked ? true : false;
 
     fetch(`${useApiStore.getState().apiUrl}alerts/${selectedUser._id}`, {
       method: "PATCH",
@@ -334,7 +341,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
         description: document.getElementById("description").value,
         location: locationList,
         level: document.getElementById("level").value,
-        isSpecific: isSpecific,
+        // isSpecific: isSpecific,
         radius: parseFloat(document.getElementById("c_radius").value),
         // specified_user: document.getElementById("c_birthday").value,
         // notified_user: document.getElementById("c_password").value,
@@ -463,17 +470,6 @@ export default function Map({ markerData, selectedData, data, filter }) {
                         <FormattedDateTime date={alert.expires} />
                       </td>
                     </tr>
-                    {alert.isSpecific && (
-                      <tr>
-                        <th>Specified Target:</th>
-                        <td>Feature Not Working</td>
-                      </tr>
-                    )}
-
-                    <tr>
-                      <th>Notified Users:</th>
-                      <td>Feature Not Working</td>
-                    </tr>
                   </table>
                   <hr />
 
@@ -559,13 +555,13 @@ export default function Map({ markerData, selectedData, data, filter }) {
                   </tr>
                 </table>
 
-                <hr />
+                {/* <hr />
 
                 <div className="text-center py-2">
                   <button className="btn btn-danger text-white fw-bold">
                     Send Notification
                   </button>
-                </div>
+                </div> */}
               </div>
             </Popup>
           </Marker>
@@ -579,7 +575,7 @@ export default function Map({ markerData, selectedData, data, filter }) {
                 report.positionInfo.latitude,
                 report.positionInfo.longitude,
               ]}
-              icon={reportMarker}
+              icon={report.report.status == "no_response" ? reportMarker : reportMarker2}
             >
               <Popup>
                 <div>
@@ -1065,13 +1061,13 @@ export default function Map({ markerData, selectedData, data, filter }) {
                         );
                       })}
 
-                      <button
+                      {/* <button
                         onClick={addLatLongInput}
                         className="btn btn-secondary text-center mt-2"
                         onSubmit={null}
                       >
                         + Longitude Latitude Pair
-                      </button>
+                      </button> */}
                     </div>
                   </div>
 
@@ -1131,88 +1127,6 @@ export default function Map({ markerData, selectedData, data, filter }) {
                         <option value="high">High</option>
                       </select>
                     )}
-                  </div>
-
-                  <div className="mb-3 mt-3">
-                    <label for="specific_user">Specific User: </label>
-                    <br />
-                    {selectedUser.isSpecific ? (
-                      <>
-                        <div className="px-3">
-                          <div>
-                            <input
-                              type="radio"
-                              id="yes"
-                              name="specific_user"
-                              value="true"
-                              checked
-                            />{" "}
-                            Yes
-                          </div>
-                          <div>
-                            <input
-                              type="radio"
-                              id="no"
-                              name="specific_user"
-                              value="false"
-                            />{" "}
-                            No
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="px-3">
-                        <div>
-                          <input
-                            type="radio"
-                            id="yes"
-                            name="specific_user"
-                            value="true"
-                          />{" "}
-                          Yes
-                        </div>
-                        <div>
-                          <input
-                            type="radio"
-                            id="no"
-                            name="specific_user"
-                            value="false"
-                            checked
-                          />{" "}
-                          No
-                        </div>
-                      </div>
-                    )}
-
-                    <br />
-                  </div>
-
-                  <div className="mb-3 mt-3">
-                    <label htmlFor="" className="label">
-                      Specified Users
-                    </label>
-                    <input
-                      type="text"
-                      id="specified_users"
-                      className="form-control"
-                      placeholder="Specified User - Feature Not Working"
-                      name="specified_users"
-                      readOnly
-                    />
-                  </div>
-
-                  <div className="mb-3 mt-3">
-                    <label htmlFor="notified_users" className="label">
-                      Notified Users
-                    </label>
-                    <input
-                      type="text"
-                      id="notified_users"
-                      className="form-control"
-                      placeholder="Notified User - Feature Not Working"
-                      name="notified_users"
-                      readOnly
-                    />
                   </div>
 
                   <div className="mb-3">

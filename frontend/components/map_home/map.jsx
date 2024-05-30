@@ -97,7 +97,8 @@ export default function Map({ markerData, selectedData, data, filter }) {
 
 
   function centerLatLong() {
-    if (filter == "fisherfolk" && navigatedData !== null) {
+    if (filter == "fisherfolk" && navigatedData !== null && navigatedData !== undefined) {
+      console.log("navigated data ========> " + navigatedData);
       return [
         Number(navigatedData.position.latitude),
         Number(navigatedData.position.longitude),

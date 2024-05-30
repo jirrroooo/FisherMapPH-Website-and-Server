@@ -58,12 +58,6 @@ const Sidebar = ({ isOpen, toggleSidebar, userType }) => {
             <Link href="/manage-accounts/admin-applications" className="link">
               Manage Admin Account Applications
             </Link>
-            <Link
-              href="/manage-accounts/admin-rejected-applications"
-              className="link"
-            >
-              Manage Rejected Admin Accounts
-            </Link>
           </>
         )}
 
@@ -73,12 +67,13 @@ const Sidebar = ({ isOpen, toggleSidebar, userType }) => {
         <Link href="/manage-accounts/fisherfolk-applications" className="link">
           Manage Fisherfolk Account Applications
         </Link>
-        <Link
-          href="/manage-accounts/fisherfolk-rejected-applications"
-          className="link"
-        >
-          Manage Rejected Fisherfolk Accounts
+        <Link href="/manage-alerts" className="link">
+          Manage Alerts
         </Link>
+        <Link href="/manage-distress-calls" className="link">
+          Manage Distress Calls
+        </Link>
+
         <Link href="/map" className="link">
           View Sea Map
         </Link>

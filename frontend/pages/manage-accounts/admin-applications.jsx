@@ -581,6 +581,12 @@ export default function AdminApplications() {
                             </td>
                           </tr>
                           <tr>
+                            <td className="fw-bold">Sex:</td>
+                            <td>
+                              {selectedUser.sex[0].toUpperCase()}{selectedUser.sex.substring(1)}
+                            </td>
+                          </tr>
+                          <tr>
                             <td className="fw-bold">Email Address:</td>
                             <td>{selectedUser.email_address}</td>
                           </tr>
@@ -729,7 +735,7 @@ export default function AdminApplications() {
                   View Admin Accounts
                 </Link>
               </div>
-              <div className="col-3"></div>
+              <div className="col-2"></div>
             </div>
           </div>
         </>

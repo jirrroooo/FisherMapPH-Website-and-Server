@@ -85,14 +85,14 @@ export class UsersController {
 
   @Get('total-fisherfolk-users')
   @UseGuards(AuthGuard())
-  async getTotalFisherfolkUsers(){
-    return this.usersService.getTotalFisherfolkUsers();
+  async getTotalFisherfolkUsers(@Query() query: ExpressQuery,){
+    return this.usersService.getTotalFisherfolkUsers(query);
   }
 
   @Get('total-fisherfolk-pending-users')
   @UseGuards(AuthGuard())
-  async getTotalFisherfolkPendingUsers(){
-    return this.usersService.getTotalFisherfolkPendingUsers();
+  async getTotalFisherfolkPendingUsers(@Query() query: ExpressQuery,){
+    return this.usersService.getTotalFisherfolkPendingUsers(query);
   }
 
   @Get('total-admin-pending-users')
